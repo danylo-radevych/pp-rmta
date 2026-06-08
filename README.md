@@ -1,1 +1,1 @@
-Standalone pseudopotential (PP) rigid muffin-tin approximation (RMTA) implementation using Quantum ESPRESSO as a DFT engine
+Standalone pseudopotential (PP) rigid muffin-tin approximation (RMTA) implementation that can be compiled by linking to virtually any modern installation of Quantum ESPRESSO, which is used as a DFT engine
