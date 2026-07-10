@@ -12,3 +12,7 @@ all rmta :
 
 clean :
 	rm -vrf bin; (cd src; rm -vrf *.x *.o *.mod *.a *~; cd - || exit 1 )
+
+depend .depend :
+	if test -d src ; then \
+	( cd src ; $(MAKE) depend || exit 1 ) ; fi
