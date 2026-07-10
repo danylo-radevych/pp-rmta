@@ -1,4 +1,6 @@
-export QE_ROOT = $(HOME)/install/rmta-qe
+# export QE_ROOT = $(HOME)/install/rmta-qe
+
+include make.inc
 
 MAKE = make
 
@@ -9,4 +11,4 @@ all rmta :
 	( cd src ; $(MAKE) all || exit 1 ) ; fi
 
 clean :
-	rm -vrf bin; rm -vrf src/rmta.x src/*.o src/*.mod
+	rm -vrf bin; (cd src; rm -vrf *.x *.o *.mod *.a *~; cd - || exit 1 )

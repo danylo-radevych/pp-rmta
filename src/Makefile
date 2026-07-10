@@ -1,6 +1,7 @@
 # Makefile for rmta.x
 # QE_ROOT = $(HOME)/install/rmta-qe
 
+# include ../make.inc
 include $(QE_ROOT)/make.inc
 
 # location of needed modules and included files (if any)
@@ -45,6 +46,6 @@ rmta.x : rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS)
 
 clean :
 	- /bin/rm -f *.x *.o *.a *~ *.mod
-	- /bin/rm -f ../../../bin/rmta.x librmta.a
+	- /bin/rm -f ../bin/rmta.x librmta.a
 
 include make.depend

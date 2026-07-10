@@ -19,9 +19,9 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-In the `pprmta` root folder:
+In the `PPRMTA_ROOT` root folder:
 
-edit the `QE_ROOT` in the `Makefile` to link the desired QE installation, and run
+edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
 
 ```
 make all
