@@ -1,0 +1,11 @@
+muffin_tin.o : muffin_tin.f90 const.o hamann.o mh_eta.o part_dos.o mt_printing.o mt_var.o neighbor.o sym_type.o compare.o 
+mh_eta.o : mh_eta.f90 
+part_dos.o : part_dos.f90 
+hamann.o : hamann.f90 
+rmta_lschps_qe.o : rmta_lschps_qe.f90 
+compare.o : compare.f90 
+sym_type.o : sym_type.f90 
+mt_var.o : mt_var.f90 compare.o neighbor.o sym_type.o 
+neighbor.o : neighbor.f90 const.o 
+mt_printing.o : mt_printing.f90 const.o sym_type.o mt_var.o 
+const.o : const.f90 

@@ -52,6 +52,7 @@ clean :
 	- /bin/rm -f ../bin/rmta.x librmta.a
 
 depend .depend:
-	makedepf90 -free -I $(VPATH) $(SRC) > .depend
+	makedepf90 -free $(RMTASRC) > .depend
 
-include make.depend
+# include make.depend
+include .depend
