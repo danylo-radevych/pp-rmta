@@ -118,7 +118,7 @@
         DO irot = 1, nrot
           IF ((irt(irot, iat) > 0) .AND. (irt(irot, iat) /= iat) .AND. &
             (irt(irot, iat) <= nat)) THEN
-            WRITE(stdout, '(7x, "irt(", I2, ", ", I2, ") = ", I, ": ", A)') &
+            WRITE(stdout, '(7x, "irt(", I2, ", ", I2, ") = ", I0, ": ", A)') &
               irot, iat, irt(irot, iat), upf(ityp(irt(irot, iat)))%psd
             counter = counter + 1
             !
@@ -130,16 +130,16 @@
         END DO ! irot
         WRITE(stdout, '(6x, "symmetry type: ", I4)') ist_i(iat)
         WRITE(stdout, '(6x, "# of partners: ", I4)') counter
-!         st_wt(iat) = st_wt(iat) / counter
-!         sum_st_wt = sum_st_wt + st_wt(iat)
-!         WRITE(stdout, '(6x, "symmetry weight: ", F10.8)') st_wt(iat)
+        ! st_wt(iat) = st_wt(iat) / counter
+        ! sum_st_wt = sum_st_wt + st_wt(iat)
+        ! WRITE(stdout, '(6x, "symmetry weight: ", F10.8)') st_wt(iat)
       END DO ! iat
       WRITE(stdout, '(/5x)')
       !
-!       WRITE(stdout, '(5x, "sum of symmetry weights: ", F10.8)') sum_st_wt
+      ! WRITE(stdout, '(5x, "sum of symmetry weights: ", F10.8)') sum_st_wt
       !
-!       ! TODO
-!       nst = NINT(sum_st_wt)
+      ! ! TODO
+      ! nst = NINT(sum_st_wt)
       nst = MAXVAL(ist_i(:))
       !
       IF (nst /= MAXVAL(ist_i(:))) THEN

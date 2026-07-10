@@ -1,8 +1,9 @@
   ! Copyright (C) 2024-2026 Danylo Radevych
   !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
+  ! This file is distributed under the terms of the MIT Non-AI License. 
+  ! See the file `LICENSE' in the root directory of the               
+  ! present distribution, or 
+  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
   !
   ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
   !
@@ -360,7 +361,7 @@
       !
       ! radial functions u_l(r, E_F)
       !
-      CALL rmta_solve_radial()
+      CALL solve_radial()
       !
       ! IF (.NOT. lhamann) &
       !   CALL rmta_set_u_derivatives()
@@ -893,7 +894,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE rmta_solve_radial()
+    SUBROUTINE solve_radial()
     !---------------------------------------------------------------------------
     !!
     !! Solve radial Schrodinger equation for all available l.
@@ -919,7 +920,7 @@
       !
       IMPLICIT NONE
       !
-      EXTERNAL :: rmta_lschps_qe
+      EXTERNAL :: errore, rmta_lschps_qe
       !
       CHARACTER(len=200) :: routine_name
       !! name of this subroutine
@@ -943,8 +944,6 @@
       !! output of lschps used for error decision
       REAL(DP), ALLOCATABLE :: v0(:)
       !! potential
-      REAL(DP), ALLOCATABLE :: vwork(:)
-      !! working potential
       INTEGER :: iat, ispin, ir, iorb
       !! iterators
       LOGICAL :: lint_to_rmt = .TRUE.
@@ -981,7 +980,7 @@
       !! for pseudopotential to produce wavefunction beyond
       !! radius used for pseudopotential construction
       !
-      routine_name = "rmta_solve_radial"
+      routine_name = "solve_radial"
       !
       !
       ! prepare input for lschps
@@ -994,10 +993,6 @@
       ALLOCATE(v0(mt_nrf), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, "Error allocating v0", 1)
       v0(:) = 0.0_dp
-      !
-      ALLOCATE(vwork(mt_nrf), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, "Error allocating vwork", 1)
-      vwork(:) = 0.0_dp
       !
       ALLOCATE(vkb(mt_nrf, 3), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, "Error allocating vkb", 1)
@@ -1105,15 +1100,12 @@
             dudrrf_at_de_down(:) = 0.0_dp
             !
             !
+            ! TODO 2025/04/18: try to use vlocscrrf - DR: bad idea
             !
-            vwork(:) = vlocscr00rf(:, ispin, iat)
+            ! vfullrf(:, iorb, ispin, iat) = vlocscrrf(:, ispin, iat)
             !
-            ! TODO 2025/04/18: try to use rmta_vlocscrrf - DR: bad idea
+            vfullrf(:, iorb, ispin, iat) = vlocscr00rf(:, ispin, iat)
             !
-            ! vwork(:) = rmta_vlocscrrf(:, ispin, iat)
-            !
-            !
-            vfullrf(:, iorb, ispin, iat) = vwork(:)
             !
             IF (lsemiloc) THEN
               vfullrf(:, iorb, ispin, iat) = &
@@ -1142,7 +1134,7 @@
             !   WRITE(stdout, '(/5x, A, 3es13.4)') "evkb(:) == ", evkb(:)
             !   !
             !   CALL hamann_lschvkbs(l, nvkb, e, mt_rf(ist_i(iat))%r(:), &
-            !     vwork(:), vkb, &
+            !     vfullrf(:, iorb, ispin, iat), vkb, &
             !     evkb, &
             !     urf(:, iorb, ispin, iat), &
             !     dudrrf(:, iorb, ispin, iat), &
@@ -1166,7 +1158,7 @@
             e = fermi_energy(ispin) + de
             IF (lhamann .AND. lnonlocal) THEN
               CALL hamann_lschvkbs(l, nvkb, e, mt_rf(:, ist_i(iat)), &
-                vwork(:), vkb, &
+                vfullrf(:, iorb, ispin, iat), vkb, &
                 evkb, &
                 urf_at_de_up(:), &
                 dudrrf_at_de_up(:), &
@@ -1190,7 +1182,7 @@
             e = fermi_energy(ispin) - de
             IF (lhamann .AND. lnonlocal) THEN
               CALL hamann_lschvkbs(l, nvkb, e, mt_rf(:, ist_i(iat)), &
-                vwork(:), vkb, &
+                vfullrf(:, iorb, ispin, iat), vkb, &
                 evkb, &
                 urf_at_de_down(:), &
                 dudrrf_at_de_down(:), &
@@ -1324,9 +1316,6 @@
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error deallocating urf_at_de_down", 1)
       !
-      DEALLOCATE(vwork, STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error deallocating vwork", 1)
       DEALLOCATE(v0, STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error deallocating v0", 1)
@@ -1339,7 +1328,7 @@
         CALL errore(routine_name, "Error deallocating evkb", 1)
       !
     !---------------------------------------------------------------------------
-    END SUBROUTINE rmta_solve_radial
+    END SUBROUTINE solve_radial
     !---------------------------------------------------------------------------
     !
     !
@@ -1358,7 +1347,8 @@
       USE kinds, ONLY: DP
       USE uspp_param, ONLY: upf
       USE io_global, ONLY : stdout
-      USE ep_constants, ONLY : bohr, ryd2ev
+      USE constants, ONLY : rytoev
+      USE const, ONLY : bohrtoang
       USE ions_base, ONLY: ityp
       USE mt_var, ONLY: &
         natoms, norbs, orb_label, &
@@ -1570,14 +1560,14 @@
               " M_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt * &
-              (ryd2ev / bohr), &
+              (rytoev / bohrtoang), &
               " (eV / A)"
             WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
               " M^2_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt * &
               mll1_at_rmt * &
-              (ryd2ev / bohr)**2, &
+              (rytoev / bohrtoang)**2, &
               " (eV / A)^2"
             !
             ! WRITE(stdout, '(5x, "Scaled:")')
@@ -1585,14 +1575,14 @@
             !   " M_", mll1rf_label(iorb, ispin, iat), &
             !   "(",  rmtf, "):", &
             !   mll1_at_rmt * &
-            !   (ryd2ev / bohr) / SQRT(rmta_wds4), &
+            !   (rytoev / bohrtoang) / SQRT(rmta_wds4), &
             !   " (Wd^1/2 / S^2)"
             ! WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
             !   " M^2_", mll1rf_label(iorb, ispin, iat), &
             !   "(",  rmtf, "):", &
             !   mll1_at_rmt * &
             !   mll1_at_rmt * &
-            !   (ryd2ev / bohr)**2 / rmta_wds4, &
+            !   (rytoev / bohrtoang)**2 / rmta_wds4, &
             !   " (Wd / S^4)"
             !
             WRITE(stdout, '("")')
@@ -1629,8 +1619,6 @@
       !
       IMPLICIT NONE
       !
-      external :: errore
-      !
       INTEGER, INTENT(in) :: xdim
       !! coarse grid dimension
       REAL(DP), INTENT(in) :: x(:)
@@ -1657,6 +1645,8 @@
       !! name of this subroutine
       INTEGER :: ierr
       !! error code
+      !
+      EXTERNAL :: errore
       !
       routine_name = "spline_interpolation_rarr"
       !
@@ -1735,8 +1725,6 @@
       !
       IMPLICIT NONE
       !
-      external :: errore
-      !
       INTEGER, INTENT(in) :: xdim
       !! coarse grid dimension
       REAL(DP), INTENT(in) :: x(:)
@@ -1760,6 +1748,8 @@
       !! name of this subroutine
       INTEGER :: ierr
       !! error code
+      !
+      EXTERNAL :: errore
       !
       routine_name = "spline_interpolation_rsca"
       !

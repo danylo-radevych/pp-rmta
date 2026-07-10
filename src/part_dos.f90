@@ -1,8 +1,9 @@
   ! Copyright (C) 2024-2026 Danylo Radevych
   !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
+  ! This file is distributed under the terms of the MIT Non-AI License. 
+  ! See the file `LICENSE' in the root directory of the               
+  ! present distribution, or 
+  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
   !
   ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
   !
@@ -62,7 +63,7 @@
       !
       ! determine the number of points cos(theta)
       !
-      ngpt = lmax+1
+      ngpt = lmax + 1
       CALL grule(ngpt, xx, w) ! outputs (ngpt + 1) / 2 points
       !
       ! in phi, use nyquist frequency, i.e.,  2 * lmax + 1
@@ -76,8 +77,8 @@
         DO k=1, nphi
           phi = k * delphi
           j = j + 1
-          vgauss(1, j) = rxy * cos(phi)
-          vgauss(2, j) = rxy * sin(phi)
+          vgauss(1, j) = rxy * COS(phi)
+          vgauss(2, j) = rxy * SIN(phi)
           vgauss(3, j) = xx(i)
           wt(j) = w(i) * delphi
           j = j + 1
@@ -88,10 +89,10 @@
         ENDDO
       ENDDO
       !
-      IF (MODULO(ngpt, 2 == 1)) THEN
-        DO k=1,nphi
+      IF (MODULO(ngpt, 2) == 1) THEN
+        DO k = 1, nphi
           vgauss(1, j + k) = COS(k * delphi)
-          vgauss(2, j + k) = sin(k * delphi)
+          vgauss(2, j + k) = SIN(k * delphi)
           vgauss(3, j + k) = 0._dp
           wt(j + k) = w((ngpt + 1) / 2) * delphi
         ENDDO
@@ -547,13 +548,13 @@
       !
       WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
       WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I)') nspin
+      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
       IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I)') ngauss
+        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
         WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
       END IF
-      WRITE(stdout, '(7x, "nkstot = ", I)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I)') nbnd
+      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
+      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
       WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       DO ik = 1, nkstot, nkstot - 1
@@ -676,15 +677,15 @@
       !
       DO iat = 1, nat
         !
-        WRITE(stdout, '(/6x, "atom #", I, " out of ", I)') iat, nat
+        WRITE(stdout, '(/6x, "atom #", I0, " out of ", I0)') iat, nat
         !
         DO ispin = 1, nspin
           !
-          WRITE(stdout, '(/7x, "spin #", I, " out of ", I)') ispin, nspin
+          WRITE(stdout, '(/7x, "spin #", I0, " out of ", I0)') ispin, nspin
           !
           DO ir = imin, imax
             !
-            WRITE(stdout, '(8x, "ir #", I, " on [", I, ", ", I, "]")') &
+            WRITE(stdout, '(8x, "ir #", I0, " on [", I0, ", ", I0, "]")') &
              ir, imin, imax
             !
             ! precompute psi_krtau with delta function for all bands
@@ -711,7 +712,7 @@
                 DO ibnd = 1, nbnd
                   !
                   IF (ltetra) THEN
-                    lselect = ABS(wdk(ibnd, ik) > eps32)
+                    lselect = ABS(wdk(ibnd, ik)) > eps32
                     ! lselect = .true.
                   ELSE
                     deltaf = &
@@ -768,7 +769,7 @@
               l = iorb - 1
               l0 = l * (l + 1) + 1
               !
-              ! WRITE(stdout, '(/8x, "orbit #", I, " out of ", I)') l, norb - 1
+              ! WRITE(stdout, '(/8x, "orbit #", I0, " out of ", I0)') l, norb - 1
               !
               DO im = 1, 2 * l + 1
                 !
@@ -1012,7 +1013,7 @@
       !
       DO ispin = 1, nspin
           !
-          WRITE(stdout, '(/6x, "spin #", I, " out of ", I)') ispin, nspin
+          WRITE(stdout, '(/6x, "spin #", I0, " out of ", I0)') ispin, nspin
           !
           DO ik = 1, nkstot
             !

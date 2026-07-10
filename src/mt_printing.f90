@@ -1,8 +1,9 @@
   ! Copyright (C) 2024-2026 Danylo Radevych
   !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
+  ! This file is distributed under the terms of the MIT Non-AI License. 
+  ! See the file `LICENSE' in the root directory of the               
+  ! present distribution, or 
+  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
   !
   ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
   !
@@ -901,7 +902,7 @@
         OPEN(UNIT = if_vlocionr3d, FILE = TRIM('vlocionr3d.dat'), &
           FORM = 'formatted', STATUS = 'unknown')
         WRITE(if_vlocionr3d, '(1x, "Vloc_tot(r1, r2, r3)")')
-        WRITE(if_vlocionr3d, '(1x, I, "  ", I, "  ", I)') &
+        WRITE(if_vlocionr3d, '(1x, I0, "  ", I0, "  ", I0)') &
             dfftp%nr1, dfftp%nr2, dfftp%nr3
         DO i = 1, dfftp%nr1
           DO j = 1, dfftp%nr2
@@ -935,8 +936,8 @@
         OPEN(UNIT = if_vlocscrr3d, FILE = TRIM('vlocscrr3d.dat'), &
           FORM = 'formatted', STATUS = 'unknown')
         DO ispin = 1, nspins
-          WRITE(if_vlocscrr3d, '(1x, "Vrs for spin ", I)') ispin
-          WRITE(if_vlocscrr3d, '(1x, I, "  ", I, "  ", I)') &
+          WRITE(if_vlocscrr3d, '(1x, "Vrs for spin ", I0)') ispin
+          WRITE(if_vlocscrr3d, '(1x, I0, "  ", I0, "  ", I0)') &
             dfftp%nr1, dfftp%nr2, dfftp%nr3
           DO i = 1, dfftp%nr1
             DO j = 1, dfftp%nr2
@@ -969,8 +970,8 @@
         OPEN(UNIT = if_vlocscfr3d, FILE = TRIM('vlocscfr3d.dat'), &
           FORM = 'formatted', STATUS = 'unknown')
         DO ispin = 1, nspins
-          WRITE(if_vlocscfr3d, '(1x, "Vrs for spin ", I)') ispin
-          WRITE(if_vlocscfr3d, '(1x, I, "  ", I, "  ", I)') &
+          WRITE(if_vlocscfr3d, '(1x, "Vrs for spin ", I0)') ispin
+          WRITE(if_vlocscfr3d, '(1x, I0, "  ", I0, "  ", I0)') &
             dfftp%nr1, dfftp%nr2, dfftp%nr3
           DO i = 1, dfftp%nr1
             DO j = 1, dfftp%nr2
@@ -1003,12 +1004,12 @@
         OPEN(UNIT = if_vlocscrg3d, FILE = TRIM('vlocscrg3d.dat'), &
           FORM = 'formatted', STATUS = 'unknown')
         DO ispin = 1, nspins
-          WRITE(if_vlocscrg3d, '(1x, "V_{loc-tot}^{scr}(G) for spin ", I)') &
+          WRITE(if_vlocscrg3d, '(1x, "V_{loc-tot}^{scr}(G) for spin ", I0)') &
             ispin
           ishift(1) = MAXVAL(mill(1, :))
           ishift(2) = MAXVAL(mill(2, :))
           ishift(3) = MAXVAL(mill(3, :))
-          WRITE(if_vlocscrg3d, '(1x, I, "  ", I, "  ", I)') &
+          WRITE(if_vlocscrg3d, '(1x, I0, "  ", I0, "  ", I0)') &
             2 * ishift(1) + 1, &
             2 * ishift(2) + 1, &
             2 * ishift(3) + 1
@@ -1046,8 +1047,8 @@
         OPEN(UNIT = if_vlocscfg3d, FILE = TRIM('vlocscfg3d.dat'), &
           FORM = 'formatted', STATUS = 'unknown')
         DO ispin = 1, nspins
-          WRITE(if_vlocscfg3d, '(1x, "Vgs for spin ", I)') ispin
-          WRITE(if_vlocscfg3d, '(1x, I)') ngm
+          WRITE(if_vlocscfg3d, '(1x, "Vgs for spin ", I0)') ispin
+          WRITE(if_vlocscfg3d, '(1x, I0)') ngm
           WRITE(if_vlocscfg3d, '("   h    k    l", &
             "          gx          gy          gz", &
             "           g", &
@@ -1238,8 +1239,8 @@
       USE io_global, ONLY: stdout
       USE ions_base, ONLY: ityp
       USE uspp_param, ONLY: upf
-      USE ep_constants, ONLY: ryd2ev, bohr
-      USE constants, ONLY: eps12
+      USE constants, ONLY: rytoev, eps12
+      USE const, ONLY: bohrtoang
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
       USE mt_var, ONLY: natoms, norbs, orb_label, &
         nspins, fermi_energy, &
@@ -1354,13 +1355,13 @@
           !
           WRITE(stdout, '(/8x, A16, F10.4, A8, F8.4, A6)') &
             "E_F = ", fermi_energy(ispin), " (Ry) = ", &
-            fermi_energy(ispin) * ryd2ev, " (eV)"
+            fermi_energy(ispin) * rytoev, " (eV)"
           WRITE(stdout, '(8x, A5, F10.5, A4, F10.4, A8, F10.4, A8)') &
             "V(", rmtf, ") = ", veff, &
-            " (Ry) = ", veff * ryd2ev, " (eV)"
+            " (Ry) = ", veff * rytoev, " (eV)"
           WRITE(stdout, '(8x, A5, F10.5, A10, F10.4, A8, F10.4, A8)') &
             "V(", rmtf, ") - E_F = ", veff - fermi_energy(ispin), &
-            " (Ry) = ", (veff - fermi_energy(ispin)) * ryd2ev, " (eV)"
+            " (Ry) = ", (veff - fermi_energy(ispin)) * rytoev, " (eV)"
           !
           WRITE(stdout, '(/8x, A16, F10.4)') &
             "! E_F:", fermi_energy(ispin)
@@ -1416,11 +1417,11 @@
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * (ryd2ev / bohr), " (eV / A)"
+                mll1 * (rytoev / bohrtoang), " (eV / A)"
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M^2_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * mll1 * (ryd2ev / bohr)**2, " (eV / A)^2"
+                mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
               !
               ! WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4)') &
               !   "! M^2_", TRIM(m_label), &
@@ -1432,14 +1433,14 @@
               !   " M_", TRIM(m_label), &
               !   "(",  rmtf, "):", &
               !   mll1 * &
-              !   (ryd2ev / bohr) / SQRT(rmta_wds4), &
+              !   (rytoev / bohrtoang) / SQRT(rmta_wds4), &
               !   " (Wd^1/2 / S^2)"
               ! WRITE(stdout, '(7x, A10, A, A, F10.4, A, F14.4, A)') &
               !   " M^2_", TRIM(m_label), &
               !   "(",  rmtf, "):", &
               !   mll1 * &
               !   mll1 * &
-              !   (ryd2ev / bohr)**2 / rmta_wds4, &
+              !   (rytoev / bohrtoang)**2 / rmta_wds4, &
               !   " (Wd / S^4)"
               !
               WRITE(stdout, '("")')
@@ -1512,12 +1513,12 @@
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1, " (Ry / bohr^2) = ", &
-                etall1 * ryd2ev / bohr**2, " (eV / A^2)"
+                etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
               ! WRITE(stdout, '(8x, A7, A, A, F10.5, A, &
               !   es14.4)') &
               !   "! eta_", TRIM(m_label), &
               !   "(",  rmtf, ") (eV / A^2):", &
-              !   etall1 * ryd2ev / bohr**2
+              !   etall1 * rytoev / bohr**2
               !
               WRITE(stdout, '("")')
               !
@@ -1549,12 +1550,12 @@
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta, " (Ry / bohr^2) = ", &
-                eta * ryd2ev / bohr**2, " (eV / A^2)"
+                eta * rytoev / bohrtoang**2, " (eV / A^2)"
               ! WRITE(stdout, '(8x, A9, A, F10.4, A, &
               !   es14.4)') &
               !   "! eta_tot", &
               !   "(",  rmtf, ") (eV / A^2):", &
-              !   eta * ryd2ev / bohr**2
+              !   eta * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
               !
@@ -1624,11 +1625,11 @@
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * (ryd2ev / bohr), " (eV / A)"
+                mll1 * (rytoev / bohrtoang), " (eV / A)"
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M^2_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * mll1 * (ryd2ev / bohr)**2, " (eV / A)^2"
+                mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
               !
               WRITE(stdout, '(8x, A10, A, A, F14.4)') &
                 "! M^2_", TRIM(m_label), &
@@ -1644,11 +1645,11 @@
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1, " (Ry / bohr^2) = ", &
-                etall1 * ryd2ev / bohr**2, " (eV / A^2)"
+                etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
               !
               WRITE(stdout, '(8x, A7, A, A, es14.4)') &
                 "! eta_", TRIM(m_label), &
-                ":", etall1 * ryd2ev / bohr**2
+                ":", etall1 * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
               !
@@ -1666,11 +1667,11 @@
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta, " (Ry / bohr^2) = ", &
-                eta * ryd2ev / bohr**2, " (eV / A^2)"
+                eta * rytoev / bohrtoang**2, " (eV / A^2)"
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
                 "! eta_tot:", &
-                eta * ryd2ev / bohr**2
+                eta * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
               !
@@ -1757,7 +1758,7 @@
       !! iterators
       !
       WRITE(stdout, '(/5x, "PP info:")')
-      WRITE(stdout, '(7x, "SIZE(upf): ", I, /)') SIZE(upf)
+      WRITE(stdout, '(7x, "SIZE(upf): ", I0, /)') SIZE(upf)
       DO ict = 1, SIZE(upf)
         WRITE(stdout, '(7x, "element: ", A)') upf(ict)%psd
         WRITE(stdout, '(7x, "z_valence: ", F10.6)') upf(ict)%zp
@@ -1774,19 +1775,19 @@
         WRITE(stdout, '(7x, "core_correction: ", L)') upf(ict)%nlcc
         WRITE(stdout, '(7x, "with_metagga_info: ", L)') &
           upf(ict)%with_metagga_info
-        WRITE(stdout, '(7x, "total_psenergy: ", F)') upf(ict)%etotps
+        WRITE(stdout, '(7x, "total_psenergy: ", F0.20)') upf(ict)%etotps
         WRITE(stdout, '(7x, "wfc_cutoff: ", F10.6)') upf(ict)%ecutwfc
         WRITE(stdout, '(7x, "rho_cutoff: ", F10.6)') upf(ict)%ecutrho
         ! maximum l component in beta
-        WRITE(stdout, '(7x, "l_max: ", I)') upf(ict)%lmax
+        WRITE(stdout, '(7x, "l_max: ", I0)') upf(ict)%lmax
         ! 2 * lmax
-        WRITE(stdout, '(7x, "l_max_rho: ", I)') upf(ict)%lmax_rho
+        WRITE(stdout, '(7x, "l_max_rho: ", I0)') upf(ict)%lmax_rho
         ! L of channel used to generate local potential
         ! (if < 0 it was generated by smoothing AE potential)
-        WRITE(stdout, '(7x, "l_local: ", I)') upf(ict)%lloc
+        WRITE(stdout, '(7x, "l_local: ", I0)') upf(ict)%lloc
         ! the maximum radius of the mesh
         WRITE(stdout, '(7x, "r_max: ", F10.6)') upf(ict)%rmax
-        WRITE(stdout, '(7x, "number_of_wfc: ", I)') upf(ict)%nwfc
+        WRITE(stdout, '(7x, "number_of_wfc: ", I0)') upf(ict)%nwfc
         DO j = 1, upf(ict)%nwfc
           WRITE(stdout, '(9x, "rcut(", I3, "): ", F6.3, &
             "  rcutus(", I3, "): ", F6.3, &
@@ -1798,8 +1799,8 @@
             j, upf(ict)%lchi(j)
         END DO ! j
         WRITE(stdout, '(7x)')
-        WRITE(stdout, '(7x, "nat: ", I)') nat
-        WRITE(stdout, '(7x, "natomwfc: ", I)') natomwfc
+        WRITE(stdout, '(7x, "nat: ", I0)') nat
+        WRITE(stdout, '(7x, "natomwfc: ", I0)') natomwfc
         ! DO j = 1, natomwfc
         !   WRITE(stdout, '(9x, &
         !     "  n(", I3, "): ", I3, &
@@ -1810,9 +1811,9 @@
         !     j, nlmchi(j)%m
         ! END DO ! j
         WRITE(stdout, '(7x)')
-        WRITE(stdout, '(7x, "number_of_proj: ", I)') upf(ict)%nbeta
+        WRITE(stdout, '(7x, "number_of_proj: ", I0)') upf(ict)%nbeta
         ! number of points in the radial mesh
-        WRITE(stdout, '(7x, "mesh_size: ", I)') upf(ict)%mesh
+        WRITE(stdout, '(7x, "mesh_size: ", I0)') upf(ict)%mesh
         !
         WRITE(stdout, '(7x)')
       END DO ! ict

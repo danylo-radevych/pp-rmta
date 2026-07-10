@@ -1,10 +1,7 @@
-  ! Copyright (C) 2024-2026 Danylo Radevych
-  !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
   !
-  ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
+  ! Subroutines in this module are adopted, with slight modifications,
+  ! from the ONCVPSP code, which retains the full credit:
+  ! https://github.com/oncvpsp/oncvpsp
   !
   !=============================================================================
   MODULE hamann
@@ -65,7 +62,8 @@
       !
       !Local variables
       REAL(DP) :: amesh,al
-      REAL(DP) :: aeo, aio, als, cn
+      REAL(DP), EXTERNAL :: aeo, aio
+      REAL(DP) :: als, cn
       REAL(DP) :: ro
       REAL(DP) :: sls, sn, uout, upout
       INTEGER :: ii, it
@@ -285,6 +283,8 @@
     REAL(DP) :: rcut
     INTEGER ii,jj,krc,ierr,info
 
+    EXTERNAL :: dgesv
+
     uu(:)=0.0d0
     up(:)=0.0d0
 
@@ -407,7 +407,8 @@
 
     !Local variables
     REAL(DP) :: amesh,al
-    REAL(DP) :: aeo, aio, als, cn
+    REAL(DP), EXTERNAL :: aeo, aio
+    REAL(DP) :: als, cn
     REAL(DP) :: ro
     REAL(DP) :: sls, sn, uout, upout
     INTEGER :: ii, it
@@ -533,7 +534,8 @@
 
     !Local variables
     REAL(DP) :: amesh,al
-    REAL(DP) :: aeo, aio, als
+    REAL(DP), EXTERNAL :: aeo, aio
+    REAL(DP) :: als
     REAL(DP) :: sls, uout, upout
     REAL(DP) :: akb,ckb
     INTEGER :: ii, it

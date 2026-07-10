@@ -1,8 +1,9 @@
   ! Copyright (C) 2024-2026 Danylo Radevych
   !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
+  ! This file is distributed under the terms of the MIT Non-AI License. 
+  ! See the file `LICENSE' in the root directory of the               
+  ! present distribution, or 
+  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
   !
   ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
   !
@@ -19,11 +20,12 @@
   !
     USE kinds, ONLY: DP
     USE radial_grids, ONLY: radial_grid_type
+    USE constants, ONLY: bohr_radius_si
     !
     IMPLICIT NONE
     !
     PUBLIC :: &
-      rmta_set_vars, rmta_delete_vars, &
+      rmta_set_vars, rmta_delete_vars, rmt_default, &
       lmpi_single_rank, &
       mt_prec, natoms, nspins, mt_r_mt, norbs, &
       rmta_lmax, orb_label, &
@@ -63,6 +65,8 @@
     !
     INTEGER, PARAMETER :: natmax = 256
     !! max number of atoms
+    REAL(DP), PARAMETER :: bohrtoang = bohr_radius_si * 1.0E10_DP
+    !! Bohr radius in angstroms
     !
     CHARACTER(LEN=12), SAVE :: rmta_code = 'RMTA'
     !! Name of the code
@@ -354,14 +358,20 @@
     SUBROUTINE set_rmt_from_nn()
     !---------------------------------------------------------------------------
     !!
-    !! Sets MT radii as a minimum of the half the nearest-neighbor distance
-    !! for each symmetry type.
+    !! Sets MT radii for each symmetry type as a minimum of the 
+    !! nearest-neighbor distance divided in ratio of internal MT radii 
+    !! defaults, then ensuring that the spheres do touch...
+    !! ... more in the code below
     !!
     !---------------------------------------------------------------------------
+    !
+    !  D. Radevych
+    !
+      !
       USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i
-      USE neighbor, ONLY: nn_dist
-      USE ep_constants, ONLY: bohr, eps6
+      USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
+      USE neighbor, ONLY: nn_dist, inn_i
+      USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
       USE ions_base, ONLY: ityp
       !
@@ -369,38 +379,106 @@
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
+      LOGICAL :: ltouch
+      !! if true, make additional pass to ensure touching spheres
+      !! only if lrmt = .false.
+      LOGICAL, ALLOCATABLE :: lrmt_fixed(:)
+      !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
       !! error code
       INTEGER :: ist, iat
       !! iterators
       REAL(DP) :: rtmp
       !! real temporary var
+      REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
+      !! temprary default MT radii
+      !
+      EXTERNAL :: errore
       !
       routine_name = "set_rmt_from_nn"
       !
+      ltouch = .TRUE.
+      !
       ALLOCATE(mt_r_mt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_r_mt', 1)
+      ALLOCATE(lrmt_fixed(nst), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating lrmt_fixed', 1)
       !
       mt_r_mt(:) = -1.0_dp
+      lrmt_fixed(:) = .FALSE.
+      !
       IF (.NOT. lrmt) THEN
         !
         DO iat = 1, natoms
-          rtmp = nn_dist(iat) / 2.0_dp
+          !
+          ! rtmp = nn_dist(iat) / 2.0_dp ! old solution
+          !
+          rmt_d_iat = rmt_default(st_name(ist_i(iat))) ! this symmetry type
+          rmt_d_iat_nn = &
+            rmt_default(st_name(ist_i(inn_i(iat)))) ! its nearest symmetry type
+          !
+          ! rmt_d_iat = rmt_default(upf(ityp(iat))%psd) ! this symmetry type
+          ! rmt_d_iat_nn = &
+          !   rmt_default(upf(ityp(inn_i(iat)))%psd) ! its nearest symmetry type
+          !
+          !
+          rtmp = nn_dist(iat)  * & ! distance to the neighbor
+            rmt_d_iat / & ! this atom
+            (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
+          !
           IF ((mt_r_mt(ist_i(iat)) < 0.0_dp) .OR. &
             (mt_r_mt(ist_i(iat)) > rtmp)) THEN
+            !
             mt_r_mt(ist_i(iat)) = rtmp
             !
             IF (mt_r_mt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 F10.8, " bohr = ", F10.8, " A")') &
-                mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohr
-              CALL errore(routine_name, "MT radius is too small.", 1)
+                mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohrtoang
+              CALL errore(routine_name, &
+                "first MT radius guess is too small.", 1)
             END IF
             !
           END IF
+          !
         END DO ! iat
+        !
+        !
+        IF (ltouch) THEN
+          !
+          ! if there is a space for one sphere to grow, let it do it;
+          ! otherwise, fix both MT radii for good
+          !
+          DO iat = 1, natoms
+            !
+            IF (ABS(mt_r_mt(ist_i(iat)) + mt_r_mt(ist_i(inn_i(iat))) - &
+              nn_dist(iat)) > eps6 .AND. .NOT. lrmt_fixed(ist_i(iat))) THEN
+              !
+              IF (mt_r_mt(ist_i(inn_i(iat))) < nn_dist(iat)) THEN
+                mt_r_mt(ist_i(iat)) = nn_dist(iat) - mt_r_mt(ist_i(inn_i(iat)))
+                !
+                lrmt_fixed(ist_i(iat)) = .TRUE.
+                !
+              END IF
+              !
+            ELSE IF (ABS(mt_r_mt(ist_i(iat)) + mt_r_mt(ist_i(inn_i(iat))) - &
+                nn_dist(iat)) <= eps6) THEN
+              !
+              lrmt_fixed(ist_i(iat)) = .TRUE.
+              lrmt_fixed(ist_i(inn_i(iat))) = .TRUE.
+              !
+            END IF
+            !
+          END DO
+          !
+        END IF
+        !
+        !
       ELSE
+        !
+        ! user-specified MT radii
+        !
         DO iat = 1, natoms
           IF (mt_r_mt(ist_i(iat)) < 0._dp .AND. rmt(iat) > 0._dp) THEN
             WRITE(stdout, '(6x, "MT-radius of atom ", I4, &
@@ -413,7 +491,31 @@
               "MT-radii inconsistent for the symmetry type.", 1)
           END IF
         END DO
+        !
       END IF
+      !
+      !
+      ! check
+      !
+      DO ist = 1, nst
+        !
+        IF (mt_r_mt(ist) < 0._dp) THEN
+          !
+          WRITE(stdout, '(6x, "MT radius for the type ", I0, &
+            " is not defined")') ist
+          CALL errore(routine_name, "Error in mt_r_mt array", 1)
+          !
+        ELSE IF (mt_r_mt(ist) < MAXVAL(upf(ist_ityp(ist))%rcut(:))) THEN
+            !
+            WRITE(stdout, '(6x, "symmetry type #", I4)') ist
+            WRITE(stdout, '(6x, "MT radius: ", &
+              F10.8, " bohr = ", F10.8, " A")') &
+              mt_r_mt(ist), mt_r_mt(ist) * bohrtoang
+            CALL errore(routine_name, "MT radius is too small.", 1)
+            !
+        END IF
+        !
+      END DO
       !
       !
       ! printing
@@ -421,13 +523,15 @@
       WRITE(stdout, '(/5x, "MT radii")')
       DO ist = 1, nst
         WRITE(stdout, '(5x)')
-        WRITE(stdout, '(6x, "symmetry type #", I4)') ist
+        WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
         WRITE(stdout, '(6x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
-          mt_r_mt(ist), mt_r_mt(ist) * bohr
+          mt_r_mt(ist), mt_r_mt(ist) * bohrtoang
       END DO ! ist
       WRITE(stdout, '(/5x, /5x)')
       !
-      ! CALL errore(routine_name, "Test DONE", 1)
+      DEALLOCATE(lrmt_fixed, STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, 'Error deallocating lrmt_fixed', 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_rmt_from_nn
@@ -535,7 +639,7 @@
         ! CALL deallocate_radial_grid(tmp_grid)
         !
         !
-        WRITE(stdout, '(/4x, "RMTA grid ", I, " info")') ist
+        WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
         !
         WRITE(stdout, '(6x, A, I3, A, I10)') &
           "grid(", ist, ")%mesh:", tmp_grid%mesh
@@ -566,7 +670,7 @@
         CALL deallocate_radial_grid(tmp_grid)
         !
         IF (lprint_grid) THEN
-          WRITE(stdout, '(/4x, "Generated grid ", I, " :")')
+          WRITE(stdout, '(/4x, "Generated grid ", I0, " :")')
           DO ir = 1, mt_nrf
             WRITE(stdout, '(6x, ES16.7)') mt_rf(ir, ist)
           END DO
@@ -584,7 +688,7 @@
       DO ist = 1, nst
         !
         !
-        WRITE(stdout, '(/4x, "RMTA grid ", I, " info")') ist
+        WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
         !
         WRITE(stdout, '(6x, A, I3, A, F16.7)') &
           "grid(", ist, ")%r(1):", mt_rf(1, ist)
@@ -623,7 +727,7 @@
       INTEGER :: iorb
       !! iterators
       !
-      ! EXTERNAL :: errore
+      EXTERNAL :: errore
       !
       routine_name = "set_orbitals"
       !
@@ -652,7 +756,6 @@
         END SELECT
       END DO ! iorb
       !
-      ! CALL errore(routine_name, "Test DONE", 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_orbitals
@@ -679,7 +782,7 @@
       INTEGER :: iat
       !! iterators
       !
-      ! EXTERNAL :: errore
+      EXTERNAL :: errore
       !
       routine_name = "set_tau_cart"
       !
@@ -694,8 +797,6 @@
           tau_cart(:, iat)
       END DO
       WRITE(stdout, '(/5x)')
-      !
-      ! CALL errore(routine_name, "Test DONE", 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_tau_cart
@@ -722,7 +823,7 @@
       INTEGER :: ierr
       !! error code
       !
-      ! EXTERNAL :: errore
+      EXTERNAL :: errore
       !
       routine_name = "set_fermi_energy"
       !
@@ -742,8 +843,6 @@
       ELSE
         fermi_energy(:) = ref_ef
       END IF
-      !
-      ! CALL errore(routine_name, "Test DONE", 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_fermi_energy
@@ -770,12 +869,12 @@
       INTEGER :: iat, ict
       !! iterators
       !
-      ! EXTERNAL :: errore
+      EXTERNAL :: errore
       !
       routine_name = "set_nat_per_chem_tp"
       !
       n_chem_types = SIZE(upf)
-      WRITE(stdout, '(/6x, "n_chem_types: ", I)') &
+      WRITE(stdout, '(/6x, "n_chem_types: ", I0)') &
         n_chem_types
       !
       ! get number of atoms per type
@@ -790,8 +889,6 @@
             natoms_per_chem_type(ict) = natoms_per_chem_type(ict) + 1
         END DO ! iat
       END DO ! ict
-      !
-      ! CALL errore(routine_name, "Test DONE", 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_chem_type
@@ -816,6 +913,8 @@
       !! error code
       INTEGER :: ict, ir, ichi, ibeta
       !! iterators
+      !
+      EXTERNAL :: errore
       !
       routine_name = "set_upf_vars"
       !
@@ -885,40 +984,42 @@
         !
       END DO ! ict
       !
-      !
-      ! chir: radial functions chi
-      !
-      ALLOCATE(chir(mt_nr_max, MAXVAL(nchis(:)), &
-        n_chem_types), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating chir", 1)
-      chir(:, :, :) = 0.0_dp
-      !
-      DO ict = 1, n_chem_types
-        DO ichi = 1, nchis(ict)
-          DO ir = 1, mt_nr(ict)
-              chir(ir, ichi, ict) = upf(ict)%chi(ir, ichi)
-          END DO ! ir
-        END DO ! ichi
-      END DO ! ict
-      !
-      !
-      ! betar: beta-projectors
-      !
-      ALLOCATE(betar(mt_nr_max, MAXVAL(nbetas(:)), &
-        n_chem_types), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating betar", 1)
-      betar(:, :, :) = 0.0_dp
-      !
-      DO ict = 1, n_chem_types
-        DO ibeta = 1, nbetas(ict)
-          DO ir = 1, mt_nr(ict)
-              betar(ir, ibeta, ict) = upf(ict)%beta(ir, ibeta)
-          END DO ! ir
-        END DO ! ibeta
-      END DO ! ict
-      !
+      IF (lwrite_dat) THEN
+        !
+        ! chir: radial functions chi
+        !
+        ALLOCATE(chir(mt_nr_max, MAXVAL(nchis(:)), &
+          n_chem_types), STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, "Error allocating chir", 1)
+        chir(:, :, :) = 0.0_dp
+        !
+        DO ict = 1, n_chem_types
+          DO ichi = 1, nchis(ict)
+            DO ir = 1, mt_nr(ict)
+                chir(ir, ichi, ict) = upf(ict)%chi(ir, ichi)
+            END DO ! ir
+          END DO ! ichi
+        END DO ! ict
+        !
+        !
+        ! betar: beta-projectors
+        !
+        ALLOCATE(betar(mt_nr_max, MAXVAL(nbetas(:)), &
+          n_chem_types), STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, "Error allocating betar", 1)
+        betar(:, :, :) = 0.0_dp
+        !
+        DO ict = 1, n_chem_types
+          DO ibeta = 1, nbetas(ict)
+            DO ir = 1, mt_nr(ict)
+                betar(ir, ibeta, ict) = upf(ict)%beta(ir, ibeta)
+            END DO ! ir
+          END DO ! ibeta
+        END DO ! ict
+        !
+      END IF
       !
       ! vlocionr: local ionic psuedopotential from upf
       ! vlocaer: local ionic all-electron potential from upf
@@ -991,6 +1092,8 @@
       !! iterators
       REAl(DP) :: g3d(3)
       !! current g3d vector
+      !
+      EXTERNAL :: errore, set_vrs
       !
       routine_name = "set_scf_vars"
       !
@@ -1066,9 +1169,6 @@
         CALL errore(routine_name, "Error allocating vlocscfg3d", 1)
       CALL rho_r2g(dfftp, vlocscfr3d(:, :), vlocscfg3d(:, :))
       !
-      !
-      ! CALL errore(routine_name, "Test DONE", 1)
-      !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_scf_vars
     !---------------------------------------------------------------------------
@@ -1088,6 +1188,8 @@
       !! name of this subroutine
       INTEGER :: ierr
       !! error code
+      !
+      EXTERNAL :: errore
       !
       routine_name = "set_empty_arrays"
       !
@@ -1280,13 +1382,17 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating vlocscfg3d', 1)
       !
-      DEALLOCATE(chir, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating chir', 1)
-      !
-      DEALLOCATE(betar, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating betar', 1)
+      IF (lwrite_dat) THEN
+        !
+        DEALLOCATE(chir, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, &
+          'Error deallocating chir', 1)
+        !
+        DEALLOCATE(betar, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, &
+          'Error deallocating betar', 1)
+        !
+      END IF
       !
       DEALLOCATE(vsemilocr, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
@@ -1397,6 +1503,362 @@
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE rmta_delete_vars
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    REAL(DP) FUNCTION rmt_default(element_label)
+    !---------------------------------------------------------------------------
+    !!
+    !! Get default MT-radius for the type
+    !!
+    !---------------------------------------------------------------------------
+    !
+    !  D. Radevych
+    !
+    !  Default values are
+    !  courtesy of M. Weinert and flair: FLAPW code.
+    !  https://sites.uwm.edu/weinert/flair/
+    !
+      !
+      !
+      IMPLICIT NONE
+      !
+      CHARACTER(LEN=2), INTENT(in) :: element_label
+      REAL(DP) :: rmt_d
+      !
+      CHARACTER(len=256) :: routine_name
+       !! name of this subroutine
+      EXTERNAL :: errore
+      !
+      routine_name = "rmt_default"
+      !
+      SELECT CASE(element_label)
+        !
+        CASE(' ')  ! vacancy
+          rmt_d = 2.50_dp
+        !
+        CASE('H')  ! H 1
+          rmt_d = 0.60_dp
+        !
+        CASE('He')  ! He 2
+          rmt_d = 0.70_dp
+        !
+        CASE('Li')  ! Li 3
+          rmt_d = 1.70_dp
+        !
+        CASE('Be')  ! Be 4
+          rmt_d = 1.70_dp
+        !
+        CASE('B')  ! B 5
+          rmt_d = 1.55_dp
+        !
+        CASE('C')  ! C 6
+          rmt_d = 1.30_dp
+        !
+        CASE('N')  ! N 7
+          rmt_d = 1.40_dp
+        !
+        CASE('O')  ! O 8
+          rmt_d = 1.50_dp
+        !
+        CASE('F')  ! F 9
+          rmt_d = 2.20_dp
+        !
+        CASE('Ne') ! Ne 10
+          rmt_d = 2.00_dp
+        !
+        CASE('Na') ! Na 11
+          rmt_d = 2.20_dp
+        !
+        CASE('Mg') ! Mg 12
+          rmt_d = 2.00_dp
+        !
+        CASE('Al') ! Al 13
+          rmt_d = 2.00_dp
+        !
+        CASE('Si') ! Si 14
+          rmt_d = 2.00_dp
+        !
+        CASE('P') ! P 15
+          rmt_d = 2.00_dp
+        !
+        CASE('S') ! S 16
+          rmt_d = 2.00_dp
+        !
+        CASE('Cl') ! Cl 17
+          rmt_d = 2.80_dp
+        !
+        CASE('Ar') ! Ar 18
+          rmt_d = 2.80_dp
+        !
+        CASE('K') ! K 19
+          rmt_d = 2.80_dp
+        !
+        CASE('Ca') ! Ca 20
+          rmt_d = 3.40_dp
+        !
+        CASE('Sc') ! Sc 21
+          rmt_d = 2.50_dp
+        !
+        CASE('Ti') ! Ti 22
+          rmt_d = 2.50_dp
+        !
+        CASE('V') ! V 23
+          rmt_d = 2.50_dp
+        !
+        CASE('Cr') ! Cr 24
+          rmt_d = 2.50_dp
+        !
+        CASE('Mn') ! Mn 25
+          rmt_d = 2.50_dp
+        !
+        CASE('Fe') ! Fe 26
+          rmt_d = 2.50_dp
+        !
+        CASE('Co') ! Co 27
+          rmt_d = 2.50_dp
+        !
+        CASE('Ni') ! Ni 28
+          rmt_d = 2.50_dp
+        !
+        CASE('Cu') ! Cu 29
+          rmt_d = 2.50_dp
+        !
+        CASE('Zn') ! Zn 30
+          rmt_d = 2.50_dp
+        !
+        CASE('Ga') ! Ga 31
+          rmt_d = 2.50_dp
+        !
+        CASE('Ge') ! Ge 32
+          rmt_d = 2.50_dp
+        !
+        CASE('As') ! As 33
+          rmt_d = 2.50_dp
+        !
+        CASE('Se') ! Se 34
+          rmt_d = 2.50_dp
+        !
+        CASE('Br') ! Br 35
+          rmt_d = 2.50_dp
+        !
+        CASE('Kr') ! Kr 36
+          rmt_d = 2.50_dp
+        !
+        CASE('Rb') ! Rb 37
+          rmt_d = 2.50_dp
+        !
+        CASE('Sr') ! Sr 38
+          rmt_d = 2.50_dp
+        !
+        CASE('Y') ! Y 39
+          rmt_d = 2.50_dp
+        !
+        CASE('Zr') ! Zr 40
+          rmt_d = 2.50_dp
+        !
+        CASE('Nb') ! Nb 41
+          rmt_d = 2.50_dp
+        !
+        CASE('Mo') ! Mo 42
+          rmt_d = 2.50_dp
+        !
+        CASE('Tc') ! Tc 43
+          rmt_d = 2.50_dp
+        !
+        CASE('Ru') ! Ru 44
+          rmt_d = 2.50_dp
+        !
+        CASE('Rh') ! Rh 45
+          rmt_d = 2.50_dp
+        !
+        CASE('Pd') ! Pd 46
+          rmt_d = 2.50_dp
+        !
+        CASE('Ag') ! Ag 47
+          rmt_d = 2.50_dp
+        !
+        CASE('Cd') ! Cd 48
+          rmt_d = 2.50_dp
+        !
+        CASE('In') ! In 49
+          rmt_d = 2.50_dp
+        !
+        CASE('Sn') ! Sn 50
+          rmt_d = 2.50_dp
+        !
+        CASE('Sb') ! Sb 51
+          rmt_d = 2.50_dp
+        !
+        CASE('Te') ! Te 52
+          rmt_d = 2.50_dp
+        !
+        CASE('I') ! I 53
+          rmt_d = 2.50_dp
+        !
+        CASE('Xe') ! Xe 54
+          rmt_d = 2.50_dp
+        !
+        CASE('Cs') ! Cs 55
+          rmt_d = 2.80_dp
+        !
+        CASE('Ba') ! Ba 56
+          rmt_d = 2.80_dp
+        !
+        CASE('La') ! La 57
+          rmt_d = 2.80_dp
+        !
+        CASE('Ce') ! Ce 58
+          rmt_d = 2.50_dp
+        !
+        CASE('Pr') ! Pr 59
+          rmt_d = 2.50_dp
+        !
+        CASE('Nd') ! Nd 60
+          rmt_d = 2.50_dp
+        !
+        CASE('Pm') ! Pm 61
+          rmt_d = 2.50_dp
+        !
+        CASE('Sm') ! Sm 62
+          rmt_d = 2.50_dp
+        !
+        CASE('Eu') ! Eu 63
+          rmt_d = 2.50_dp
+        !
+        CASE('Gd') ! Gd 64
+          rmt_d = 2.50_dp
+        !
+        CASE('Tb') ! Tb 65
+          rmt_d = 2.50_dp
+        !
+        CASE('Dy') ! Dy 66
+          rmt_d = 2.50_dp
+        !
+        CASE('Ho') ! Ho 67
+          rmt_d = 2.50_dp
+        !
+        CASE('Er') ! Er 68
+          rmt_d = 2.50_dp
+        !
+        CASE('Tm') ! Tm 69
+          rmt_d = 2.50_dp
+        !
+        CASE('Yb') ! Yb 70
+          rmt_d = 2.50_dp
+        !
+        CASE('Lu') ! Lu 71
+          rmt_d = 2.50_dp
+        !
+        CASE('Hf') ! Hf 72
+          rmt_d = 2.50_dp
+        !
+        CASE('Ta') ! Ta 73
+          rmt_d = 2.50_dp
+        !
+        CASE('W') ! W 74
+          rmt_d = 2.50_dp
+        !
+        CASE('Re') ! Re 75
+          rmt_d = 2.50_dp
+        !
+        CASE('Os') ! Os 76
+          rmt_d = 2.50_dp
+        !
+        CASE('Ir') ! Ir 77
+          rmt_d = 2.50_dp
+        !
+        CASE('Pt') ! Pt 78
+          rmt_d = 2.50_dp
+        !
+        CASE('Au') ! Au 79
+          rmt_d = 2.50_dp
+        !
+        CASE('Hg') ! Hg 80
+          rmt_d = 2.50_dp
+        !
+        CASE('Tl') ! Tl 81
+          rmt_d = 2.50_dp
+        !
+        CASE('Pb') ! Pb 82
+          rmt_d = 2.50_dp
+        !
+        CASE('Bi') ! Bi 83
+          rmt_d = 2.50_dp
+        !
+        CASE('Po') ! Po 84
+          rmt_d = 2.50_dp
+        !
+        CASE('At') ! At 85
+          rmt_d = 2.50_dp
+        !
+        CASE('Rn') ! Rn 86
+          rmt_d = 2.50_dp
+        !
+        CASE('Fr') ! Fr 87
+          rmt_d = 2.50_dp
+        !
+        CASE('Ra') ! Ra 88
+          rmt_d = 2.50_dp
+        !
+        CASE('Ac') ! Ac 89
+          rmt_d = 2.50_dp
+        !
+        CASE('Th') ! Th 90
+          rmt_d = 2.50_dp
+        !
+        CASE('Pa') ! Pa 91
+          rmt_d = 2.50_dp
+        !
+        CASE('U') ! U 92
+          rmt_d = 2.50_dp
+        !
+        CASE('Np') ! Np 93
+          rmt_d = 2.50_dp
+        !
+        CASE('Pu') ! Pu 94
+          rmt_d = 2.50_dp
+        !
+        CASE('Am') ! Am 95
+          rmt_d = 2.50_dp
+        !
+        CASE('Cm') ! Cm 96
+          rmt_d = 2.50_dp
+        !
+        CASE('Bk') ! Bk 97
+          rmt_d = 2.50_dp
+        !
+        CASE('Cf') ! Cf 98
+          rmt_d = 2.50_dp
+        !
+        CASE('Es') ! Es 99
+          rmt_d = 2.50_dp
+        !
+        CASE('Fm') ! Fm 100
+          rmt_d = 2.50_dp
+        !
+        CASE('Md') ! Md 101
+          rmt_d = 2.50_dp
+        !
+        CASE('No') ! No 102
+          rmt_d = 2.50_dp
+        !
+        CASE('Lr') ! Lr 103
+          rmt_d = 2.50_dp
+        !
+        CASE('Rf') ! Rf 104
+          rmt_d = 2.50_dp
+        !
+        CASE DEFAULT
+          CALL errore(TRIM(routine_name), "element label is not defined", 1)
+        !
+      END SELECT
+      !
+      rmt_default = rmt_d
+      !
+    !---------------------------------------------------------------------------
+    END FUNCTION rmt_default
     !---------------------------------------------------------------------------
     !
     !

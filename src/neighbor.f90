@@ -1,8 +1,9 @@
   ! Copyright (C) 2024-2026 Danylo Radevych
   !                                                                            
-  ! This file is distributed under the terms of the GNU General Public         
-  ! License. See the file `LICENSE' in the root directory of the               
-  ! present distribution, or http://www.gnu.org/copyleft.gpl.txt .
+  ! This file is distributed under the terms of the MIT Non-AI License. 
+  ! See the file `LICENSE' in the root directory of the               
+  ! present distribution, or 
+  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
   !
   ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
   !
@@ -48,7 +49,7 @@
       USE ions_base, ONLY: nat, tau, ityp
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, bg, alat, omega
-      USE ep_constants, ONLY: bohr
+      USE const, ONLY: bohrtoang
       USE constants, ONLY: eps12
       !
       IMPLICIT NONE
@@ -140,7 +141,7 @@
         !
         WRITE(stdout, '(6x, "neighbor index: ", I4, &
           " neighbor distance: ", F10.8, " bohr = ", F10.8, " A")') &
-          inn_i(iat), nn_dist(iat), nn_dist(iat) * bohr
+          inn_i(iat), nn_dist(iat), nn_dist(iat) * bohrtoang
         !
       END DO ! iat
       WRITE(stdout, '(/5x, /5x)')
