@@ -19,7 +19,15 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-In the `PPRMTA_ROOT` root folder:
+1. Compile Quantum ESPRESSO (QE) in `QE_ROOT` folder with:
+
+```
+./configure [OPTIONS]
+make pw ld1 pp
+make install
+```
+
+2. In the `PPRMTA_ROOT` root folder:
 
 edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
 
@@ -29,7 +37,7 @@ make all
 
 ## Workflow
 
-SCF `pw.x` ---> RMTA `rmta.x`
+SCF `$QE_ROOT/pw.x` ---> RMTA `$PPRMTA_ROOT/rmta.x`
 
 ## Executable
 `rmta.x` in the installation `bin` folder ---> calculate electronic McMillan-Hopfield factors
