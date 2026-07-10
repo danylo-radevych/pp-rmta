@@ -12,18 +12,21 @@ MODFLAGS = $(BASEMOD_FLAGS) \
           $(MOD_FLAG)$(QE_ROOT)/PP/src \
           $(MOD_FLAG)./src
 
-RMTAOBJS = \
-muffin_tin.o \
-mh_eta.o \
-part_dos.o \
-hamann.o \
-rmta_lschps_qe.o \
-compare.o \
-sym_type.o \
-mt_var.o \
-neighbor.o \
-mt_printing.o \
-const.o
+RMTASRC = \
+muffin_tin.f90 \
+mh_eta.f90 \
+part_dos.f90 \
+hamann.f90 \
+rmta_lschps_qe.f90 \
+compare.f90 \
+sym_type.f90 \
+mt_var.f90 \
+neighbor.f90 \
+mt_printing.f90 \
+const.f90
+
+### object files:
+RMTAOBJS = $(addsuffix .o , $(basename $(RMTASRC)))
 
 PPOBJS = $(QE_ROOT)/PP/src/libpp.a
 LD1OBJS = $(QE_ROOT)/atomic/src/libld1.a
@@ -47,5 +50,8 @@ rmta.x : rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS)
 clean :
 	- /bin/rm -f *.x *.o *.a *~ *.mod
 	- /bin/rm -f ../bin/rmta.x librmta.a
+
+depend .depend:
+	makedepf90 -free -I $(VPATH) $(SRC) > .depend
 
 include make.depend
