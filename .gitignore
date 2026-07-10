@@ -2,3 +2,11 @@
 *.o
 *.x
 *.mod
+*.png
+*.pdf
+*.svg
+*.dat
+*.in
+*.out
+*.tar.xz
+tempdir*
