@@ -19,9 +19,9 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-In the $PPRMTA root folder:
+In the `pprmta` root folder:
 
-Edit the `QE_ROOT` in the Makefile to link the desired QE installation, and run
+Edit the `QE_ROOT` in the `Makefile` to link the desired QE installation, and run
 
 ```
 make all
@@ -35,8 +35,8 @@ SCF `pw.x` ---> RMTA `rmta.x`
 `rmta.x` in the installation `bin` folder ---> calculate electronic McMillan-Hopfield factors
 
 ```
-mpirun -n $SLURM_NTASKS $QE/bin/pw.x < $prefix.scf.in > $prefix.scf.out
-mpirun -n 1 $PPRMTA/bin/rmta.x < $prefix.rmta.in > $prefix.rmta.out
+mpirun -n $SLURM_NTASKS $QE_ROOT/bin/pw.x < $prefix.scf.in > $prefix.scf.out
+mpirun -n 1 $PPRMTA_ROOT/bin/rmta.x < $prefix.rmta.in > $prefix.rmta.out
 ```
 
 ---
@@ -74,68 +74,68 @@ recalculated from `chi` functions and `beta` projectors.
 
 ## Examples
 
-**`$PPRMTA/examples/nb-bcc_sl_rmt_default`**: bcc Nb simple metal with 
+**`$PPRMTA_ROOT/examples/nb-bcc_sl_rmt_default`**: bcc Nb simple metal with 
 automatically calculated MT radii, a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v3si-a15_sl_rmt_default`**: *A*15 V<sub>3</sub>Si 
+**`$PPRMTA_ROOT/examples/v3si-a15_sl_rmt_default`**: *A*15 V<sub>3</sub>Si 
 compound with automatically calculated MT radii, pseudopotentials
 explicitly containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v-bcc`**: bcc V simple metal with standard pseudopotential from
+**`$PPRMTA_ROOT/examples/v-bcc`**: bcc V simple metal with standard pseudopotential from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v-bcc_sl`**: bcc V simple metal with a pseudopotential explicitly
+**`$PPRMTA_ROOT/examples/v-bcc_sl`**: bcc V simple metal with a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/nb-bcc`**: bcc Nb simple metal with standard pseudopotential from
+**`$PPRMTA_ROOT/examples/nb-bcc`**: bcc Nb simple metal with standard pseudopotential from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/nb-bcc_sl`**: bcc Nb simple metal with a pseudopotential explicitly
+**`$PPRMTA_ROOT/examples/nb-bcc_sl`**: bcc Nb simple metal with a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/mo-bcc`**: bcc Mo simple metal with standard pseudopotential from
+**`$PPRMTA_ROOT/examples/mo-bcc`**: bcc Mo simple metal with standard pseudopotential from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/mo-bcc_sl`**: bcc Mo simple metal with a pseudopotential explicitly
+**`$PPRMTA_ROOT/examples/mo-bcc_sl`**: bcc Mo simple metal with a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/pd-fcc`**: fcc Pd simple metal with standard pseudopotential from
+**`$PPRMTA_ROOT/examples/pd-fcc`**: fcc Pd simple metal with standard pseudopotential from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/pd-fcc_sl`**: fcc Pd simple metal with a pseudopotential explicitly
+**`$PPRMTA_ROOT/examples/pd-fcc_sl`**: fcc Pd simple metal with a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/nbn-b1`**: *B*1 NbN compound with standard pseudopotentials from
+**`$PPRMTA_ROOT/examples/nbn-b1`**: *B*1 NbN compound with standard pseudopotentials from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/nbn-b1_sl`**: *B*1 NbN compound with pseudopotentials explicitly
+**`$PPRMTA_ROOT/examples/nbn-b1_sl`**: *B*1 NbN compound with pseudopotentials explicitly
 containing the `PP_SEMILOCAL` blocks, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v3si-a15`**: *A*15 V<sub>3</sub>Si compound with standard pseudopotentials from
+**`$PPRMTA_ROOT/examples/v3si-a15`**: *A*15 V<sub>3</sub>Si compound with standard pseudopotentials from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v3si-a15_sl`**: *A*15 V<sub>3</sub>Si compound with pseudopotentials explicitly
+**`$PPRMTA_ROOT/examples/v3si-a15_sl`**: *A*15 V<sub>3</sub>Si compound with pseudopotentials explicitly
 containing the `PP_SEMILOCAL` blocks, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v3sn-a15`**: *A*15 V<sub>3</sub>Sn compound with standard pseudopotentials from
+**`$PPRMTA_ROOT/examples/v3sn-a15`**: *A*15 V<sub>3</sub>Sn compound with standard pseudopotentials from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
-**`$PPRMTA/examples/v3sn-a15_sl`**: *A*15 V<sub>3</sub>Sn compound with pseudopotentials explicitly
+**`$PPRMTA_ROOT/examples/v3sn-a15_sl`**: *A*15 V<sub>3</sub>Sn compound with pseudopotentials explicitly
 containing the `PP_SEMILOCAL` blocks, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
