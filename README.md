@@ -37,7 +37,7 @@ make all
 
 ## Workflow
 
-SCF `$QE_ROOT/pw.x` ---> RMTA `$PPRMTA_ROOT/rmta.x`
+SCF `$QE_ROOT/bin/pw.x` ---> RMTA `$PPRMTA_ROOT/bin/rmta.x`
 
 ## Executable
 `rmta.x` in the installation `bin` folder ---> calculate electronic McMillan-Hopfield factors
