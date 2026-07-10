@@ -1,14 +1,15 @@
 # Makefile for rmta.x
+# QE_ROOT = $(HOME)/install/rmta-qe
 
-include ../../../make.inc
+include $(QE_ROOT)/make.inc
 
 # location of needed modules and included files (if any)
 MODFLAGS = $(BASEMOD_FLAGS) \
-          $(MOD_FLAG)../../../dft-d3 \
-          $(MOD_FLAG)../../../PW/src \
-          $(MOD_FLAG)../../../atomic/src \
-          $(MOD_FLAG)../../../PP/src \
-          $(MOD_FLAG)../../../EPW/RMTA/src
+          $(MOD_FLAG)$(QE_ROOT)/dft-d3 \
+          $(MOD_FLAG)$(QE_ROOT)/PW/src \
+          $(MOD_FLAG)$(QE_ROOT)/atomic/src \
+          $(MOD_FLAG)$(QE_ROOT)/PP/src \
+          $(MOD_FLAG)./src
 
 RMTAOBJS = \
 muffin_tin.o \
@@ -23,14 +24,14 @@ neighbor.o \
 mt_printing.o \
 const.o
 
-PPOBJS = ../../../PP/src/libpp.a
-LD1OBJS = ../../../atomic/src/libld1.a
-PWOBJS = ../../../PW/src/libpw.a ../../../KS_Solvers/libks_solvers.a ../../../dft-d3/libdftd3qe.a
-QEMODS = ../../../KS_Solvers/libks_solvers.a ../../../dft-d3/libdftd3qe.a $(BASEMODS)
+PPOBJS = $(QE_ROOT)/PP/src/libpp.a
+LD1OBJS = $(QE_ROOT)/atomic/src/libld1.a
+PWOBJS = $(QE_ROOT)/PW/src/libpw.a $(QE_ROOT)/KS_Solvers/libks_solvers.a $(QE_ROOT)/dft-d3/libdftd3qe.a
+QEMODS = $(QE_ROOT)/KS_Solvers/libks_solvers.a $(QE_ROOT)/dft-d3/libdftd3qe.a $(BASEMODS)
 
-.PHONY: all pw pp ld1
+.PHONY: all
 
-all : pw librmta.a rmta.x
+all : librmta.a rmta.x
 
 librmta.a : $(RMTAOBJS)
 	$(AR) $(ARFLAGS) $@ $?
@@ -39,16 +40,7 @@ librmta.a : $(RMTAOBJS)
 rmta.x : rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS)
 	$(LD) $(LDFLAGS) -o $@ \
 	rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS) $(QELIBS)
-	- ( cd ../../../bin ; ln -fs ../EPW/RMTA/src/$@ . )
-
-pp $(PPOBJS) :
-	cd ../../../ ; make pp
-
-ld1 $(LD1OBJS) :
-	cd ../../../ ; make ld1
-
-pw $(PWOBJS) :
-	cd ../../../ ; make pw
+	- ( cd ../; mkdir -vp bin; cd bin; ln -fs ../src/$@ . )
 
 
 clean :
