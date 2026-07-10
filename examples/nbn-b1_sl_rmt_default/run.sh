@@ -3,7 +3,7 @@
 ncpu=6
 # ncpu=$SLURM_NTASKS
 
-QEBIN='../../../../bin'
+QEBIN='../../bin'
 BIN_DIR=$QEBIN
 EXEC="mpirun"
 ECHO=echo
