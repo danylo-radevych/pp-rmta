@@ -1,7 +1,5 @@
 # Makefile for rmta.x
-# QE_ROOT = $(HOME)/install/rmta-qe
 
-# include ../make.inc
 include $(QE_ROOT)/make.inc
 
 # location of needed modules and included files (if any)
@@ -58,5 +56,4 @@ clean :
 depend .depend :
 	makedepf90 -free $(RMTASRC) > .depend
 
-# include make.depend
 include .depend
