@@ -79,17 +79,19 @@ recalculated from `chi` functions and `beta` projectors.
 
 
 ## Examples
-
+<!-- 
 **`$PPRMTA_ROOT/examples/nb-bcc_sl_rmt_default`**: bcc Nb simple metal with 
 automatically calculated MT radii, a pseudopotential explicitly
 containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
+-->
 
 **`$PPRMTA_ROOT/examples/v3si-a15_sl_rmt_default`**: *A*15 V<sub>3</sub>Si 
 compound with automatically calculated MT radii, pseudopotentials
 explicitly containing the `PP_SEMILOCAL` block, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
 
+<!-- 
 **`$PPRMTA_ROOT/examples/v-bcc`**: bcc V simple metal with standard pseudopotential from
 PseudoDojo, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
@@ -145,3 +147,4 @@ plot radial functions with `python plot_lwrite_dat.py`
 **`$PPRMTA_ROOT/examples/v3sn-a15_sl`**: *A*15 V<sub>3</sub>Sn compound with pseudopotentials explicitly
 containing the `PP_SEMILOCAL` blocks, and `lwrite_dat = .true.`; 
 plot radial functions with `python plot_lwrite_dat.py`
+-->
