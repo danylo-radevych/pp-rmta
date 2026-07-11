@@ -27,9 +27,7 @@ make pw ld1 pp
 make install
 ```
 
-2. In the `PPRMTA_ROOT` root folder:
-
-edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
+2. In the `PPRMTA_ROOT` root folder, edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
 
 ```
 make all

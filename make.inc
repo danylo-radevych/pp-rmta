@@ -1,1 +1,1 @@
-export QE_ROOT=$(HOME)/install/rmta-qe
+export QE_ROOT=$(HOME)/install/qef-dr

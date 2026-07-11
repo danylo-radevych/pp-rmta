@@ -1,10 +1,13 @@
 #!/bin/bash
 
-ncpu=12
+. ../../paths.sh
+
+ncpu=8
 # ncpu=$SLURM_NTASKS
 
-QEBIN='../../bin'
-BIN_DIR=$QEBIN
+
+# QEBIN='../../bin'
+# BIN_DIR=$QEBIN
 EXEC="mpirun"
 ECHO=echo
 
@@ -183,7 +186,7 @@ file_check $name_check
 cat $name_check >> $NAME.in
 
 $ECHO "  running the scf calculation for $PREFIX..."
-$EXEC -n $ncpu $BIN_DIR/pw.x < $NAME.in > $OUT_DIR/$NAME.out
+$EXEC -n $ncpu $QE_ROOT/bin/pw.x < $NAME.in > $OUT_DIR/$NAME.out
 $ECHO "$SUFFIX is done"
 
 if [ $? -ne 0 ]; then
@@ -253,7 +256,7 @@ cat > ${NAME}.in << EOF
   rmt(8) = $RMT2
 /
 EOF
-$EXEC -n 1 $BIN_DIR/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
+$EXEC -n 1 $PPRMTA_ROOT/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
 
 $ECHO "$SUFFIX is done"
 

@@ -29,7 +29,8 @@ const.f90
 RMTAOBJS = $(addsuffix .o , $(basename $(RMTASRC)))
 
 PPOBJS = $(QE_ROOT)/PP/src/libpp.a
-LD1OBJS = $(QE_ROOT)/atomic/src/libld1.a
+#LD1OBJS = $(QE_ROOT)/atomic/src/libld1.a
+LD1OBJS := $(filter-out %/ld1.o, $(wildcard $(QE_ROOT)/atomic/src/*.o))
 PWOBJS = $(QE_ROOT)/PW/src/libpw.a $(QE_ROOT)/KS_Solvers/libks_solvers.a $(QE_ROOT)/dft-d3/libdftd3qe.a
 QEMODS = $(QE_ROOT)/KS_Solvers/libks_solvers.a $(QE_ROOT)/dft-d3/libdftd3qe.a $(BASEMODS)
 
@@ -41,17 +42,20 @@ librmta.a : $(RMTAOBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-rmta.x : rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS)
+rmta.x : rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(LD1MODS) $(PWOBJS) $(QEMODS)
 	$(LD) $(LDFLAGS) -o $@ \
-	rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(PWOBJS) $(QEMODS) $(QELIBS)
+	rmta.o librmta.a $(PPOBJS) $(LD1OBJS) $(LD1MODS) $(PWOBJS) $(QEMODS) $(QELIBS)
 	- ( cd ../; mkdir -vp bin; cd bin; ln -fs ../src/$@ . )
+	- ( cd ../; echo "export QE_ROOT=$(QE_ROOT)" > paths.sh; chmod +x paths.sh )
+	- ( cd ../; PPRMTA_ROOT=$$(pwd); echo "export PPRMTA_ROOT=$$PPRMTA_ROOT" >> paths.sh )
+# 	@$(SHELL) -c 'PPRMTA_ROOT=$$(pwd)/../; cd ../; echo "export PPRMTA_ROOT=$$PPRMTA_ROOT" >> paths.sh'
 
 
 clean :
 	- /bin/rm -f *.x *.o *.a *~ *.mod
 	- /bin/rm -f ../bin/rmta.x librmta.a
 
-depend .depend:
+depend .depend :
 	makedepf90 -free $(RMTASRC) > .depend
 
 # include make.depend
