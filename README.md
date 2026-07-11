@@ -1,3 +1,5 @@
+# PP-RMTA
+
 Standalone pseudopotential (PP) rigid muffin-tin approximation (RMTA) 
 implementation that can be compiled by linking to any installation of 
 Quantum ESPRESSO v7.5+, which is used as a DFT engine.
@@ -19,7 +21,7 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-1. Compile Quantum ESPRESSO (QE) in `QE_ROOT` folder with:
+- Compile Quantum ESPRESSO (QE) in `QE_ROOT` folder with:
 
 ```
 ./configure [OPTIONS]
@@ -27,7 +29,7 @@ make pw ld1 pp
 make install
 ```
 
-2. In the `PPRMTA_ROOT` root folder, edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
+- In the `PPRMTA_ROOT` root folder, edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
 
 ```
 make all
