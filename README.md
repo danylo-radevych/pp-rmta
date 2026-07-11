@@ -50,7 +50,7 @@ mpirun -n 1 $PPRMTA_ROOT/bin/rmta.x < $prefix.rmta.in > $prefix.rmta.out
 ## Pseudopotentials
 Hamann's 
 [Optimized Norm-Conserving Vanderbilt Pseudopotentials (ONCVPSP)](https://www.pseudo-dojo.org/) 
-pseudopotentials containing at least `PP_CHI` and `PP_BETA`
+containing at least `PP_CHI` and `PP_BETA`
 blocks are **required**.
 
 **Recommended** ONCVPSP pseudopotentials with explicit `PP_SEMILOCAL` blocks,
