@@ -56,7 +56,7 @@ blocks are **required**.
 **Recommended** ONCVPSP pseudopotentials with explicit `PP_SEMILOCAL` blocks,
 regenerated with the [ONCVPSP](https://github.com/oncvpsp/oncvpsp.git) 
 version 3.3.1 code based on the input from [PseudoDojo](https://www.pseudo-dojo.org/) 
-pseudopotentials, are available in the [ONCVPSP_SL](https://gitlab.com/rmta-qe/oncvpsp_sl)
+pseudopotentials, are available in the [oncvpsp-sl](https://github.com/danylo-radevych/oncvpsp-sl.git)
 repository. If present, `PP_SEMILOCAL` blocks are used.
 Otherwise, semilocal parts are 
 recalculated from `chi` functions and `beta` projectors.
