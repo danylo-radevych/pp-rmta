@@ -21,7 +21,7 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-- Compile Quantum ESPRESSO (QE) in `QE_ROOT` folder with:
+- Compile [Quantum ESPRESSO (QE)](https://gitlab.com/QEF/q-e.git) in the corresponding `QE_ROOT` folder with:
 
 ```
 ./configure [OPTIONS]
@@ -29,7 +29,7 @@ make pw ld1 pp
 make install
 ```
 
-- In the `PPRMTA_ROOT` root folder, edit the `QE_ROOT` in `make.inc` to link the desired QE installation, and run
+- In the `PPRMTA_ROOT` root folder of the present code, edit the `QE_ROOT` in `make.inc` to link the compiled QE installation, and run
 
 ```
 make all
