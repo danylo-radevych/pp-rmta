@@ -12,7 +12,7 @@
   MODULE muffin_tin
   !=============================================================================
   !!
-  !! Main module for the RMTA program in EPW/RMTA/src/rmta.f90.
+  !! Main module for the RMTA progra
   !!
   !=============================================================================
   !
