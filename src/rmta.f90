@@ -12,7 +12,7 @@
   PROGRAM rmta_prog
   !=============================================================================
   !!
-  !! Program for rigid muffin-tin approximation (RMTA) descriptor.
+  !! Program for rigid muffin-tin approximation (RMTA) factors
   !!
   !! Namelist name is &rmta.
   !!
