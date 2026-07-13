@@ -1738,7 +1738,7 @@
         WRITE(stdout,'(7x, "outdir = ", a)') outdir
         WRITE(stdout,'(7x, "tmp_dir = ", a)') tmp_dir
         !
-        IF (lnonlocal == .TRUE.) &
+        IF (lnonlocal) &
           CALL errore(routine_name, "lnonlocal is not supported", 1)
         !
       ENDIF
