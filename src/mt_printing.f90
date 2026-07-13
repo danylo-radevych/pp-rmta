@@ -1718,17 +1718,29 @@
     !
       USE io_global, ONLY: stdout, ionode
       USE io_files, ONLY: prefix, tmp_dir
+      USE mt_var, ONLY: lnonlocal
       !
       IMPLICIT NONE
       !
+      EXTERNAL :: errore
+      !
+      CHARACTER(len=200) :: routine_name
+      !! name of this subroutine
       CHARACTER(LEN=256), INTENT(IN) :: outdir
       CHARACTER(LEN=256), EXTERNAL :: trimcheck
       !
+      routine_name = "check_input"
+      !
       IF (ionode) THEN
+        !
         WRITE(stdout,'(/5x, "Check input:")')
         WRITE(stdout,'(7x, "prefix = ", a)') prefix
         WRITE(stdout,'(7x, "outdir = ", a)') outdir
         WRITE(stdout,'(7x, "tmp_dir = ", a)') tmp_dir
+        !
+        IF (lnonlocal == .TRUE.) &
+          CALL errore(routine_name, "lnonlocal is not supported", 1)
+        !
       ENDIF
       !
     !---------------------------------------------------------------------------

@@ -363,8 +363,6 @@
       !
       CALL solve_radial()
       !
-      ! IF (.NOT. lhamann) &
-      !   CALL rmta_set_u_derivatives()
       !
       ! log derivatives L_l(r, E_F), d L_l / d e
       !
@@ -913,14 +911,14 @@
         urf, duderf, dudrrf, d2udrderf, &
         vfullrf, rvfullrf, vlocscr00rf, vsemilocrf, &
         irf_max, &
-        lsemiloc, lhamann, lnonlocal, &
+        lsemiloc, lnonlocal, &
         mt_nrf, mt_rf, mt_dx
       USE sym_type, ONLY: ist_i
       USE constants, ONLY: eps12
       !
       IMPLICIT NONE
       !
-      EXTERNAL :: errore, rmta_lschps_qe
+      EXTERNAL :: errore
       !
       CHARACTER(len=200) :: routine_name
       !! name of this subroutine
@@ -967,7 +965,7 @@
       REAL(DP) :: de = 1.0E-6_dp
       !! de step for energy derivative
       !
-      ! pre-defined variables
+      ! pre-defined variables (QE lschps)
       !
       ! INTEGER :: mode = 1
       !! find energy and wavefunction of bound states,
@@ -976,7 +974,7 @@
       !! mode number for finding energy and wavefunction of bound state
       ! INTEGER :: mode = 3
       !! mode number for fixed-energy calculation
-      INTEGER :: mode = 5
+      ! INTEGER :: mode = 5
       !! for pseudopotential to produce wavefunction beyond
       !! radius used for pseudopotential construction
       !
@@ -1128,76 +1126,60 @@
             ! at e
             !
             e = fermi_energy(ispin)
-            ! IF (lhamann .AND. lnonlocal) THEN
-            !   !
-            !   CALL rmta_set_vkb(l, iat, mt_nrf, nvkb, vkb, evkb)
-            !   WRITE(stdout, '(/5x, A, 3es13.4)') "evkb(:) == ", evkb(:)
-            !   !
-            !   CALL hamann_lschvkbs(l, nvkb, e, mt_rf(ist_i(iat))%r(:), &
-            !     vfullrf(:, iorb, ispin, iat), vkb, &
-            !     evkb, &
-            !     urf(:, iorb, ispin, iat), &
-            !     dudrrf(:, iorb, ispin, iat), &
-            !     mt_nrf, nin)
-            ! ELSE
-            IF (lhamann) THEN
+            !
+            IF (lnonlocal) THEN
+              !
+              ! CALL rmta_set_vkb(l, iat, mt_nrf, nvkb, vkb, evkb)
+              ! WRITE(stdout, '(/5x, A, 3es13.4)') "evkb(:) == ", evkb(:)
+              !
+              CALL hamann_lschvkbs(l, nvkb, e, mt_rf(:, ist_i(iat)), &
+                vfullrf(:, iorb, ispin, iat), vkb, &
+                evkb, &
+                urf(:, iorb, ispin, iat), &
+                dudrrf(:, iorb, ispin, iat), &
+                mt_nrf, nin)
+            ELSE
               CALL hamann_lschps(l, nstop, e, mt_rf(:, ist_i(iat)), &
                 vfullrf(:, iorb, ispin, iat), &
                 urf(:, iorb, ispin, iat), &
                 dudrrf(:, iorb, ispin, iat), mt_nrf, nin)
-            ELSE
-              CALL rmta_lschps_qe(mode, z, eps, mt_rf(:, ist_i(iat)), &
-                nin, n, l, e, &
-                vfullrf(:, iorb, ispin, iat), &
-                urf(:, iorb, ispin, iat), &
-                dudrrf(:, iorb, ispin, iat), nstop)
             END IF
             !
             ! at e + de
             !
             e = fermi_energy(ispin) + de
-            IF (lhamann .AND. lnonlocal) THEN
+            IF (lnonlocal) THEN
               CALL hamann_lschvkbs(l, nvkb, e, mt_rf(:, ist_i(iat)), &
                 vfullrf(:, iorb, ispin, iat), vkb, &
                 evkb, &
                 urf_at_de_up(:), &
                 dudrrf_at_de_up(:), &
                 mt_nrf, nin)
-            ELSE IF (lhamann) THEN
+            ELSE 
               CALL hamann_lschps(l, nstop, e, mt_rf(:, ist_i(iat)), &
                 vfullrf(:, iorb, ispin, iat), &
                 urf_at_de_up(:), &
                 dudrrf_at_de_up(:), mt_nrf, nin)
-            ELSE
-              CALL rmta_lschps_qe(mode, z, eps, mt_rf(:, ist_i(iat)), &
-                nin, n, l, e, &
-                vfullrf(:, iorb, ispin, iat), &
-                urf_at_de_up(:), &
-                dudrrf_at_de_up(:), nstop)
             END IF
+            !
             ! dudrrf_at_de_up(:) = dudrrf_at_de_up(:) / mt_rabf(:)
             !
             ! at e - de
             !
             e = fermi_energy(ispin) - de
-            IF (lhamann .AND. lnonlocal) THEN
+            !
+            IF (lnonlocal) THEN
               CALL hamann_lschvkbs(l, nvkb, e, mt_rf(:, ist_i(iat)), &
                 vfullrf(:, iorb, ispin, iat), vkb, &
                 evkb, &
                 urf_at_de_down(:), &
                 dudrrf_at_de_down(:), &
                 mt_nrf, nin)
-            ELSE IF (lhamann) THEN
+            ELSE
               CALL hamann_lschps(l, nstop, e, mt_rf(:, ist_i(iat)), &
                 vfullrf(:, iorb, ispin, iat), &
                 urf_at_de_down(:), &
                 dudrrf_at_de_down(:), mt_nrf, nin)
-            ELSE
-              CALL rmta_lschps_qe(mode, z, eps, mt_rf(:, ist_i(iat)), &
-                nin, n, l, e, &
-                vfullrf(:, iorb, ispin, iat), &
-                urf_at_de_down(:), &
-                dudrrf_at_de_down(:), nstop)
             END IF
             !
             !

@@ -15,7 +15,6 @@ muffin_tin.f90 \
 mh_eta.f90 \
 part_dos.f90 \
 hamann.f90 \
-rmta_lschps_qe.f90 \
 compare.f90 \
 sym_type.f90 \
 mt_var.f90 \

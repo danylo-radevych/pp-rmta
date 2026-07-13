@@ -52,7 +52,7 @@
       luse_ref_pot, luse_tot_dos, &
       rmta_code, rmta_routine, & ! variables
       atomic_type, lsemiloc, lhybrid, &
-      lsemilocupf, lhamann, lnonlocal, &
+      lsemilocupf, lnonlocal, &
       lwrite_dat, mt_ngauss, mt_degauss, &
       irf_delta, lrmt, &
       ltetra, ldense_r_grid, &
@@ -142,8 +142,7 @@
     !
     ltetra = .TRUE.
     lhybrid = .FALSE.
-    lhamann = .TRUE.
-    lnonlocal = .FALSE.
+    lnonlocal = .FALSE. ! non-local form is not functional at this point
     lsemiloc = .TRUE.
     lsemilocupf = .FALSE. ! will reset to .TRUE. if pseudo has PP_SEMILOCAL
     luse_ref_pot = .FALSE. ! only for debug with FLAPW potential
@@ -186,7 +185,6 @@
     CALL mp_bcast(lsemiloc, ionode_id, intra_image_comm)
     CALL mp_bcast(lsemilocupf, ionode_id, intra_image_comm)
     CALL mp_bcast(lhybrid, ionode_id, intra_image_comm)
-    CALL mp_bcast(lhamann, ionode_id, intra_image_comm)
     CALL mp_bcast(lnonlocal, ionode_id, intra_image_comm)
     CALL mp_bcast(lrmt, ionode_id, intra_image_comm)
     CALL mp_bcast(rmt, ionode_id, intra_image_comm)

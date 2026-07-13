@@ -48,7 +48,7 @@
       rmta_routine, rmta_code, &
       atomic_type, &
       lsemiloc, lsemilocupf, &
-      lhybrid, lhamann, lnonlocal, &
+      lhybrid, lnonlocal, &
       lwrite_dat, &
       mt_ngauss, mt_degauss, &
       mt_rab, &
@@ -91,8 +91,6 @@
     !! if true, use high number of points on radial grid
     LOGICAL :: lwrite_dat
     !! if true, write data in *.dat files
-    LOGICAL :: lhamann
-    !! use Hamann's subroutines
     LOGICAL :: lnonlocal
     !! use nonlocal operator V_{NL}(r, r')
     LOGICAL :: luse_ref_pot

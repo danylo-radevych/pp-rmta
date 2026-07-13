@@ -52,7 +52,7 @@
       !
       !Input variables
       INTEGER, INTENT(in) :: mmax,mch
-      REAL(DP), INTENT(in) :: rr(mmax),vv(mmax)
+      REAL(DP), INTENT(in) :: rr(mmax), vv(mmax)
       INTEGER, INTENT(in) :: ll
       !
       !Output variables
