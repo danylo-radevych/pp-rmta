@@ -56,7 +56,7 @@
       lwrite_dat, mt_ngauss, mt_degauss, &
       irf_delta, lrmt, &
       ltetra, ldense_r_grid, &
-      rmt
+      rmt, rmt_method
     USE mt_printing, ONLY: &
       print_welcome_message, rmta_write, &
       print_clocks, check_input
@@ -98,6 +98,7 @@
     !
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
+    rmt_method = "default"
     rmt(:) = -1.0_dp
     ngauss = -99
     degauss = 0.001_dp
@@ -187,6 +188,7 @@
     CALL mp_bcast(lhybrid, ionode_id, intra_image_comm)
     CALL mp_bcast(lnonlocal, ionode_id, intra_image_comm)
     CALL mp_bcast(lrmt, ionode_id, intra_image_comm)
+    CALL mp_bcast(rmt_method, ionode_id, intra_image_comm)
     CALL mp_bcast(rmt, ionode_id, intra_image_comm)
     CALL mp_bcast(lwrite_dat, ionode_id, intra_image_comm)
     CALL mp_bcast(mt_ngauss, ionode_id, intra_image_comm)

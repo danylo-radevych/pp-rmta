@@ -56,7 +56,7 @@
       nbetas, beta_label, &
       mt_grid, &
       mt_nrf, mt_rf, mt_rfab, mt_dx, rmta_ng, lrmt, &
-      ltetra, ldense_r_grid, rmt
+      ltetra, ldense_r_grid, rmt, rmt_method
     !
     !
     PRIVATE :: set_orbitals, set_tau_cart, set_rmt_from_nn, set_chem_type, &
@@ -74,6 +74,8 @@
     !! Name of the code (short)
     CHARACTER(len = 256) :: atomic_type
     !! TODO: obsolete
+    CHARACTER(LEN=128) :: rmt_method
+    !! Method for the selection of MT radii
     CHARACTER(LEN=1), ALLOCATABLE :: orb_label(:)
     !! orbital labels
     CHARACTER(LEN=5), ALLOCATABLE :: mll1rf_label(:, :, :)
@@ -384,7 +386,7 @@
       !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
       !! error code
-      INTEGER :: ist, iat
+      INTEGER :: ist, iat, jat
       !! iterators
       REAL(DP) :: rtmp
       !! real temporary var
@@ -395,7 +397,7 @@
       !
       routine_name = "set_rmt_from_nn"
       !
-      ltouch = .TRUE.
+      ltouch = .FALSE.
       !
       ALLOCATE(mt_r_mt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_r_mt', 1)
@@ -429,16 +431,70 @@
             !
             mt_r_mt(ist_i(iat)) = rtmp
             !
-            IF (mt_r_mt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
-              WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
-              WRITE(stdout, '(6x, "MT radius: ", &
-                F10.8, " bohr = ", F10.8, " A")') &
-                mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohrtoang
-              CALL errore(routine_name, &
-                "first MT radius guess is too small.", 1)
+          END IF
+          !
+          DO jat = 1, natoms
+            !
+            IF (iat == inn_i(jat)) THEN
+              !
+              IF ( (mt_r_mt(ist_i(iat)) > 0.0_dp) .AND. &
+                (mt_r_mt(ist_i(jat)) > 0.0_dp) .AND. &
+                (mt_r_mt(ist_i(iat)) + mt_r_mt(ist_i(jat)) - &
+                nn_dist(jat)) > 0.0_dp ) THEN
+                !
+                rtmp = nn_dist(jat) - mt_r_mt(ist_i(jat))
+                !
+                IF (rtmp < mt_r_mt(ist_i(iat))) THEN
+                  mt_r_mt(ist_i(iat)) = rtmp
+                END IF
+                !
+              ELSE IF ((mt_r_mt(ist_i(iat)) > 0.0_dp) .AND. &
+                (mt_r_mt(ist_i(jat)) < 0.0_dp)) THEN
+                !
+                mt_r_mt(ist_i(jat)) = nn_dist(jat) - mt_r_mt(ist_i(iat))
+                !
+              END IF
+              !
+            END IF ! jat
+            !
+          END DO
+          !
+          IF ( (mt_r_mt(ist_i(iat)) > 0.0_dp) .AND. &
+            (mt_r_mt(ist_i(inn_i(iat))) > 0.0_dp) .AND. &
+            (mt_r_mt(ist_i(iat)) + mt_r_mt(ist_i(inn_i(iat))) - &
+            nn_dist(iat)) > 0.0_dp ) THEN
+            !
+            rtmp = nn_dist(iat) - mt_r_mt(ist_i(inn_i(iat)))
+            !
+            IF (rtmp < mt_r_mt(ist_i(iat))) THEN
+              mt_r_mt(ist_i(iat)) = rtmp
             END IF
             !
           END IF
+          !
+          IF (mt_r_mt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
+            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+            WRITE(stdout, '(6x, "MT radius: ", &
+              F10.8, " bohr = ", F10.8, " A")') &
+              mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohrtoang
+            CALL errore(routine_name, &
+              "first MT radius guess is too small.", 1)
+          ELSE IF (mt_r_mt(ist_i(iat)) > nn_dist(iat)) THEN
+            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+            WRITE(stdout, '(6x, "MT radius: ", &
+              F10.8, " bohr = ", F10.8, " A")') &
+              mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohrtoang
+            CALL errore(routine_name, &
+              "first MT radius guess is too high.", 1)
+          ELSE IF (mt_r_mt(ist_i(iat)) < 0.0_dp) THEN
+            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+            WRITE(stdout, '(6x, "MT radius: ", &
+              F10.8, " bohr = ", F10.8, " A")') &
+              mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(iat)) * bohrtoang
+            CALL errore(routine_name, &
+              "first MT radius guess not assigned.", 1)
+          END IF
+          !
           !
         END DO ! iat
         !
@@ -515,16 +571,38 @@
         !
       END DO
       !
+      DO iat = 1, natoms
+        !
+        IF ( (mt_r_mt(ist_i(iat)) + mt_r_mt(ist_i(inn_i(iat))) - &
+          nn_dist(iat)) > eps6 ) THEN
+          !
+          WRITE(stdout, '(/5x, "Spheres ", I0, " and ", I0, " overlap:")') &
+            iat, inn_i(iat)
+          WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > " F0.16)') &
+            mt_r_mt(ist_i(iat)), mt_r_mt(ist_i(inn_i(iat))), nn_dist(iat)
+          CALL errore(routine_name, "Error for overlapping spheres", 1)
+          !
+        END IF
+        !
+      END DO ! iat
+      !
       !
       ! printing
       !
-      WRITE(stdout, '(/5x, "MT radii")')
+      WRITE(stdout, '(/5x, "MT radii for symmetry types")')
       DO ist = 1, nst
         WRITE(stdout, '(5x)')
         WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
         WRITE(stdout, '(6x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
           mt_r_mt(ist), mt_r_mt(ist) * bohrtoang
       END DO ! ist
+      WRITE(stdout, '(/5x, /5x)')
+      !
+      WRITE(stdout, '(/5x, "MT radii for atoms")')
+      DO iat = 1, natoms
+        WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
+          iat, mt_r_mt(ist_i(iat))
+      END DO ! iat
       WRITE(stdout, '(/5x, /5x)')
       !
       DEALLOCATE(lrmt_fixed, STAT = ierr)
