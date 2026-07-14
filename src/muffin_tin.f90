@@ -693,7 +693,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    REAL(DP) FUNCTION rmta_integrate_u2(nr, dx, r, ur, l)
+    PURE REAL(DP) FUNCTION rmta_integrate_u2(nr, dx, r, ur, l)
     !---------------------------------------------------------------------------
     !!
     !! Integrates u^2(r) on logarithmic mesh.
