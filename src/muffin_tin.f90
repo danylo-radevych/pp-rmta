@@ -285,7 +285,7 @@
               !
               gtau = DOT_PRODUCT(g(1 : 3, ig), tau(:, iat))
               !
-              ! expinential factor
+              ! exponential factor
               !
               ! old
               ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND=DP)
