@@ -71,6 +71,7 @@ recalculated from `chi` functions and `beta` projectors.
 | `CHARACTER`  | `prefix`     | `'pwscf'` | prefix used in the SCF calculation |
 | `CHARACTER`  | `outdir`     | `'./'`    | folder where SCF wavefunctions and charge density are stored |
 | `LOGICAL`    | `lwrite_dat` | `.false.` | if `.true.`, write spherical potentials and radial functions in `*.dat` files for subsequent plotting with the `plot_lwrite_dat.py` script (not required) |
+| `LOGICAL`    | `lhybrid`    | `.false.` | if `.true.`, evaulate energy derivatives of log derivatives as integrals of u^2(r); if `.false.`, evaluate energy derivatives explicitly |
 | `LOGICAL`    | `lrmt`       | `.false.` | if `.true.`, read MT radii for each atom, specified in the `rmt(:)` array, from input; if `.false.`, calculate MT radii by dividing nearest-neighbor distances in ratios of the corresponding internal default MT radii, without reading `rmt(:)` |
 | `REAL`       | `rmt(:)`     | `-1.0`    | MT radii of each atom in bohr; when `lrmt == .false.`, defaults to MT radii calculated from nearest-neighbor distances and internal default MT radii; if MT radii of any two atoms of the same symmetry type are different, the code stops |
 
