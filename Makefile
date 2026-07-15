@@ -1,5 +1,3 @@
-# export QE_ROOT = $(HOME)/install/rmta-qe
-
 include make.inc
 
 MAKE = make
