@@ -1291,10 +1291,10 @@
         irf_max, &
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
-        loglrf, dloglderf, &
+        urf, loglrf, dloglderf, &
         lhybrid
       USE sym_type, ONLY: ist_i
-      USE constants, ONLY: eps12
+      USE constants, ONLY: eps6, eps12
       !
       IMPLICIT NONE
       !
@@ -1314,6 +1314,14 @@
       !! V(r) - E_F
       REAL(DP) :: rmtf
       !! current r_{MT} radius, on fine grid
+      REAL(DP) :: ul
+      !! u_l(r)
+      REAL(DP) :: ul1
+      !! u_l+1(r)
+      REAL(DP) :: rl
+      !! R_l(r) = u_l(r) / r
+      REAL(DP) :: rl1
+      !! R_l+1(r) = u_l+1(r) / r
       REAL(DP) :: logl
       !! L_l(r) = r R' / R = r u' / u - 1
       REAL(DP) :: logl1
@@ -1340,10 +1348,10 @@
       !
       IF (lhybrid) THEN
         WRITE(stdout, '(/5x, /5x, /5x, &
-          ">>>>>>>>>>>>  HYBRID START  <<<<<<<<<<<<")')
+          ">>>>>>>>>>>>  HYBRID BEGIN  <<<<<<<<<<<<")')
       ELSE
         WRITE(stdout, '(/5x, /5x, /5x, &
-          ">>>>>>>>>>>> PETTIFOR START <<<<<<<<<<<<")')
+          ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
       END IF
       !
       !
@@ -1358,7 +1366,7 @@
         !
         DO ispin = 1, nspins
           !
-          WRITE(stdout, '(/5x, A, I3, A, I3)') &
+          WRITE(stdout, '(/7x, A, I3, A, I3)') &
               "atom: ", iat, " spin: ", ispin
           !
           ! interpolate veff
@@ -1369,11 +1377,11 @@
           !
           veff = v0 - fermi_energy(ispin)
           !
-          WRITE(stdout, '(/5x, A, F16.8, A)') &
+          WRITE(stdout, '(/7x, A, F16.8, A)') &
             "E_F", fermi_energy(ispin), " (Ry)"
-          WRITE(stdout, '(5x, A, F16.8, A)') &
+          WRITE(stdout, '(7x, A, F16.8, A)') &
             "V(r_mt)", v0, " (Ry)"
-          WRITE(stdout, '(5x, A, F16.8, A)') &
+          WRITE(stdout, '(7x, A, F16.8, A)') &
            "V(r_mt) - E_F", veff, " (Ry)"
           !
           !
@@ -1440,19 +1448,45 @@
             !
             rmtf = mt_rf(mt_nrf, ist_i(iat))
             !
+            ul = urf(mt_nrf, iorb, ispin, iat)
+            ul1 = urf(mt_nrf, iorb + 1, ispin, iat)
+            rl = ul / rmtf
+            rl1 = ul1 / rmtf
             logl = loglrf(mt_nrf, iorb, ispin, iat)
             logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
             dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
             dlogl1de = dloglderf(mt_nrf, iorb + 1, ispin, iat)
             !
-            WRITE(stdout, '(/5x, A, I1, A, F16.8)') &
+            WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
+              "u_", iorb - 1, "(r_mt) = ", ul
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+              "R_", iorb - 1, "(r_mt) = ", rl
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "L_", iorb - 1, "(r_mt) = ", logl
-            WRITE(stdout, '(5x, A, I1, A, F16.8, A)') &
+            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
               "dL_", iorb - 1, "(r_mt) / de = ", dloglde, " (1 / Ry)"
-            WRITE(stdout, '(/5x, A, I1, A, F16.8)') &
+            !
+            IF (ABS(ul) < eps6) THEN
+              WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
+                iorb - 1
+              CALL errore(routine_name, "Adjust rmt.")
+            END IF
+            !
+            WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
+              "u_", iorb, "(r_mt) = ", ul1
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+              "R_", iorb, "(r_mt) = ", rl1
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "L_", iorb, "(r_mt) = ", logl1
-            WRITE(stdout, '(5x, A, I1, A, F16.8, A)') &
+            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
               "dL_", iorb, "(r_mt) / de = ", dlogl1de, " (1 / Ry)"
+            !
+            IF (ABS(ul1) < eps6) THEN
+              WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
+                iorb
+              CALL errore(routine_name, "Adjust rmt.")
+            END IF
+            !
             !
             ! interpolate M_{l, l+1} at r_mt (Ry / bohr)
             !
