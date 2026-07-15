@@ -89,7 +89,7 @@
     !
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
-      dnr, lrmt, rmt, ltetra
+      dnr, lrmt, rmt, ltetra, lhybrid
     !
     ! defaults
     !
@@ -173,6 +173,7 @@
       mt_degauss = degauss
       !
     ENDIF
+    !
     !
     !
     CALL mp_bcast(ios, ionode_id, intra_image_comm)

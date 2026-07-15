@@ -765,7 +765,7 @@
        INTEGER, INTENT(in) :: nat
        !! number of atoms
        INTEGER, INTENT(in) :: stp(:)
-      !! array converting atom indices into symmetry type indices, stp(atom)
+       !! array converting atom indices into symmetry type indices, stp(atom)
        INTEGER, INTENT(in) :: norb
        !! number of orbitals
        INTEGER, INTENT(in) :: nspins
@@ -827,6 +827,7 @@
                      urf(ir, iorb, ispin, iat)) * &
                      rmta_integrate_u2(ir, dx(stp(iat)), rf(:, stp(iat)), &
                      urf(:, iorb, ispin, iat), iorb - 1)
+                   !
                  END IF ! lhybrid
                  !
                END IF ! urf > eps12
