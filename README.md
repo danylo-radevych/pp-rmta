@@ -74,7 +74,7 @@ recalculated from `chi` functions and `beta` projectors.
 | `LOGICAL`    | `lhybrid`    | `.false.` | if `.true.`, evaulate energy derivatives of log derivatives as integrals of u^2(r); if `.false.`, evaluate energy derivatives explicitly |
 | `LOGICAL`    | `lrmt`       | `.false.` | if `.true.`, read MT radii for each atom, specified in the `rmt(:)` array, from input; if `.false.`, calculate MT radii by automatically with one of the methods specified in `rmt_method`, without reading `rmt(:)` |
 | `CHARACTER`  | `rmt_method` | `'touching'`| if `'default'`, set default MT radii from the table (results in very small MT radii); if `'neighbor'`, divide nearest-neighbor distances into ratios of the default MT radii (still leaves a lot of empty space); if `'touching'`, enforce touching spheres (recommended) |
-| `REAL`       | `rmt(:)`     | `-1.0`    | MT radii of each atom in bohr; when `lrmt == .false.`, defaults to MT radii calculated from nearest-neighbor distances and internal default MT radii; if MT radii of any two atoms of the same symmetry type are different, the code stops |
+| `REAL`       | `rmt(:)`     | `-1.0`    | MT radii of each atom in bohr; when `lrmt == .false.`, defaults to MT radii calculated with a method in `rmt_method`; if MT radii of any two atoms of the same symmetry type are different or atomic spheres overlap, the code stops |
 
 ---
 
