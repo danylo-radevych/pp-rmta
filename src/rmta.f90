@@ -89,7 +89,7 @@
     !
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
-      dnr, lrmt, rmt, ltetra, lhybrid
+      dnr, lrmt, rmt, ltetra, lhybrid, rmt_method
     !
     ! defaults
     !
@@ -98,7 +98,7 @@
     !
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
-    rmt_method = "default"
+    rmt_method = "touching"
     rmt(:) = -1.0_dp
     ngauss = -99
     degauss = 0.001_dp

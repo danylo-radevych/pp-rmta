@@ -395,7 +395,7 @@
       !
       routine_name = "set_rmt"
       !
-      ltouch = .TRUE.
+      ltouch = .FALSE.
       !
       ALLOCATE(mt_rmt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
@@ -407,106 +407,124 @@
       !
       IF (.NOT. lrmt) THEN
         !
-        DO iat = 1, natoms
-          !
-          DO inn = 1, nneighbors(iat)
-            !
-            ! this symmetry type
-            rmt_d_iat = rmt_default(st_name(ist_i(iat)))
-            ! its nearest neighbor symmetry type
-            rmt_d_iat_nn = &
-              rmt_default(st_name(ist_i(inn_i(iat, inn))))
-            !
-            !
-            rtmp = nn_dist(iat)  * & ! distance to the neighbor
-              rmt_d_iat / & ! this atom
-              (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
-            !
-            IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
-              (mt_rmt(ist_i(iat)) > rtmp)) THEN
-              !
-              mt_rmt(ist_i(iat)) = rtmp
-              !
-            END IF
-            !
-          END DO ! inn
-          !
-          !
-          !
-          IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
-            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
-            WRITE(stdout, '(6x, "MT radius: ", &
-              F10.8, " bohr = ", F10.8, " A")') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
-            CALL errore(routine_name, &
-              "First MT radius guess is too small.", 1)
-          ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
-            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
-            WRITE(stdout, '(6x, "MT radius: ", &
-              F10.8, " bohr = ", F10.8, " A")') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
-            CALL errore(routine_name, &
-              "First MT radius guess is too high.", 1)
-          ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
-            WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
-            WRITE(stdout, '(6x, "MT radius: ", &
-              F10.8, " bohr = ", F10.8, " A")') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
-            CALL errore(routine_name, &
-              "First MT radius guess not assigned.", 1)
-          END IF
-          !
-          !
-        END DO ! iat
+        ! automatically generated MT radii
         !
-        !
-        IF (ltouch) THEN
+        IF (TRIM(rmt_method) == "default") THEN
+          !
+          ! from MT-radius table
+          !
+          DO ist = 1, nst
+            mt_rmt(ist) = rmt_default(st_name(ist))
+          END DO ! ist
+          !
+        ELSE IF (TRIM(rmt_method) == "neighbor" .OR. &
+          TRIM(rmt_method) == "touching") THEN
+          !
+          ! based on the nearest-neighbor distances
           !
           DO iat = 1, natoms
             !
             DO inn = 1, nneighbors(iat)
               !
-              IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
-                nn_dist(iat)) < eps6) THEN
-                lrmt_fixed(ist_i(iat)) = .TRUE.
-                lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
+              ! this symmetry type
+              rmt_d_iat = rmt_default(st_name(ist_i(iat)))
+              ! its nearest neighbor symmetry type
+              rmt_d_iat_nn = &
+                rmt_default(st_name(ist_i(inn_i(iat, inn))))
+              !
+              !
+              rtmp = nn_dist(iat)  * & ! distance to the neighbor
+                rmt_d_iat / & ! this atom
+                (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
+              !
+              IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
+                (mt_rmt(ist_i(iat)) > rtmp)) THEN
+                !
+                mt_rmt(ist_i(iat)) = rtmp
+                !
               END IF
               !
             END DO ! inn
             !
-            IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
-              !
-              rtmp = -1.0_dp
-              !
-              DO inn = 1, nneighbors(iat)
-                !
-                ! IF (lrmt_fixed(ist_i(inn_i(iat, inn)))) THEN
-                  !
-                  rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat, inn)))
-                  !
-                  IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
-                    (rtmp < 0.0_dp)) THEN
-                    rtmp = rtmp2
-                  END IF
-                  !
-                ! END IF
-                !
-              END DO ! inn
-              !
-              IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
-                mt_rmt(ist_i(iat)) = rtmp
-              END IF
-              !
-              lrmt_fixed(ist_i(iat)) = .TRUE.
-              !
-              !
+            !
+            !
+            IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
+              WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+              WRITE(stdout, '(6x, "MT radius: ", &
+                F10.8, " bohr = ", F10.8, " A")') &
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+              CALL errore(routine_name, &
+                "First MT radius guess is too small.", 1)
+            ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
+              WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+              WRITE(stdout, '(6x, "MT radius: ", &
+                F10.8, " bohr = ", F10.8, " A")') &
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+              CALL errore(routine_name, &
+                "First MT radius guess is too high.", 1)
+            ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
+              WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+              WRITE(stdout, '(6x, "MT radius: ", &
+                F10.8, " bohr = ", F10.8, " A")') &
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+              CALL errore(routine_name, &
+                "First MT radius guess not assigned.", 1)
             END IF
+            !
             !
           END DO ! iat
           !
-        END IF ! ltouch
-        !
-        !
+          IF (TRIM(rmt_method) == "touching") THEN
+            ltouch = .TRUE.
+          END IF
+          !
+          IF (ltouch) THEN
+            !
+            DO iat = 1, natoms
+              !
+              DO inn = 1, nneighbors(iat)
+                !
+                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
+                  nn_dist(iat)) < eps6) THEN
+                  lrmt_fixed(ist_i(iat)) = .TRUE.
+                  lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
+                END IF
+                !
+              END DO ! inn
+              !
+              IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
+                !
+                rtmp = -1.0_dp
+                !
+                DO inn = 1, nneighbors(iat)
+                  !
+                  ! IF (lrmt_fixed(ist_i(inn_i(iat, inn)))) THEN
+                    !
+                    rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat, inn)))
+                    !
+                    IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
+                      (rtmp < 0.0_dp)) THEN
+                      rtmp = rtmp2
+                    END IF
+                    !
+                  ! END IF
+                  !
+                END DO ! inn
+                !
+                IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
+                  mt_rmt(ist_i(iat)) = rtmp
+                END IF
+                !
+                lrmt_fixed(ist_i(iat)) = .TRUE.
+                !
+                !
+              END IF
+              !
+            END DO ! iat
+            !
+          END IF ! ltouch
+          !
+        END IF ! rmt_method
         !
       ELSE
         !
