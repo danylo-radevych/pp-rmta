@@ -386,8 +386,8 @@
       !! error code
       INTEGER :: ist, iat, inn !, jat
       !! iterators
-      REAL(DP) :: rtmp
-      !! real temporary var
+      REAL(DP) :: rtmp, rtmp2
+      !! real temporary vars
       REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
       !! temprary default MT radii
       !
@@ -395,7 +395,7 @@
       !
       routine_name = "set_rmt"
       !
-      ltouch = .FALSE.
+      ltouch = .TRUE.
       !
       ALLOCATE(mt_rmt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
@@ -498,6 +498,57 @@
           !
           !
         END DO ! iat
+        !
+        !
+        IF (ltouch) THEN
+          !
+          DO iat = 1, natoms
+            !
+            DO inn = 1, nneighbors(iat)
+              !
+              IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
+                nn_dist(iat)) < eps6) THEN
+                lrmt_fixed(ist_i(iat)) = .TRUE.
+                lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
+              END IF
+              !
+            END DO ! inn
+            !
+            IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
+              !
+              rtmp = -1.0_dp
+              !
+              DO inn = 1, nneighbors(iat)
+                !
+                ! IF (lrmt_fixed(ist_i(inn_i(iat, inn)))) THEN
+                  !
+                  rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat, inn)))
+                  !
+                  IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
+                    (rtmp < 0.0_dp)) THEN
+                    rtmp = rtmp2
+                  END IF
+                  !
+                ! END IF
+                !
+              END DO ! inn
+              !
+              IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
+                mt_rmt(ist_i(iat)) = rtmp
+              END IF
+              !
+              lrmt_fixed(ist_i(iat)) = .TRUE.
+              !
+              ! IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
+              !   nn_dist(iat)) < eps6) THEN
+              !   lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
+              ! END IF
+              !
+            END IF
+            !
+          END DO ! iat
+          !
+        END IF ! ltouch
         !
         ! !
         ! IF (ltouch) THEN

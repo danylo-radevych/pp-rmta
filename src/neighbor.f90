@@ -208,19 +208,19 @@
         WRITE(stdout, '(7x, "neighbor distance: ", F10.8, " bohr = ", &
           F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
         !
-        WRITE(stdout, '(7x, "neighbor indices: ")')
+        WRITE(stdout, '(7x, "neighbor indices:", /8x)', advance='no')
         DO inn = 1, nneighbors(iat)
-          WRITE(stdout, '(8x, I3, " ")', advance='no') &
+          WRITE(stdout, '(I3, " ")', advance='no') &
             inn_i(iat, inn)
         END DO
-        WRITE(stdout, '(8x)')
+        WRITE(stdout, '()')
         !
-        WRITE(stdout, '(7x, "neighbor types: ")')
+        WRITE(stdout, '(7x, "neighbor types:", /8x)', advance='no')
         DO inn = 1, nneighbors(iat)
-          WRITE(stdout, '(8x, A3, " ")', advance='no') &
+          WRITE(stdout, '(A3, " ")', advance='no') &
             upf(ityp(inn_i(iat, inn)))%psd
         END DO
-        WRITE(stdout, '(8x)')
+        WRITE(stdout, '()')
         !
       END DO ! iat
       WRITE(stdout, '(/5x, /5x)')

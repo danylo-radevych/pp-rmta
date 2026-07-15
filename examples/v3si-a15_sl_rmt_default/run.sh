@@ -9,11 +9,11 @@ ncpu=8
 EXEC="mpirun"
 ECHO=echo
 
-lrun_scf=true
+lrun_scf=false
 lrun_rmta=true
 
-lsave_tmp_dir=false
-lsave_tmp_dir_tar=false
+lsave_tmp_dir=true
+lsave_tmp_dir_tar=true
 
 PREFIX='v3si-a15'
 IBRAV=1
