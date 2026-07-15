@@ -28,9 +28,11 @@
     !
     PUBLIC :: &
       allocate_nn, deallocate_nn, &
-      inn_i, nn_dist
+      nneighbors, inn_i, nn_dist
     !
-    INTEGER, ALLOCATABLE :: inn_i(:)
+    INTEGER, ALLOCATABLE :: nneighbors(:)
+    !! number of the nearest neighbors of each atom
+    INTEGER, ALLOCATABLE :: inn_i(:, :)
     !! indeces of the nearest neighbors of each atom
     REAL(DP), ALLOCATABLE :: nn_dist(:)
     !! distances to the nearest neighbors of each atom
@@ -50,7 +52,7 @@
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, bg, alat, omega
       USE const, ONLY: bohrtoang
-      USE constants, ONLY: eps12
+      USE constants, ONLY: eps6, eps12
       !
       IMPLICIT NONE
       !
@@ -60,7 +62,7 @@
       !! name of this subroutine
       INTEGER :: ierr
       !! error code
-      INTEGER :: iat, jat, nc1, nc2, nc3
+      INTEGER :: iat, jat, nc1, nc2, nc3, inn
       !! iterators
       INTEGER :: nc_max
       !! maximum index of the supercell
@@ -79,14 +81,20 @@
       !
       nc_max = 1
       !
-      ALLOCATE(inn_i(nat), STAT = ierr)
+      ALLOCATE(nneighbors(nat), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nneighbors', 1)
+      nneighbors(:) = 0
+      !
+      ALLOCATE(inn_i(nat, nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating inn_i', 1)
-      inn_i(:) = 0
+      inn_i(:, :) = -1
       !
       ALLOCATE(nn_dist(nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nn_dist', 1)
       nn_dist(:) = -1.0_dp
       !
+      !
+      ! minimize distance
       !
       DO iat = 1, nat
         DO jat = 1, nat
@@ -124,11 +132,70 @@
           IF ((nn_dist(iat) < 0.0_dp) .OR. &
             (jat_dist < nn_dist(iat))) THEN
             nn_dist(iat) = jat_dist
-            inn_i(iat) = jat
+            ! inn_i(iat) = jat
           END IF
           !
           !
         END DO ! jat
+        !
+        IF (nn_dist(iat) < 0.0_dp) THEN
+          WRITE(stdout, '("Distance to nearest-neighbor of atom ", I0, &
+            " not found")')
+          CALL errore(routine_name, "Error in nn_dist", 1)
+        END IF
+        !
+      END DO ! iat
+      !
+      !
+      ! record all atoms with the minimal distance
+      !
+      DO iat = 1, nat
+        DO jat = 1, nat
+          !
+          !
+          jat_dist = -1.0_dp
+          !
+          DO nc3 = - nc_max, nc_max
+            DO nc2 = - nc_max, nc_max
+              DO nc1 = - nc_max, nc_max
+                !
+                T(:) = (nc1 * at(:, 1) + &
+                  nc2 * at(:, 2) + &
+                  nc3 * at(:, 3))
+                !
+                dist_vec(:) = ((tau(:, jat) + T(:)) - tau(:, iat)) * &
+                  alat
+                tmp_dist = dist_vec(1) * dist_vec(1)
+                tmp_dist = tmp_dist + &
+                  dist_vec(2) * dist_vec(2)
+                tmp_dist = tmp_dist + &
+                  dist_vec(3) * dist_vec(3)
+                !
+                tmp_dist = SQRT(tmp_dist)
+                !
+                IF (((jat_dist < 0._dp) .OR. &
+                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps12)) THEN
+                  jat_dist = tmp_dist
+                END IF
+                !
+              END DO ! nc1
+            END DO ! nc2
+          END DO ! nc3
+          !
+          IF ((nn_dist(iat) >= 0.0_dp) .AND. &
+            (ABS(jat_dist - nn_dist(iat)) < eps6)) THEN
+            nneighbors(iat) = nneighbors(iat) + 1
+            inn_i(iat, nneighbors(iat)) = jat
+          END IF
+          !
+        END DO ! jat
+        !
+        IF (ALL(inn_i(iat, :) < 0.0_dp)) THEN
+          WRITE(stdout, '("Nearest-neighbor indices of atom ", I0, &
+            " not found")')
+          CALL errore(routine_name, "Error in inn_i", 1)
+        END IF
+        !
       END DO ! iat
       !
       ! printing
@@ -138,10 +205,22 @@
         WRITE(stdout, '(5x)')
         WRITE(stdout, '(6x, "atom #", I4, " out of ", I4, ": ", A4)') &
           iat, nat, upf(ityp(iat))%psd
+        WRITE(stdout, '(7x, "neighbor distance: ", F10.8, " bohr = ", &
+          F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
         !
-        WRITE(stdout, '(6x, "neighbor index: ", I4, &
-          " neighbor distance: ", F10.8, " bohr = ", F10.8, " A")') &
-          inn_i(iat), nn_dist(iat), nn_dist(iat) * bohrtoang
+        WRITE(stdout, '(7x, "neighbor indices: ")')
+        DO inn = 1, nneighbors(iat)
+          WRITE(stdout, '(8x, I3, " ")', advance='no') &
+            inn_i(iat, inn)
+        END DO
+        WRITE(stdout, '(8x)')
+        !
+        WRITE(stdout, '(7x, "neighbor types: ")')
+        DO inn = 1, nneighbors(iat)
+          WRITE(stdout, '(8x, A3, " ")', advance='no') &
+            upf(ityp(inn_i(iat, inn)))%psd
+        END DO
+        WRITE(stdout, '(8x)')
         !
       END DO ! iat
       WRITE(stdout, '(/5x, /5x)')
@@ -173,6 +252,10 @@
       !! error code
       !
       routine_name = "deallocate_nn"
+      !
+      DEALLOCATE(nneighbors, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating nneighbors', 1)
       !
       DEALLOCATE(inn_i, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating inn_i', 1)

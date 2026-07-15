@@ -112,54 +112,6 @@
       !
       !
       !
-      ! TODO: seriously obsolete debug block
-!       ! TODO sets type-specific test values
-!       ! to compare to Pettifor's results
-!       IF (atomic_type == 'Mo') THEN
-! !         mt_rmt = 2.93_dp
-!         rmta_wds4 = 6.9_dp
-!         !
-!         ALLOCATE(rmta_pse(6))
-!         rmta_pse(1) = -4.729384
-!         rmta_pse(2) = -0.300335
-!         rmta_pse(3) = -2.828610
-!         rmta_pse(4) = -0.076688
-!         rmta_pse(5) = -0.275824
-!         rmta_pse(6) =  0.300000
-!       ELSE IF (atomic_type == 'Y') THEN
-! !         mt_rmt = 3.76_dp
-!         rmta_wds4 = 1.78_dp
-!       ELSE IF (atomic_type == 'Nb') THEN
-! !         mt_rmt = 3.07_dp
-!         rmta_wds4 = 5.65_dp
-!         !
-!         ! 1981 Pickett
-!         ! mt_rmt = 2.685_dp
-!         !
-!         ALLOCATE(rmta_pse(6))
-!         rmta_pse(1) = -4.291834
-!         rmta_pse(2) = -0.292652
-!         rmta_pse(3) = -2.537228
-!         rmta_pse(4) = -0.500000
-!         rmta_pse(5) = -0.223446
-!         rmta_pse(6) =  0.200000
-!       ELSE IF (atomic_type == 'V') THEN
-!         ! Pickett
-! !         mt_rmt = 2.477_dp
-!         rmta_wds4 = 1.78_dp
-!       ELSE IF (atomic_type == 'Zr') THEN
-!         rmta_wds4 = 3.48_dp
-!       ELSE IF (atomic_type == 'Tc') THEN
-!         rmta_wds4 = 7.66_dp
-!       ELSE IF (atomic_type == 'Ru') THEN
-!         rmta_wds4 = 7.56_dp
-!       ELSE IF (atomic_type == 'Rh') THEN
-!         rmta_wds4 = 6.14_dp
-!       ELSE IF (atomic_type == 'Pd') THEN
-!         rmta_wds4 = 4.35_dp
-!       ELSE
-!         rmta_wds4 = 1.00_dp
-!       END IF
       !
       !
       ! check upf data
@@ -1337,7 +1289,7 @@
         nspins, fermi_energy, &
         mll1rf_label, mll1rf, &
         irf_max, &
-        mt_nrf, mt_rf, mt_r_mt, &
+        mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
         loglrf, dloglderf, &
         lhybrid
@@ -1385,7 +1337,6 @@
       mll1rf_label(:, :, :) = "?????"
       !
       nin = irf_max
-      ! imt = rmta_get_index(mt_nrf, mt_rf(1 : nin), mt_rmt)
       !
       IF (lhybrid) THEN
         WRITE(stdout, '(/5x, /5x, /5x, &
@@ -1402,7 +1353,7 @@
           " ==============================================================")') &
           iat, upf(ityp(iat))%psd
         rmtf = mt_rf(mt_nrf, ist_i(iat))
-        WRITE(stdout, '(/7x, "Desired r_mt: ", F10.4)') mt_r_mt(ist_i(iat))
+        WRITE(stdout, '(/7x, "Desired r_mt: ", F10.4)') mt_rmt(ist_i(iat))
         WRITE(stdout, '(/7x, "Actual r_mt: ", F10.4)') rmtf
         !
         DO ispin = 1, nspins
@@ -1483,22 +1434,7 @@
               !
               !
             END DO ! ir
-            ! !
-            ! ! interpolate L_l and d L_l / d e
-            ! !
-            ! CALL spline_interpolation(nin, mt_rf(:), &
-            !   loglrf(:, iorb, ispin, iat), &
-            !   mt_rmt, logl)
-            ! CALL spline_interpolation(nin, mt_rf(:), &
-            !   loglrf(:, iorb + 1, ispin, iat), &
-            !   mt_rmt, logl1)
-            ! !
-            ! CALL spline_interpolation(nin, mt_rf(:), &
-            !   dloglderf(:, iorb, ispin, iat), &
-            !   mt_rmt, dloglde)
-            ! CALL spline_interpolation(nin, mt_rf(:), &
-            !   dloglderf(:, iorb + 1, ispin, iat), &
-            !   mt_rmt, dlogl1de)
+            !
             !
             ! at rmtf
             !
