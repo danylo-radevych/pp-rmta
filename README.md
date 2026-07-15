@@ -10,7 +10,6 @@ Danylo Radevych<sup>1</sup>
 1. *Department of Physics and Astronomy,
    George Mason University, Fairfax, VA, USA*
 
-(June 2026)
 
 
 D\. Radevych, T. Shishidou, M. Weinert, E. R. Margine, A. N. Kolmogorov, I. I. Mazin,
