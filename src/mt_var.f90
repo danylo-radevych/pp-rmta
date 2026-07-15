@@ -433,46 +433,6 @@
           !
           !
           !
-          ! DO jat = 1, natoms
-          !   !
-          !   IF (iat == inn_i(jat)) THEN
-          !     !
-          !     IF ( (mt_rmt(ist_i(iat)) > 0.0_dp) .AND. &
-          !       (mt_rmt(ist_i(jat)) > 0.0_dp) .AND. &
-          !       (mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
-          !       nn_dist(jat)) > 0.0_dp ) THEN
-          !       !
-          !       rtmp = nn_dist(jat) - mt_rmt(ist_i(jat))
-          !       !
-          !       IF (rtmp < mt_rmt(ist_i(iat))) THEN
-          !         mt_rmt(ist_i(iat)) = rtmp
-          !       END IF
-          !       !
-          !     ELSE IF ((mt_rmt(ist_i(iat)) > 0.0_dp) .AND. &
-          !       (mt_rmt(ist_i(jat)) < 0.0_dp)) THEN
-          !       !
-          !       mt_rmt(ist_i(jat)) = nn_dist(jat) - mt_rmt(ist_i(iat))
-          !       !
-          !     END IF
-          !     !
-          !   END IF ! jat
-          !   !
-          ! END DO
-          ! !
-          ! IF ( (mt_rmt(ist_i(iat)) > 0.0_dp) .AND. &
-          !   (mt_rmt(ist_i(inn_i(iat))) > 0.0_dp) .AND. &
-          !   (mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat))) - &
-          !   nn_dist(iat)) > 0.0_dp ) THEN
-          !   !
-          !   rtmp = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat)))
-          !   !
-          !   IF (rtmp < mt_rmt(ist_i(iat))) THEN
-          !     mt_rmt(ist_i(iat)) = rtmp
-          !   END IF
-          !   !
-          ! END IF
-          !
-          !
           IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
             WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
             WRITE(stdout, '(6x, "MT radius: ", &
@@ -539,10 +499,6 @@
               !
               lrmt_fixed(ist_i(iat)) = .TRUE.
               !
-              ! IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
-              !   nn_dist(iat)) < eps6) THEN
-              !   lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
-              ! END IF
               !
             END IF
             !
@@ -550,35 +506,6 @@
           !
         END IF ! ltouch
         !
-        ! !
-        ! IF (ltouch) THEN
-        !   !
-        !   ! if there is a space for one sphere to grow, let it do it;
-        !   ! otherwise, fix both MT radii for good
-        !   !
-        !   DO iat = 1, natoms
-        !     !
-        !     IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat))) - &
-        !       nn_dist(iat)) > eps6 .AND. .NOT. lrmt_fixed(ist_i(iat))) THEN
-        !       !
-        !       IF (mt_rmt(ist_i(inn_i(iat))) < nn_dist(iat)) THEN
-        !         mt_rmt(ist_i(iat)) = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat)))
-        !         !
-        !         lrmt_fixed(ist_i(iat)) = .TRUE.
-        !         !
-        !       END IF
-        !       !
-        !     ELSE IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat))) - &
-        !         nn_dist(iat)) <= eps6) THEN
-        !       !
-        !       lrmt_fixed(ist_i(iat)) = .TRUE.
-        !       lrmt_fixed(ist_i(inn_i(iat))) = .TRUE.
-        !       !
-        !     END IF
-        !     !
-        !   END DO
-        !   !
-        ! END IF
         !
         !
       ELSE
