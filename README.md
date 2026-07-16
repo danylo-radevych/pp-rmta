@@ -70,11 +70,15 @@ recalculated from `chi` functions and `beta` projectors.
 | :---         | :---         | :---:     | :---                               |
 | `CHARACTER`  | `prefix`     | `'pwscf'` | prefix used in the SCF calculation |
 | `CHARACTER`  | `outdir`     | `'./'`    | folder where SCF wavefunctions and charge density are stored |
-| `LOGICAL`    | `lwrite_dat` | `.false.` | if `.true.`, write spherical potentials and radial functions in `*.dat` files for subsequent plotting with the `plot_lwrite_dat.py` script (not required) |
-| `LOGICAL`    | `lhybrid`    | `.false.` | if `.true.`, evaulate energy derivatives of log derivatives as integrals of u^2(r); if `.false.`, evaluate energy derivatives explicitly |
+| `CHARACTER`  | `rmt_method` | `'touching'`| see `lrmt`: if `'default'`, set default MT radii from the table (results in very small MT radii); if `'neighbor'`, divide nearest-neighbor distances into ratios of the default MT radii (still leaves a lot of empty space); if `'touching'`, enforce touching spheres (recommended) |
 | `LOGICAL`    | `lrmt`       | `.false.` | if `.true.`, read MT radii for each atom, specified in the `rmt(:)` array, from input; if `.false.`, calculate MT radii by automatically with one of the methods specified in `rmt_method`, without reading `rmt(:)` |
-| `CHARACTER`  | `rmt_method` | `'touching'`| if `'default'`, set default MT radii from the table (results in very small MT radii); if `'neighbor'`, divide nearest-neighbor distances into ratios of the default MT radii (still leaves a lot of empty space); if `'touching'`, enforce touching spheres (recommended) |
+| `LOGICAL`    | `ltetra`     | `.true.`  | if `.true.`, use tetrhedron method for partial DOS integration; if `.false.`, use delta-function smearing set by `ngauss` and `degauss` |
+| `LOGICAL`    | `lwrite_dat` | `.false.` | if `.true.`, write spherical potentials and radial functions in `*.dat` files for subsequent plotting with the `plot_lwrite_dat.py` script (not required) |
+| `LOGICAL`    | `lhybrid`    | `.false.` | if `.true.`, evaulate energy derivatives of log derivatives as integrals of u^2(r); if `.false.`, take energy derivatives explicitly |
+| `INTEGER`    | `ngauss`     | `-1`      | delta-function smearing for partial DOS integration: `-1` Fermi-Dirac; `0` Gauss; `1` MP; see `ltetra`, `degauss` |
+| `REAL`       | `degauss`    | `0.001`   | smearing degauss value in Ry; see `ltetra`, `ngauss` |
 | `REAL`       | `rmt(:)`     | `-1.0`    | MT radii of each atom in bohr; when `lrmt == .false.`, defaults to MT radii calculated with a method in `rmt_method`; if MT radii of any two atoms of the same symmetry type are different or atomic spheres overlap, the code stops |
+
 
 ---
 
