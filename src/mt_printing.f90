@@ -1239,7 +1239,7 @@
       USE io_global, ONLY: stdout
       USE ions_base, ONLY: ityp
       USE uspp_param, ONLY: upf
-      USE constants, ONLY: rytoev, eps12
+      USE constants, ONLY: rytoev, eps6, eps12
       USE const, ONLY: bohrtoang
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
       USE mt_var, ONLY: natoms, norbs, orb_label, &
@@ -1248,7 +1248,7 @@
         irf_min, irf_max, &
         dos_nrf, dos_n, dos_nlrf, &
         vlocscr00rf, &
-        mll1rf_label, mll1rf, etall1rf, &
+        mll1rf_label, mll1rf, etall1rf, etall1rf_nodloglde, &
         mt_nrf, mt_rf
       !
       IMPLICIT NONE
@@ -1275,6 +1275,10 @@
       !! \eta_{l, l+1}
       REAL(DP) :: eta
       !! \eta = sum_l \eta_{l, l+1}
+      REAL(DP) :: etall1_nodloglde
+      !! \eta_{l, l+1}
+      REAL(DP) :: eta_nodloglde
+      !! \eta = sum_l \eta_{l, l+1}
       INTEGER :: iat, ispin, iorb, ist
       !! iterators
       INTEGER :: imin
@@ -1284,6 +1288,9 @@
       REAL(DP), ALLOCATABLE :: mll1_sym_tp(:, :, :)
       !! value of m_{l, l + 1} for each type
       REAL(DP), ALLOCATABLE :: etall1_sym_tp(:, :, :)
+      !! value of eta_{l, l + 1} for each type,
+      !! last element etall1_sym_tp(norbs, :) is eta_tot
+      REAL(DP), ALLOCATABLE :: etall1_nodloglde_sym_tp(:, :, :)
       !! value of eta_{l, l + 1} for each type,
       !! last element etall1_sym_tp(norbs, :) is eta_tot
       REAL(DP) :: sum_n_dos
@@ -1308,6 +1315,11 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating etall1_sym_tp', 1)
       etall1_sym_tp(:, :, :) = 0._dp
+      !
+      ALLOCATE(etall1_nodloglde_sym_tp(norbs, nspins, nst), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error allocating etall1_nodloglde_sym_tp', 1)
+      etall1_nodloglde_sym_tp(:, :, :) = 0._dp
       !
       !
       WRITE(stdout, '(/5x, /5x, /5x, &
@@ -1500,6 +1512,9 @@
               etall1 = etall1rf(mt_nrf - irf_min + 1, &
                iorb, ispin, iat)
               !
+              etall1_nodloglde = etall1rf_nodloglde(mt_nrf - irf_min + 1, &
+               iorb, ispin, iat)
+              !
               ! etall1_sym_tp(iorb, ispin, ityp(iat)) = &
               !   etall1_sym_tp(iorb, ispin, ityp(iat)) + &
               !   etall1 / nat_per_chem_tp(ityp(iat))
@@ -1508,19 +1523,33 @@
                 etall1_sym_tp(iorb, ispin, ist_i(iat)) + &
                 etall1 / natoms
               !
+              etall1_nodloglde_sym_tp(iorb, ispin, ist_i(iat)) = &
+                etall1_nodloglde_sym_tp(iorb, ispin, ist_i(iat)) + &
+                etall1_nodloglde / natoms
+              !
               WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
                 es14.4, A)') &
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
+                etall1_nodloglde, " (Ry / bohr^2) = ", &
+                etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+              !
+              WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
+                es14.4, A)') &
+                "eta-", TRIM(m_label), &
+                "(",  rmtf, "):", &
                 etall1, " (Ry / bohr^2) = ", &
                 etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
-              ! WRITE(stdout, '(8x, A7, A, A, F10.5, A, &
-              !   es14.4)') &
-              !   "! eta_", TRIM(m_label), &
-              !   "(",  rmtf, ") (eV / A^2):", &
-              !   etall1 * rytoev / bohr**2
               !
               WRITE(stdout, '("")')
+              !
+              IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
+                !
+                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                  " and ignore eta-", A)') &
+                  TRIM(m_label), TRIM(m_label)
+                !
+              END IF
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
@@ -1530,34 +1559,43 @@
               !
               WRITE(stdout, '("")')
               !
-              ! CALL spline_interpolation(imin, imax, mt_rf(:), &
-              !   etall1rf(:, norbs, ispin, iat), &
-              !   rmtf, eta)
-              !
               eta = etall1rf(mt_nrf - irf_min + 1, &
                 norbs, ispin, iat)
               !
-              ! etall1_sym_tp(norbs, ispin, ityp(iat)) = &
-              !   etall1_sym_tp(norbs, ispin, ityp(iat)) + &
-              !   eta / nat_per_chem_tp(ityp(iat))
+              eta_nodloglde = etall1rf_nodloglde(mt_nrf - irf_min + 1, &
+                norbs, ispin, iat)
               !
               etall1_sym_tp(norbs, ispin, ist_i(iat)) = &
                 etall1_sym_tp(norbs, ispin, ist_i(iat)) + &
                 eta / natoms
               !
+              etall1_nodloglde_sym_tp(norbs, ispin, ist_i(iat)) = &
+                etall1_nodloglde_sym_tp(norbs, ispin, ist_i(iat)) + &
+                eta_nodloglde / natoms
+              !
               WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
                 es14.4, A)') &
                 "eta_tot", &
                 "(",  rmtf, "):", &
+                eta_nodloglde, " (Ry / bohr^2) = ", &
+                eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+              !
+              WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
+                es14.4, A)') &
+                "eta-tot", &
+                "(",  rmtf, "):", &
                 eta, " (Ry / bohr^2) = ", &
                 eta * rytoev / bohrtoang**2, " (eV / A^2)"
-              ! WRITE(stdout, '(8x, A9, A, F10.4, A, &
-              !   es14.4)') &
-              !   "! eta_tot", &
-              !   "(",  rmtf, ") (eV / A^2):", &
-              !   eta * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
+              !
+              IF (ABS(eta_nodloglde - eta) > eps6) THEN
+                !
+                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                  " and ignore eta-", A)') &
+                  "tot", "tot"
+                !
+              END IF
               !
             END IF
             !
@@ -1639,19 +1677,35 @@
               !
               !
               etall1 = etall1_sym_tp(iorb, ispin, ist)
+              etall1_nodloglde = etall1_nodloglde_sym_tp(iorb, ispin, ist)
               !
               WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
                 es14.4, A)') &
                 "eta_", TRIM(m_label), &
+                "(",  rmtf, "):", &
+                etall1_nodloglde, " (Ry / bohr^2) = ", &
+                etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+              !
+              WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
+                es14.4, A)') &
+                "eta-", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1, " (Ry / bohr^2) = ", &
                 etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
               !
               WRITE(stdout, '(8x, A7, A, A, es14.4)') &
                 "! eta_", TRIM(m_label), &
-                ":", etall1 * rytoev / bohrtoang**2
+                ":", etall1_nodloglde * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
+              !
+              IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
+                !
+                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                  " and ignore eta-", A)') &
+                  TRIM(m_label), TRIM(m_label)
+                !
+              END IF
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
@@ -1661,19 +1715,35 @@
               !
               !
               eta = etall1_sym_tp(norbs, ispin, ist)
+              eta_nodloglde = etall1_nodloglde_sym_tp(norbs, ispin, ist)
               !
               WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
                 es14.4, A)') &
                 "eta_tot", &
+                "(",  rmtf, "):", &
+                eta_nodloglde, " (Ry / bohr^2) = ", &
+                eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+              !
+              WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
+                es14.4, A)') &
+                "eta-tot", &
                 "(",  rmtf, "):", &
                 eta, " (Ry / bohr^2) = ", &
                 eta * rytoev / bohrtoang**2, " (eV / A^2)"
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
                 "! eta_tot:", &
-                eta * rytoev / bohrtoang**2
+                eta_nodloglde * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
+              !
+              IF (ABS(eta_nodloglde - eta) > eps6) THEN
+                !
+                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                  " and ignore eta-", A)') &
+                  "tot", "tot"
+                !
+              END IF
               !
             END IF ! iorb
           END DO ! iorb
@@ -1698,6 +1768,10 @@
       DEALLOCATE(etall1_sym_tp, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating etall1_sym_tp', 1)
+      !
+      DEALLOCATE(etall1_nodloglde_sym_tp, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating etall1_nodloglde_sym_tp', 1)
       !
       CALL stop_clock(routine_name)
       !
@@ -1787,7 +1861,7 @@
         WRITE(stdout, '(7x, "core_correction: ", L)') upf(ict)%nlcc
         WRITE(stdout, '(7x, "with_metagga_info: ", L)') &
           upf(ict)%with_metagga_info
-        WRITE(stdout, '(7x, "total_psenergy: ", F0.20)') upf(ict)%etotps
+        WRITE(stdout, '(7x, "total_psenergy: ", F0.16)') upf(ict)%etotps
         WRITE(stdout, '(7x, "wfc_cutoff: ", F10.6)') upf(ict)%ecutwfc
         WRITE(stdout, '(7x, "rho_cutoff: ", F10.6)') upf(ict)%ecutrho
         ! maximum l component in beta

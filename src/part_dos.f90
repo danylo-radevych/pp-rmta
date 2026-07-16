@@ -342,7 +342,8 @@
     SUBROUTINE set_dos_n(ltetra, nr, imin, imax, stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, dloglde, degauss, efermi, &
-      dos_nlmr, dos_nlr, dos_nr, dos_n)
+      dos_nlmr, dos_nlr, dos_nr, dos_n, &
+      dos_nlmr_nodloglde, dos_nlr_nodloglde, dos_nr_nodloglde)
     !---------------------------------------------------------------------------
     !!
     !! Computes partial densities n at Fermi level for each atom i,
@@ -420,6 +421,18 @@
       REAL(DP), INTENT(inout) :: dos_n(:)
       !! total DOS at the Fermi level n(E_F), per atom per spin
       !! dos_n(nspin)
+      REAL(DP), INTENT(inout) :: dos_nlmr_nodloglde(:, :, :, :)
+      !! reduced by dloglde partial densities n**i_{lm}(r, E_F)
+      !! dos_nlmr(nr, (lmax + 1)**2, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nlr_nodloglde(:, :, :, :)
+      !! reduced by dloglde partial densities n**i_{l}(r, E_F)
+      !! dos_nlr(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nr_nodloglde(:, :, :)
+      !! reduced by dloglde partial densities n**i(r, E_F), per atom, per spin
+      !! dos_nr(nr, nspin, nat)
+      !! lmax = norb - 1
       !
       ! local variables
       !
@@ -466,6 +479,8 @@
       !! common prefactor for given rmt, atom, and l
       REAL(DP) :: prefactor_tot_dos
       !! constant prefactor for total DOS
+      REAL(DP) :: prefactor_nodloglde
+      !! reduced by dloglde common prefactor for given rmt, atom, and l
       REAL(DP) :: rvec_cart(3)
       !! temporary MT-sphere vector for Gauss integration
       !! in Cartesian coordinates
@@ -498,6 +513,16 @@
       !! lmax = norb - 1
       REAL(DP), ALLOCATABLE :: dos_nlr_sym(:, :, :, :)
       !! symmetrized  partial densities n**i_{l}(r, E_F)
+      !! for a specific atom
+      !! dos_nlr_sym(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), ALLOCATABLE :: dos_nlmr_nodloglde_sym(:, :, :, :)
+      !! reduced by dloglde symmetrized partial densities n**i_{lm}(r, E_F)
+      !! for a specific atom
+      !! dos_nlmr_sym(nr, 2 * lmax + 1, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), ALLOCATABLE :: dos_nlr_nodloglde_sym(:, :, :, :)
+      !! reduced by dloglde symmetrized  partial densities n**i_{l}(r, E_F)
       !! for a specific atom
       !! dos_nlr_sym(nr, norb, nspin, nat)
       !! lmax = norb - 1
@@ -648,6 +673,10 @@
       dos_nlr(:, :, :, :) = 0._dp
       dos_nr(:, :, :) = 0._dp
       !
+      dos_nlmr_nodloglde(:, :, :, :) = 0._dp
+      dos_nlr_nodloglde(:, :, :, :) = 0._dp
+      dos_nr_nodloglde(:, :, :) = 0._dp
+      !
       !
       ! spin!
       IF (ltetra) THEN
@@ -780,6 +809,7 @@
                 !
                 prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
                   ABS(dloglde(ir, iorb, ispin, iat))
+                prefactor_nodloglde = prefactor_part_dos * r(ir, stp(iat))
                 !
                 ! cnr_aux(:, :) = CMPLX(0._dp, 0._dp, KIND=DP)
                 !
@@ -828,10 +858,26 @@
                           prefactor * &
                           REAL( cnr_aux * CONJG(cnr_aux) ) * &
                           wdk(ibnd, ik)
+                        !
+                        dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat) &
+                          = &
+                          dos_nlmr_nodloglde(ir - imin + 1, l0 + m, &
+                            ispin, iat) + &
+                          prefactor_nodloglde * &
+                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          wdk(ibnd, ik)
                       ELSE
                         dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
                           dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
                           prefactor * &
+                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          wk(ik) * deltaf
+                        !
+                        dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat) &
+                          = &
+                          dos_nlmr_nodloglde(ir - imin + 1, l0 + m, &
+                            ispin, iat) + &
+                          prefactor_nodloglde * &
                           REAL( cnr_aux * CONJG(cnr_aux) ) * &
                           wk(ik) * deltaf
                       END IF
@@ -848,9 +894,17 @@
                   dos_nlr(ir - imin + 1, iorb, ispin, iat) + &
                   dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
                 !
+                dos_nlr_nodloglde(ir - imin + 1, iorb, ispin, iat) = &
+                  dos_nlr_nodloglde(ir - imin + 1, iorb, ispin, iat) + &
+                  dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat)
+                !
                 dos_nr(ir - imin + 1, ispin, iat) = &
                   dos_nr(ir - imin + 1, ispin, iat) + &
                   dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
+                !
+                dos_nr_nodloglde(ir - imin + 1, ispin, iat) = &
+                  dos_nr_nodloglde(ir - imin + 1, ispin, iat) + &
+                  dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat)
                 !
                 !
               END DO ! im
@@ -878,6 +932,20 @@
         IF (ierr /= 0) &
           CALL errore(routine_name, 'Error allocating dos_nlr_sym', 1)
         dos_nlr_sym(:, :, :, :) = dos_nlr(:, :, :, :)
+        !
+        ALLOCATE(dos_nlmr_nodloglde_sym(imax - imin + 1, &
+          (lmax + 1) * (lmax + 1), &
+          nspin, nat), STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, &
+            'Error allocating dos_nlmr_nodloglde_sym', 1)
+        dos_nlmr_nodloglde_sym(:, :, :, :) = dos_nlmr_nodloglde(:, :, :, :)
+        !
+        ALLOCATE(dos_nlr_nodloglde_sym(imax - imin + 1, norb, nspin, nat), &
+          STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, 'Error allocating dos_nlr_nodloglde_sym', 1)
+        dos_nlr_nodloglde_sym(:, :, :, :) = dos_nlr_nodloglde(:, :, :, :)
         !
         ALLOCATE(counters(nat), STAT = ierr)
         IF (ierr /= 0) &
@@ -918,11 +986,21 @@
                         dos_nlmr_sym(ir - imin + 1, l0 + m, ispin, iat) + &
                         dos_nlmr(ir - imin + 1, l0 + m, ispin, jat)
                       !
+                      dos_nlmr_nodloglde_sym(ir - imin + 1, l0 + m, &
+                        ispin, iat) = &
+                        dos_nlmr_nodloglde_sym(ir - imin + 1, l0 + m, &
+                          ispin, iat) + &
+                        dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, jat)
+                      !
                     END DO ! im
                     !
                     dos_nlr_sym(ir - imin + 1, iorb, ispin, iat) = &
                       dos_nlr_sym(ir - imin + 1, iorb, ispin, iat) + &
                       dos_nlr(ir - imin + 1, iorb, ispin, jat)
+                    !
+                    dos_nlr_nodloglde_sym(ir - imin + 1, iorb, ispin, iat) = &
+                      dos_nlr_nodloglde_sym(ir - imin + 1, iorb, ispin, iat) + &
+                      dos_nlr_nodloglde(ir - imin + 1, iorb, ispin, jat)
                     !
                   END DO ! iorb
                   !
@@ -945,9 +1023,15 @@
           dos_nlmr(:, :, :, iat) = &
             dos_nlmr_sym(:, :, :, iat) / counters(iat)
           !
+          dos_nlr_nodloglde(:, :, :, iat) = &
+            dos_nlr_nodloglde_sym(:, :, :, iat) / counters(iat)
+          dos_nlmr_nodloglde(:, :, :, iat) = &
+            dos_nlmr_nodloglde_sym(:, :, :, iat) / counters(iat)
+          !
           ! updating total DOS, inside MT sphere(s)
           !
           dos_nr(:, :, iat) = 0._dp
+          dos_nr_nodloglde(:, :, iat) = 0._dp
           DO ispin = 1, nspin
             DO ir = imin, imax
               DO iorb = 1, norb
@@ -955,6 +1039,11 @@
                 dos_nr(ir - imin + 1, ispin, iat) = &
                   dos_nr(ir - imin + 1, ispin, iat) + &
                   dos_nlr(ir - imin + 1, iorb, ispin, iat)
+                !
+                !
+                dos_nr_nodloglde(ir - imin + 1, ispin, iat) = &
+                  dos_nr_nodloglde(ir - imin + 1, ispin, iat) + &
+                  dos_nlr_nodloglde(ir - imin + 1, iorb, ispin, iat)
                 !
               END DO ! iorb
             END DO ! ir
@@ -974,6 +1063,16 @@
         DEALLOCATE(dos_nlmr_sym, STAT = ierr)
         IF (ierr /= 0) &
           CALL errore(routine_name, 'Error deallocating dos_nlmr_sym', 1)
+        !
+        DEALLOCATE(dos_nlr_nodloglde_sym, STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, &
+            'Error deallocating dos_nlr_nodloglde_sym', 1)
+        !
+        DEALLOCATE(dos_nlmr_nodloglde_sym, STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, &
+            'Error deallocating dos_nlmr_nodloglde_sym', 1)
         !
         WRITE(stdout, &
           '(7x, "Done symmetrizing partial DOS = f(r, E_F).", /6x, /6x)')

@@ -292,8 +292,10 @@
         urf, dudrrf, duderf, d2udrderf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
+        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, dos_nrf_nodloglde, &
         luse_tot_dos, &
-        mll1rf, etall1rf, &
+        mll1rf, mll1rf_nodloglde, &
+        etall1rf, etall1rf_nodloglde, &
         natoms, tau_cart, n_chem_types, &
         nspins, fermi_energy, &
         lsemilocupf, mt_rab, &
@@ -336,15 +338,18 @@
         dloglderf(1 : irf_max, &
           1 : norbs, 1 : nspins, 1 : natoms), &
         mt_degauss, fermi_energy, &
-        dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+        dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
+        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, dos_nrf_nodloglde)
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l
       !
       CALL set_eta(mt_nrf, irf_min, irf_max, &
         natoms, norbs, nspins, &
         dos_nlrf, dos_nrf, &
+        dos_nlrf_nodloglde, dos_nrf_nodloglde, &
         dos_n, luse_tot_dos, &
-        mll1rf, etall1rf)
+        mll1rf, mll1rf_nodloglde, &
+        etall1rf, etall1rf_nodloglde)
       !
       ! Interpolate and print quantities at specified MT-radius
       !
@@ -1288,7 +1293,7 @@
       USE mt_var, ONLY: &
         natoms, norbs, orb_label, &
         nspins, fermi_energy, &
-        mll1rf_label, mll1rf, &
+        mll1rf_label, mll1rf, mll1rf_nodloglde, &
         irf_max, &
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
@@ -1333,6 +1338,8 @@
       !! d L_{l + 1}(r) / d e
       REAL(DP) :: mll1_at_rmt
       !! Value of M_{l, l+1} at r_mt
+      REAL(DP) :: mll1_nodloglde_at_rmt
+      !! Value of m_{l, l+1} at r_mt
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
@@ -1343,6 +1350,7 @@
       CALL start_clock(routine_name)
       !
       mll1rf(:, :, :, :) = 0.0_dp
+      mll1rf_nodloglde(:, :, :, :) = 0.0_dp
       mll1rf_label(:, :, :) = "?????"
       !
       nin = irf_max
@@ -1426,18 +1434,52 @@
               ! WRITE(*, *) "dlogl1de == ", dlogl1de
               !
               !
-              IF (ABS(rmtf) > eps12 .AND. &
-                ABS(dloglde) > eps12 .AND. &
-                ABS(dlogl1de) > eps12 .AND. &
-                dloglde * dlogl1de > 0.0_dp) THEN
+              IF (ABS(rmtf) > eps12) THEN
                 !
-                mll1rf(ir, iorb, ispin, iat) = &
+                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
                   veff * rmtf * rmtf - &
                   (logl - (iorb - 1)) * (logl1 + (iorb - 1) + 2)
-                mll1rf(ir, iorb, ispin, iat) = &
-                  mll1rf(ir, iorb, ispin, iat) / &
-                  rmtf / &
-                  SQRT(dloglde * dlogl1de)
+                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
+                  mll1rf_nodloglde(ir, iorb, ispin, iat) / rmtf
+                !
+                IF (ABS(dloglde) > eps12 .AND. &
+                  ABS(dlogl1de) > eps12 .AND. &
+                  (dloglde * dlogl1de > 0.0_dp)) THEN
+                  !
+                  mll1rf(ir, iorb, ispin, iat) = &
+                    mll1rf_nodloglde(ir, iorb, ispin, iat)
+                  mll1rf(ir, iorb, ispin, iat) = &
+                    mll1rf(ir, iorb, ispin, iat) / &
+                    SQRT(ABS(dloglde * dlogl1de))
+                  !
+                ELSE
+                  !
+                  IF (ir == nin) THEN
+                    IF (ABS(dloglde) <= eps12) THEN
+                      CALL errore(routine_name, &
+                        "dloglde is close to zero at rmt", 1)
+                    ELSE IF (ABS(dlogl1de) <= eps12) THEN
+                      CALL errore(routine_name, &
+                        "dlogl1de is close to zero at rmt", 1)
+                    ELSE IF (dloglde * dlogl1de <= 0.0_dp) THEN
+                      WRITE(stdout, '(/5x, &
+                        "WARNING: dloglde * dlogl1de <= 0 at rmt")')
+                      WRITE(stdout, '(6x, "dloglde = ", F0.16)') dloglde
+                      WRITE(stdout, '(6x, "dlogl1de = ", F0.16)') dlogl1de
+                      CALL errore(routine_name, &
+                        "dloglde * dlogl1de <= 0", 1)
+                    ELSE
+                      CALL errore(routine_name, &
+                        "problem with dloglde or dlogl1de", 1)
+                    END IF
+                  END IF
+                  !
+                END IF
+                !
+              ELSE
+                !
+                IF (ir == nin) &
+                  CALL errore(routine_name, "rmtf is close to zero", 1)
                 !
               END IF
               !
@@ -1495,9 +1537,16 @@
             !   mll1rf(:, iorb, ispin, iat), &
             !   rmtf, mll1_at_rmt)
             !
+            mll1_nodloglde_at_rmt = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
             mll1_at_rmt = mll1rf(mt_nrf, iorb, ispin, iat)
             !
             WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
+              " m_", mll1rf_label(iorb, ispin, iat), &
+              "(",  rmtf, "):", &
+              mll1_nodloglde_at_rmt, &
+              " "
+            !
+            WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
               " M_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt, &
