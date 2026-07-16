@@ -24,7 +24,7 @@
     !
     IMPLICIT NONE
     !
-    PUBLIC :: &
+    PUBLIC :: ldebug, &
       rmta_set_vars, rmta_delete_vars, rmt_default, &
       lmpi_single_rank, &
       mt_prec, natoms, nspins, mt_rmt, norbs, &
@@ -88,6 +88,8 @@
     CHARACTER(LEN=2), ALLOCATABLE :: chi_label(:, :)
     !! chi_label(nchis(n_chem_types), n_chem_types)
     !! label of chi(r) for each atomic wfc and type
+    LOGICAL :: ldebug
+    !! if true, enter the debug mode and print more info
     LOGICAL :: ltetra
     !! if true, use tetrahedron method for integration
     LOGICAL :: ldense_r_grid
@@ -735,31 +737,35 @@
         ! CALL deallocate_radial_grid(tmp_grid)
         !
         !
-        WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
-        !
-        WRITE(stdout, '(6x, A, I3, A, I10)') &
-          "grid(", ist, ")%mesh:", tmp_grid%mesh
-        !
         IF (tmp_grid%mesh /= nr) THEN
           CALL errore(routine_name, "incorrect size of generated grid", 1)
         END IF
         !
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%rmax:", tmp_grid%rmax
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%zmesh:", tmp_grid%zmesh
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%xmin:", tmp_grid%xmin
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%dx:", tmp_grid%dx
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(1):", tmp_grid%r(1)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(2):", tmp_grid%r(2)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(3):", tmp_grid%r(3)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(mesh):", tmp_grid%r(nr)
+        IF (ldebug) THEN
+          !
+          WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
+          !
+          WRITE(stdout, '(6x, A, I3, A, I10)') &
+            "grid(", ist, ")%mesh:", tmp_grid%mesh
+          !
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%rmax:", tmp_grid%rmax
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%zmesh:", tmp_grid%zmesh
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%xmin:", tmp_grid%xmin
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%dx:", tmp_grid%dx
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(1):", tmp_grid%r(1)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(2):", tmp_grid%r(2)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(3):", tmp_grid%r(3)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(mesh):", tmp_grid%r(nr)
+          !
+        END IF ! ldebug
         !
         CALL check_mesh(tmp_grid)
         !
@@ -777,26 +783,31 @@
         !
       END DO ! ist
       !
-      ! check
       !
-      WRITE(stdout, '(/4x, "VERIFY GRID")')
-      !
-      DO ist = 1, nst
+      IF (ldebug) THEN
         !
+        ! check
         !
-        WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
+        WRITE(stdout, '(/4x, "VERIFY GRID")')
         !
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(1):", mt_rf(1, ist)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(2):", mt_rf(2, ist)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(3):", mt_rf(3, ist)
-        WRITE(stdout, '(6x, A, I3, A, F16.7)') &
-          "grid(", ist, ")%r(mesh):", mt_rf(nr, ist)
+        DO ist = 1, nst
+          !
+          !
+          WRITE(stdout, '(/4x, "RMTA grid ", I0, " info")') ist
+          !
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(1):", mt_rf(1, ist)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(2):", mt_rf(2, ist)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(3):", mt_rf(3, ist)
+          WRITE(stdout, '(6x, A, I3, A, F16.7)') &
+            "grid(", ist, ")%r(mesh):", mt_rf(nr, ist)
+          !
+          !
+        END DO ! ist
         !
-        !
-      END DO ! ist
+      END IF
       !
       !
       ! CALL errore(routine_name, "Test DONE", 1)

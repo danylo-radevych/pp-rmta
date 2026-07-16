@@ -1290,7 +1290,7 @@
       USE constants, ONLY : rytoev
       USE const, ONLY : bohrtoang
       USE ions_base, ONLY: ityp
-      USE mt_var, ONLY: &
+      USE mt_var, ONLY: ldebug, &
         natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         mll1rf_label, mll1rf, mll1rf_nodloglde, &
@@ -1531,22 +1531,19 @@
             END IF
             !
             !
-            ! interpolate M_{l, l+1} at r_mt (Ry / bohr)
             !
-            ! CALL spline_interpolation(nin, mt_rf(:), &
-            !   mll1rf(:, iorb, ispin, iat), &
-            !   rmtf, mll1_at_rmt)
+            IF (ldebug) THEN
+              mll1_nodloglde_at_rmt = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
+              WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
+                " m_", mll1rf_label(iorb, ispin, iat), &
+                "(",  rmtf, "):", &
+                mll1_nodloglde_at_rmt, &
+                " "
+            END IF ! ldebug
             !
-            mll1_nodloglde_at_rmt = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
             mll1_at_rmt = mll1rf(mt_nrf, iorb, ispin, iat)
             !
             WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
-              " m_", mll1rf_label(iorb, ispin, iat), &
-              "(",  rmtf, "):", &
-              mll1_nodloglde_at_rmt, &
-              " "
-            !
-            WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
               " M_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt, &
@@ -1571,21 +1568,6 @@
               mll1_at_rmt * &
               (rytoev / bohrtoang)**2, &
               " (eV / A)^2"
-            !
-            ! WRITE(stdout, '(5x, "Scaled:")')
-            ! WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
-            !   " M_", mll1rf_label(iorb, ispin, iat), &
-            !   "(",  rmtf, "):", &
-            !   mll1_at_rmt * &
-            !   (rytoev / bohrtoang) / SQRT(rmta_wds4), &
-            !   " (Wd^1/2 / S^2)"
-            ! WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
-            !   " M^2_", mll1rf_label(iorb, ispin, iat), &
-            !   "(",  rmtf, "):", &
-            !   mll1_at_rmt * &
-            !   mll1_at_rmt * &
-            !   (rytoev / bohrtoang)**2 / rmta_wds4, &
-            !   " (Wd / S^4)"
             !
             WRITE(stdout, '("")')
             !

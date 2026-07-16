@@ -102,7 +102,7 @@
         vfullrf, rvfullrf, &
         irf_min, &
         dos_nlmrf, dos_nlrf, dos_nrf, &
-        etall1rf, loglrf, dloglderf
+        etall1rf, etall1rf_nodloglde, loglrf, dloglderf
       USE sym_type, ONLY: ist_i
       !
       !
@@ -169,6 +169,8 @@
       !! unit for dos_nlrf / dos_nrf
       INTEGER :: if_etall1rf = 1336
       !! unit for etall1rf
+      INTEGER :: if_etall1rf_nodloglde = 1337
+      !! unit for etall1rf_nodloglde
       REAl(DP) :: r3d(3)
       !! current r3d vector
       REAl(DP) :: g3d(3)
@@ -871,6 +873,53 @@
       !
       !
       !
+      !
+      ! etall1rf_nodloglde
+      !
+      WRITE(stdout, '(5x, A)') "writing etall1rf_nodloglde"
+      OPEN(UNIT = if_etall1rf_nodloglde, &
+        FILE = TRIM('etall1rf_nodloglde.dat'), &
+        FORM = 'formatted', STATUS = 'unknown')
+      WRITE(if_etall1rf_nodloglde, '(1x, "eta_l for each atom, spin, and l")')
+      DO iat = 1, natoms
+        DO ispin = 1, nspins
+          DO iorb = 1, norbs
+            WRITE(if_etall1rf_nodloglde, '(1x, A13)', advance='no') "r"
+            !
+            WRITE(stra, '(I0)') iat
+            WRITE(strs, '(I0)') ispin
+            !
+            IF (iorb < norbs) THEN
+              WRITE(if_etall1rf_nodloglde, '(1x, A13)', advance='no') &
+                TRIM(upf(ityp(iat))%psd) // TRIM(stra) // "_" // &
+                "spin" // TRIM(strs) // "_" // &
+                TRIM(mll1rf_label(iorb, ispin, iat))
+            ELSE
+              WRITE(if_etall1rf_nodloglde, '(1x, A13)', advance='no') &
+                TRIM(upf(ityp(iat))%psd) // TRIM(stra) // "_" // &
+                "spin" // TRIM(strs) // "_tot"
+            END IF
+          END DO ! iorb
+        END DO ! ispin
+      END DO ! iat
+      WRITE(if_etall1rf_nodloglde, '()')
+      DO ir = irf_min, mt_nrf
+        DO iat = 1, natoms
+          DO ispin = 1, nspins
+            DO iorb = 1, norbs
+              r = mt_rf(ir, ist_i(iat))
+              WRITE(if_etall1rf_nodloglde, '(1x, es13.4)', advance='no') r
+              WRITE(if_etall1rf_nodloglde, '(1x, es13.4)', advance='no') &
+                etall1rf_nodloglde(ir - irf_min + 1, iorb, ispin, iat)
+            END DO ! iorb
+          END DO ! ispin
+        END DO ! iat
+        WRITE(if_etall1rf_nodloglde, '()')
+      END DO ! ir
+      CLOSE(if_etall1rf_nodloglde)
+      !
+      !
+      !
       IF (.NOT. lskip_nonessential) THEN
         !
         ! vlociong
@@ -1242,7 +1291,7 @@
       USE constants, ONLY: rytoev, eps6, eps12
       USE const, ONLY: bohrtoang
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
-      USE mt_var, ONLY: natoms, norbs, orb_label, &
+      USE mt_var, ONLY: ldebug, natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         luse_tot_dos, &
         irf_min, irf_max, &
@@ -1329,6 +1378,7 @@
         "<<<<<<<<<<<<", &
         "<<<<<<<<<")')
       !
+      !
       ! per atom
       !
       sum_n_dos = 0._dp
@@ -1354,9 +1404,6 @@
           ispin
           !
           IF (.NOT. luse_tot_dos) THEN
-            ! CALL spline_interpolation(imin, imax, mt_rf(:), &
-            !   dos_nrf(:, ispin, iat), &
-            !   rmtf, ntot)
             ntot = dos_nrf(mt_nrf - irf_min + 1, ispin, iat)
           ELSE
             ntot = dos_n(ispin)
@@ -1365,7 +1412,7 @@
           !
           veff = vlocscr00rf(mt_nrf, ispin, iat)
           !
-          WRITE(stdout, '(/8x, A16, F10.4, A8, F8.4, A6)') &
+          WRITE(stdout, '(/8x, A9, F10.4, A8, F8.4, A6)') &
             "E_F = ", fermi_energy(ispin), " (Ry) = ", &
             fermi_energy(ispin) * rytoev, " (eV)"
           WRITE(stdout, '(8x, A5, F10.5, A4, F10.4, A8, F10.4, A8)') &
@@ -1375,14 +1422,14 @@
             "V(", rmtf, ") - E_F = ", veff - fermi_energy(ispin), &
             " (Ry) = ", (veff - fermi_energy(ispin)) * rytoev, " (eV)"
           !
-          WRITE(stdout, '(/8x, A16, F10.4)') &
-            "! E_F:", fermi_energy(ispin)
+          WRITE(stdout, '(/8x, A7, F10.4)') &
+            "E_F:", fermi_energy(ispin)
           !
-          WRITE(stdout, '(8x, A7, F10.4)') &
-            "! V:", veff
+          WRITE(stdout, '(8x, A5, F10.4)') &
+            "V:", veff
           !
-          WRITE(stdout, '(8x, A12, es14.4)') &
-            "! N(E_F):", dos_n(ispin) * natoms
+          WRITE(stdout, '(8x, A10, es14.4)') &
+            "N(E_F):", dos_n(ispin) * natoms
           !
           !
           !
@@ -1435,34 +1482,9 @@
                 "(",  rmtf, "):", &
                 mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
               !
-              ! WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4)') &
-              !   "! M^2_", TRIM(m_label), &
-              !   "(",  rmtf, ") (Ry / bohr)^2:", &
-              !   mll1 * mll1
-              
-              ! WRITE(stdout, '(5x, "Scaled:")')
-              ! WRITE(stdout, '(7x, A10, A, A, F10.4, A, F14.4, A)') &
-              !   " M_", TRIM(m_label), &
-              !   "(",  rmtf, "):", &
-              !   mll1 * &
-              !   (rytoev / bohrtoang) / SQRT(rmta_wds4), &
-              !   " (Wd^1/2 / S^2)"
-              ! WRITE(stdout, '(7x, A10, A, A, F10.4, A, F14.4, A)') &
-              !   " M^2_", TRIM(m_label), &
-              !   "(",  rmtf, "):", &
-              !   mll1 * &
-              !   mll1 * &
-              !   (rytoev / bohrtoang)**2 / rmta_wds4, &
-              !   " (Wd / S^4)"
               !
               WRITE(stdout, '("")')
               !
-              ! CALL spline_interpolation(imin, imax, mt_rf(:), &
-              !   dos_nlrf(:, iorb, ispin, iat), &
-              !   rmtf, nl)
-              ! CALL spline_interpolation(imin, imax, mt_rf(:), &
-              !   dos_nlrf(:, iorb + 1, ispin, iat), &
-              !   rmtf, nl1)
               !
               nl = dos_nlrf(mt_nrf - irf_min + 1, &
                 iorb, ispin, iat)
@@ -1494,20 +1516,17 @@
                 nl1 / ntot
               !
               WRITE(stdout, '(8x, A10, A, A, es14.4)') &
-                "! n_", TRIM(orb_label(iorb)), &
+                "n_", TRIM(orb_label(iorb)), &
                 ":", nl
               !
               IF (iorb == norbs - 1) THEN
                 WRITE(stdout, '(8x, A10, A, A, es14.4)') &
-                  "! n_", TRIM(orb_label(iorb + 1)), &
+                  "n_", TRIM(orb_label(iorb + 1)), &
                   ":", nl1
               END IF
               !
               WRITE(stdout, '("")')
               !
-              ! CALL spline_interpolation(imin, imax, mt_rf(:), &
-              !   etall1rf(:, iorb, ispin, iat), &
-              !   rmtf, etall1)
               !
               etall1 = etall1rf(mt_nrf - irf_min + 1, &
                iorb, ispin, iat)
@@ -1515,9 +1534,6 @@
               etall1_nodloglde = etall1rf_nodloglde(mt_nrf - irf_min + 1, &
                iorb, ispin, iat)
               !
-              ! etall1_sym_tp(iorb, ispin, ityp(iat)) = &
-              !   etall1_sym_tp(iorb, ispin, ityp(iat)) + &
-              !   etall1 / nat_per_chem_tp(ityp(iat))
               !
               etall1_sym_tp(iorb, ispin, ist_i(iat)) = &
                 etall1_sym_tp(iorb, ispin, ist_i(iat)) + &
@@ -1534,22 +1550,26 @@
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
                 etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
               !
-              WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
-                "eta-", TRIM(m_label), &
-                "(",  rmtf, "):", &
-                etall1, " (Ry / bohr^2) = ", &
-                etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+              !
+              IF (ldebug) THEN
+                WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
+                  es14.4, A)') &
+                  "eta-", TRIM(m_label), &
+                  "(",  rmtf, "):", &
+                  etall1, " (Ry / bohr^2) = ", &
+                  etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+                !
+                IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
+                  !
+                  WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                    " and ignore eta-", A)') &
+                    TRIM(m_label), TRIM(m_label)
+                  !
+                END IF
+              END IF ! ldebug
               !
               WRITE(stdout, '("")')
               !
-              IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
-                !
-                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                  " and ignore eta-", A)') &
-                  TRIM(m_label), TRIM(m_label)
-                !
-              END IF
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
@@ -1580,22 +1600,25 @@
                 eta_nodloglde, " (Ry / bohr^2) = ", &
                 eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
               !
-              WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
-                "eta-tot", &
-                "(",  rmtf, "):", &
-                eta, " (Ry / bohr^2) = ", &
-                eta * rytoev / bohrtoang**2, " (eV / A^2)"
+              IF (ldebug) THEN
+                WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
+                  es14.4, A)') &
+                  "eta-tot", &
+                  "(",  rmtf, "):", &
+                  eta, " (Ry / bohr^2) = ", &
+                  eta * rytoev / bohrtoang**2, " (eV / A^2)"
+                !
+                IF (ABS(eta_nodloglde - eta) > eps6) THEN
+                  !
+                  WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                    " and ignore eta-", A)') &
+                    "tot", "tot"
+                  !
+                END IF
+              END IF
               !
               WRITE(stdout, '("")')
               !
-              IF (ABS(eta_nodloglde - eta) > eps6) THEN
-                !
-                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                  " and ignore eta-", A)') &
-                  "tot", "tot"
-                !
-              END IF
               !
             END IF
             !
@@ -1670,7 +1693,7 @@
                 mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
               !
               WRITE(stdout, '(8x, A10, A, A, F14.4)') &
-                "! M^2_", TRIM(m_label), &
+                "M^2_", TRIM(m_label), &
                 ":", mll1 * mll1
               !
               WRITE(stdout, '("")')
@@ -1686,26 +1709,30 @@
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
                 etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
               !
-              WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
-                "eta-", TRIM(m_label), &
-                "(",  rmtf, "):", &
-                etall1, " (Ry / bohr^2) = ", &
-                etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+              IF (ldebug) THEN
+                WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
+                  es14.4, A)') &
+                  "eta-", TRIM(m_label), &
+                  "(",  rmtf, "):", &
+                  etall1, " (Ry / bohr^2) = ", &
+                  etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+                !
+                !
+                IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
+                  !
+                  WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                    " and ignore eta-", A)') &
+                    TRIM(m_label), TRIM(m_label)
+                  !
+                END IF
+              END IF
               !
               WRITE(stdout, '(8x, A7, A, A, es14.4)') &
-                "! eta_", TRIM(m_label), &
+                "eta_", TRIM(m_label), &
                 ":", etall1_nodloglde * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
               !
-              IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
-                !
-                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                  " and ignore eta-", A)') &
-                  TRIM(m_label), TRIM(m_label)
-                !
-              END IF
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
@@ -1724,12 +1751,22 @@
                 eta_nodloglde, " (Ry / bohr^2) = ", &
                 eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
               !
-              WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
-                "eta-tot", &
-                "(",  rmtf, "):", &
-                eta, " (Ry / bohr^2) = ", &
-                eta * rytoev / bohrtoang**2, " (eV / A^2)"
+              IF (ldebug) THEN
+                WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
+                  es14.4, A)') &
+                  "eta-tot", &
+                  "(",  rmtf, "):", &
+                  eta, " (Ry / bohr^2) = ", &
+                  eta * rytoev / bohrtoang**2, " (eV / A^2)"
+                !
+                IF (ABS(eta_nodloglde - eta) > eps6) THEN
+                  !
+                  WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
+                    " and ignore eta-", A)') &
+                    "tot", "tot"
+                  !
+                END IF
+              END IF ! ldebug
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
                 "! eta_tot:", &
@@ -1737,13 +1774,6 @@
               !
               WRITE(stdout, '("")')
               !
-              IF (ABS(eta_nodloglde - eta) > eps6) THEN
-                !
-                WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                  " and ignore eta-", A)') &
-                  "tot", "tot"
-                !
-              END IF
               !
             END IF ! iorb
           END DO ! iorb

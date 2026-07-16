@@ -47,7 +47,7 @@
     USE uspp_param, ONLY: upf
     ! custom module
     USE muffin_tin, ONLY: rmta_init, rmta_compute, rmta_quit
-    USE mt_var, ONLY: &
+    USE mt_var, ONLY: ldebug, &
       lmpi_single_rank, &
       luse_ref_pot, luse_tot_dos, &
       rmta_code, rmta_routine, & ! variables
@@ -89,7 +89,8 @@
     !
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
-      dnr, lrmt, rmt, ltetra, lhybrid, rmt_method
+      dnr, lrmt, rmt, ltetra, lhybrid, rmt_method, &
+      ldebug
     !
     ! defaults
     !
@@ -141,6 +142,7 @@
     !
     ! stable defaults
     !
+    ldebug = .FALSE.
     ltetra = .TRUE.
     lhybrid = .FALSE.
     lnonlocal = .FALSE. ! non-local form is not functional at this point
