@@ -129,6 +129,8 @@
                 rtmp_n = dos_n(ispin)
               END IF
               !
+              rtmp_n = rtmp_n * nat ! turn into total DOS, per whole cell
+              !
               IF (rtmp_n < 0._dp) &
                 CALL errore(routine_name, "n < 0", 1)
               !

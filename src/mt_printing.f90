@@ -1530,11 +1530,11 @@
               !
               etall1_sym_tp(iorb, ispin, ist_i(iat)) = &
                 etall1_sym_tp(iorb, ispin, ist_i(iat)) + &
-                etall1 / natoms
+                etall1 ! / natoms
               !
               etall1_nodloglde_sym_tp(iorb, ispin, ist_i(iat)) = &
                 etall1_nodloglde_sym_tp(iorb, ispin, ist_i(iat)) + &
-                etall1_nodloglde / natoms
+                etall1_nodloglde ! / natoms
               !
               WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
                 & es14.4, A)') &
@@ -1580,11 +1580,11 @@
               !
               etall1_sym_tp(norbs, ispin, ist_i(iat)) = &
                 etall1_sym_tp(norbs, ispin, ist_i(iat)) + &
-                eta / natoms
+                eta ! / natoms
               !
               etall1_nodloglde_sym_tp(norbs, ispin, ist_i(iat)) = &
                 etall1_nodloglde_sym_tp(norbs, ispin, ist_i(iat)) + &
-                eta_nodloglde / natoms
+                eta_nodloglde ! / natoms
               !
               WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
                 & es14.4, A)') &
