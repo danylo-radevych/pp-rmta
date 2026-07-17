@@ -3,7 +3,8 @@
 include $(QE_ROOT)/make.inc
 
 # location of needed modules and included files (if any)
-MODFLAGS = $(BASEMOD_FLAGS) \
+MODFLAGS = $(OPTFLAGS) \
+          $(BASEMOD_FLAGS) \
           $(MOD_FLAG)$(QE_ROOT)/dft-d3 \
           $(MOD_FLAG)$(QE_ROOT)/PW/src \
           $(MOD_FLAG)$(QE_ROOT)/atomic/src \
