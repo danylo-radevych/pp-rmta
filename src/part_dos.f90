@@ -650,7 +650,7 @@
           npw = ngk(ik)
           DO ig = 1, npw
             psi_kg_norm = psi_kg_norm + &
-              REAL(psi_kg(ig, ibnd, ik) * CONJG(psi_kg(ig, ibnd, ik)))
+              REAL(psi_kg(ig, ibnd, ik) * CONJG(psi_kg(ig, ibnd, ik)), KIND=DP)
           END DO ! ig
         END DO ! ibnd
       END DO ! ik
