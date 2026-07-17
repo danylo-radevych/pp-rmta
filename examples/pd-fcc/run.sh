@@ -1,6 +1,8 @@
 #!/bin/bash
 
-ncpu=6
+. ../../paths.sh
+
+ncpu=8
 # ncpu=$SLURM_NTASKS
 
 QEBIN='../../bin'
@@ -11,8 +13,8 @@ ECHO=echo
 lrun_scf=true
 lrun_rmta=true
 
-lsave_tmp_dir=false
-lsave_tmp_dir_tar=false
+lsave_tmp_dir=true
+lsave_tmp_dir_tar=true
 
 PREFIX='pd-fcc'
 IBRAV="2"
@@ -173,7 +175,7 @@ file_check $name_check
 cat $name_check >> $NAME.in
 
 $ECHO "  running the scf calculation for $PREFIX..."
-$EXEC -n $ncpu $BIN_DIR/pw.x < $NAME.in > $OUT_DIR/$NAME.out
+$EXEC -n $ncpu $QE_ROOT/bin/pw.x < $NAME.in > $OUT_DIR/$NAME.out
 $ECHO "$SUFFIX is done"
 
 if [ $? -ne 0 ]; then
@@ -236,7 +238,7 @@ cat > ${NAME}.in << EOF
   rmt(1) = $RMT1
 /
 EOF
-$EXEC -n 1 $BIN_DIR/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
+$EXEC -n 1 $PPRMTA_ROOT/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
 
 $ECHO "$SUFFIX is done"
 
