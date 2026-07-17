@@ -1,5 +1,5 @@
 
-     Program PWSCF v.7.5 starts on 10Jul2026 at 21: 2:24 
+     Program PWSCF v.7.5 starts on 17Jul2026 at 14: 0: 2 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -13,7 +13,7 @@
      Parallel version (MPI), running on     8 processors
 
      MPI processes distributed on     1 nodes
-     4155 MiB available memory on the printing compute node when the environment starts
+     853 MiB available memory on the printing compute node when the environment starts
  
      Waiting for input...
      Reading input from standard input
@@ -134,7 +134,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      starting charge      85.9925, renormalised to      86.0000
      Starting wfcs are   68 randomized atomic wfcs
 
-     total cpu time spent up to now is       37.8 secs
+     total cpu time spent up to now is       48.4 secs
 
      Self-consistent Calculation
 
@@ -148,7 +148,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.69E-04,  avg # of iterations =  6.7
 
-     total cpu time spent up to now is      257.0 secs
+     total cpu time spent up to now is      289.0 secs
 
      total energy              =    -902.78602280 Ry
      estimated scf accuracy    <       0.32926435 Ry
@@ -157,7 +157,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  3.83E-04,  avg # of iterations =  3.1
 
-     total cpu time spent up to now is      378.7 secs
+     total cpu time spent up to now is      422.5 secs
 
      total energy              =    -902.84854572 Ry
      estimated scf accuracy    <       0.20708550 Ry
@@ -166,7 +166,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  2.41E-04,  avg # of iterations =  2.5
 
-     total cpu time spent up to now is      472.2 secs
+     total cpu time spent up to now is      525.4 secs
 
      total energy              =    -902.89800805 Ry
      estimated scf accuracy    <       0.00464096 Ry
@@ -238,7 +238,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  2 eigenvalues not converged
      ethr =  5.40E-06,  avg # of iterations = 10.5
 
-     total cpu time spent up to now is      618.2 secs
+     total cpu time spent up to now is      684.2 secs
 
      total energy              =    -902.89951501 Ry
      estimated scf accuracy    <       0.00166480 Ry
@@ -292,7 +292,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  2 eigenvalues not converged
      ethr =  1.94E-06,  avg # of iterations =  9.2
 
-     total cpu time spent up to now is      749.3 secs
+     total cpu time spent up to now is      827.8 secs
 
      total energy              =    -902.90005705 Ry
      estimated scf accuracy    <       0.00060608 Ry
@@ -308,7 +308,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  7.05E-07,  avg # of iterations =  3.2
 
-     total cpu time spent up to now is      843.2 secs
+     total cpu time spent up to now is      930.7 secs
 
      total energy              =    -902.90011538 Ry
      estimated scf accuracy    <       0.00003741 Ry
@@ -333,7 +333,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  4.35E-08,  avg # of iterations =  9.1
 
-     total cpu time spent up to now is      990.3 secs
+     total cpu time spent up to now is     1087.4 secs
 
      total energy              =    -902.90014794 Ry
      estimated scf accuracy    <       0.00003440 Ry
@@ -346,7 +346,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  4.00E-08,  avg # of iterations =  2.2
 
-     total cpu time spent up to now is     1079.4 secs
+     total cpu time spent up to now is     1183.8 secs
 
      total energy              =    -902.90014754 Ry
      estimated scf accuracy    <       0.00000673 Ry
@@ -357,7 +357,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  7.83E-09,  avg # of iterations =  6.4
 
-     total cpu time spent up to now is     1196.5 secs
+     total cpu time spent up to now is     1310.7 secs
 
      total energy              =    -902.90015002 Ry
      estimated scf accuracy    <       0.00000022 Ry
@@ -369,7 +369,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  2.59E-10,  avg # of iterations =  6.9
 
-     total cpu time spent up to now is     1317.1 secs
+     total cpu time spent up to now is     1441.9 secs
 
      total energy              =    -902.90015001 Ry
      estimated scf accuracy    <       0.00000030 Ry
@@ -379,7 +379,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  2.59E-10,  avg # of iterations =  2.2
 
-     total cpu time spent up to now is     1407.9 secs
+     total cpu time spent up to now is     1545.0 secs
 
      total energy              =    -902.90015003 Ry
      estimated scf accuracy    <       0.00000003 Ry
@@ -389,7 +389,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  3.14E-11,  avg # of iterations =  5.4
 
-     total cpu time spent up to now is     1527.5 secs
+     total cpu time spent up to now is     1682.6 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          3.7E-09 Ry
@@ -399,7 +399,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      c_bands:  1 eigenvalues not converged
      ethr =  4.29E-12,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is     1617.3 secs
+     total cpu time spent up to now is     1783.8 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          1.4E-09 Ry
@@ -408,7 +408,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.64E-12,  avg # of iterations =  5.6
 
-     total cpu time spent up to now is     1722.9 secs
+     total cpu time spent up to now is     1933.3 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          1.5E-11 Ry
@@ -417,7 +417,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.00E-13,  avg # of iterations =  7.1
 
-     total cpu time spent up to now is     1850.2 secs
+     total cpu time spent up to now is     2076.7 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          3.2E-10 Ry
@@ -426,7 +426,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.00E-13,  avg # of iterations =  5.6
 
-     total cpu time spent up to now is     1974.0 secs
+     total cpu time spent up to now is     2219.4 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          1.0E-11 Ry
@@ -435,7 +435,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.00E-13,  avg # of iterations =  2.0
 
-     total cpu time spent up to now is     2058.6 secs
+     total cpu time spent up to now is     2318.2 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          4.0E-12 Ry
@@ -444,7 +444,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.00E-13,  avg # of iterations =  1.0
 
-     total cpu time spent up to now is     2132.2 secs
+     total cpu time spent up to now is     2405.3 secs
 
      total energy              =    -902.90015004 Ry
      estimated scf accuracy    <          2.2E-12 Ry
@@ -453,7 +453,7 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Davidson diagonalization with overlap
      ethr =  1.00E-13,  avg # of iterations =  1.0
 
-     total cpu time spent up to now is     2207.2 secs
+     total cpu time spent up to now is     2491.4 secs
 
      End of self-consistent calculation
 
@@ -499,49 +499,49 @@ Warning: card   PRESS = 0 ! KBAR ignored
      Writing all to output data dir tempdir/v3si-a15.save/ :
      XML data file, charge density, pseudopotentials, collected wavefunctions
  
-     init_run     :     34.27s CPU     34.59s WALL (       1 calls)
-     electrons    :   2159.68s CPU   2169.43s WALL (       1 calls)
-     forces       :     11.90s CPU     11.94s WALL (       1 calls)
-     stress       :     43.54s CPU     43.69s WALL (       1 calls)
+     init_run     :     43.96s CPU     44.33s WALL (       1 calls)
+     electrons    :   2429.18s CPU   2442.96s WALL (       1 calls)
+     forces       :     13.22s CPU     13.27s WALL (       1 calls)
+     stress       :     47.98s CPU     48.25s WALL (       1 calls)
 
      Called by init_run:
-     wfcinit      :     34.09s CPU     34.40s WALL (       1 calls)
+     wfcinit      :     43.75s CPU     44.11s WALL (       1 calls)
      potinit      :      0.02s CPU      0.02s WALL (       1 calls)
-     hinit0       :      0.04s CPU      0.05s WALL (       1 calls)
+     hinit0       :      0.02s CPU      0.03s WALL (       1 calls)
 
      Called by electrons:
-     c_bands      :   1949.50s CPU   1958.03s WALL (      20 calls)
-     sum_band     :    209.85s CPU    211.07s WALL (      20 calls)
-     v_of_rho     :      0.26s CPU      0.27s WALL (      20 calls)
-     mix_rho      :      0.07s CPU      0.07s WALL (      20 calls)
+     c_bands      :   2182.10s CPU   2194.24s WALL (      20 calls)
+     sum_band     :    246.69s CPU    248.32s WALL (      20 calls)
+     v_of_rho     :      0.31s CPU      0.31s WALL (      20 calls)
+     mix_rho      :      0.08s CPU      0.08s WALL (      20 calls)
 
      Called by c_bands:
-     init_us_2    :     24.10s CPU     24.37s WALL (   19565 calls)
-     cegterg      :   1819.47s CPU   1827.36s WALL (    9100 calls)
+     init_us_2    :     26.79s CPU     27.09s WALL (   19565 calls)
+     cegterg      :   2038.98s CPU   2050.28s WALL (    9100 calls)
 
      Called by *egterg:
-     cdiaghg      :    118.63s CPU    119.04s WALL (   52362 calls)
-     h_psi        :   1266.39s CPU   1272.67s WALL (   53272 calls)
-     g_psi        :      3.50s CPU      3.51s WALL (   43717 calls)
+     cdiaghg      :    126.84s CPU    127.40s WALL (   52362 calls)
+     h_psi        :   1450.85s CPU   1459.79s WALL (   53272 calls)
+     g_psi        :      4.05s CPU      4.08s WALL (   43717 calls)
 
      Called by h_psi:
-     h_psi:calbec :    157.31s CPU    157.92s WALL (   53272 calls)
-     vloc_psi     :   1020.88s CPU   1026.16s WALL (   53272 calls)
+     h_psi:calbec :    169.33s CPU    170.15s WALL (   53272 calls)
+     vloc_psi     :   1183.65s CPU   1191.18s WALL (   53272 calls)
                                         0.00s GPU  (   53272 calls)
-     add_vuspsi   :     83.94s CPU     84.28s WALL (   53272 calls)
+     add_vuspsi   :     93.12s CPU     93.64s WALL (   53272 calls)
 
      General routines
-     calbec       :    203.20s CPU    203.96s WALL (   61007 calls)
-     fft          :      0.16s CPU      0.17s WALL (     225 calls)
-     ffts         :      0.01s CPU      0.01s WALL (      20 calls)
-     fftw         :   1145.42s CPU   1151.38s WALL ( 3140328 calls)
+     calbec       :    219.12s CPU    220.17s WALL (   61007 calls)
+     fft          :      0.20s CPU      0.21s WALL (     225 calls)
+     ffts         :      0.02s CPU      0.02s WALL (      20 calls)
+     fftw         :   1321.29s CPU   1329.65s WALL ( 3140328 calls)
  
      Parallel routines
  
-     PWSCF        :  37m34.25s CPU  37m46.43s WALL
+     PWSCF        :  42m20.55s CPU  42m36.88s WALL
 
  
-   This run was terminated on:  21:40:11  10Jul2026            
+   This run was terminated on:  14:42:39  17Jul2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
