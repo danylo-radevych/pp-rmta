@@ -3,7 +3,11 @@
 include $(QE_ROOT)/make.inc
 
 # location of needed modules and included files (if any)
-MODFLAGS = $(OPTFLAGS) \
+#MODFLAGS = "${OPTFLAGS[@]}" 
+
+#OPTFLAGS = -warn all
+
+MODFLAGS =  $(OPTFLAGS) \
           $(BASEMOD_FLAGS) \
           $(MOD_FLAG)$(QE_ROOT)/dft-d3 \
           $(MOD_FLAG)$(QE_ROOT)/PW/src \

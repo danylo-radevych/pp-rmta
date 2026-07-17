@@ -1342,6 +1342,8 @@
       REAL(DP) :: mll1_nodloglde_at_rmt
       !! Value of m_{l, l+1} at r_mt
       !
+      EXTERNAL :: errore
+      !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
       !

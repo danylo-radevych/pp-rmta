@@ -371,7 +371,7 @@
       IMPLICIT NONE
       !
       EXTERNAL :: errore, start_clock, stop_clock, cryst_to_cart
-      REAL(KIND = DP), EXTERNAL :: w0gauss
+      REAL(DP), EXTERNAL :: w0gauss
       ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
       !
       LOGICAL, INTENT(in) :: ltetra
@@ -852,7 +852,7 @@
                         dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
                           dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
                           prefactor * &
-                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
                           wdk(ibnd, ik)
                         !
                         dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat) &
@@ -860,13 +860,13 @@
                           dos_nlmr_nodloglde(ir - imin + 1, l0 + m, &
                             ispin, iat) + &
                           prefactor_nodloglde * &
-                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
                           wdk(ibnd, ik)
                       ELSE
                         dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
                           dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
                           prefactor * &
-                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
                           wk(ik) * deltaf
                         !
                         dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat) &
@@ -874,7 +874,7 @@
                           dos_nlmr_nodloglde(ir - imin + 1, l0 + m, &
                             ispin, iat) + &
                           prefactor_nodloglde * &
-                          REAL( cnr_aux * CONJG(cnr_aux) ) * &
+                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
                           wk(ik) * deltaf
                       END IF
                       !

@@ -1073,7 +1073,7 @@
               mill(2, ig) + ishift(2), &
               mill(3, ig) + ishift(3), &
               g3d(1), g3d(2), g3d(3), &
-              REAL(vlocscrg3d(ig, ispin))
+              REAL(vlocscrg3d(ig, ispin), KIND=DP)
           END DO ! ig
         END DO ! ispin
         CLOSE(if_vlocscrg3d)
@@ -1105,7 +1105,7 @@
               mill(1, igm), mill(2, igm), mill(3, igm), &
               g3d(1), g3d(2), g3d(3), &
               mt_g(4, igm), &
-              REAL(vlocscfg3d(igm, ispin)), &
+              REAL(vlocscfg3d(igm, ispin), KIND=DP), &
               AIMAG(vlocscfg3d(igm, ispin))
           END DO ! igm
         END DO ! ispin
