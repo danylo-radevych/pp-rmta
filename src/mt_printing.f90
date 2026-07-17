@@ -1610,6 +1610,10 @@
                 END IF
               END IF
               !
+              WRITE(stdout, '(8x, A12, es14.4)') &
+                "! eta_tot:", &
+                eta_nodloglde * rytoev / bohrtoang**2
+              !
               WRITE(stdout, '("")')
               !
               !
@@ -1762,7 +1766,7 @@
               END IF ! ldebug
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
-                "! eta_tot:", &
+                "!! eta_tot:", &
                 eta_nodloglde * rytoev / bohrtoang**2
               !
               WRITE(stdout, '("")')
