@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 10Jun2026 at 12:59: 4 
+     Program RMTA v.7.5 starts on 17Jul2026 at 13:37:31 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     1361 MiB available memory on the printing compute node when the environment starts
+     1340 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -40,14 +40,6 @@
      Reading xml data from directory:
 
      tempdir/mo-bcc.save/
-     read_pp_semilocal: tag PP_VNL.0 
-     read_pp_semilocal: tag PP_VNL.1 
-     read_pp_semilocal: tag PP_VNL.2 
-     read_pp_semilocal: tag PP_VNL.3 
-     read_pp_semilocal: tag PP_VNL.4 
-     read_pp_semilocal: tag PP_VNL.5 
-     xmlr_closetag pp_semilocal ierr:   0
-     xmlr_opentag pp_nonlocal ierr:   0
 
      IMPORTANT: XC functional enforced from input :
      Exchange-correlation= PBE
@@ -86,51 +78,42 @@
      Nearest neighbors
 
       atom #   1 out of    1:   Mo
-      neighbor index:    1 neighbor distance: 5.14873979 bohr = 2.72459576 A
+       neighbor distance: 5.14873979 bohr = 2.72459576 A
+       neighbor indices:
+          1 
+       neighbor types:
+         Mo 
 
 
 
       MT-radius of atom    1 is used for the symmetry type    1
 
-     MT radii
+     MT radii for symmetry types
 
-      symmetry type #   1
+      symmetry type #   1  Mo
       MT radius: 2.57381000 bohr = 1.36200160 A
 
 
 
 
-    RMTA grid            1 info
-      grid(  1)%mesh:       401
-      grid(  1)%rmax:       2.5738100
-      grid(  1)%zmesh:       1.0000000
-      grid(  1)%xmin:     -11.1012035
-      grid(  1)%dx:       0.0301165
-      grid(  1)%r(1):       0.0000151
-      grid(  1)%r(2):       0.0000156
-      grid(  1)%r(3):       0.0000160
-      grid(  1)%r(mesh):       2.5738100
+     MT radii for atoms
+      rmt(1) =  2.5738099999999999
 
-    VERIFY GRID
 
-    RMTA grid            1 info
-      grid(  1)%r(1):       0.0000151
-      grid(  1)%r(2):       0.0000156
-      grid(  1)%r(3):       0.0000160
-      grid(  1)%r(mesh):       2.5738100
+
 
      tau (cartesian, bohr)
           0.0000      0.0000      0.0000
 
 
 
-      n_chem_types:            1
+      n_chem_types: 1
 
        FFT vrs to vgs
        DONE FFT vrs to vgs
 
      PP info:
-       SIZE(upf):            1
+       SIZE(upf): 1
 
        element: Mo
        z_valence:  14.000000
@@ -146,24 +129,24 @@
        paw_as_gipaw:  F
        core_correction:  T
        with_metagga_info:  F
-       total_psenergy:     -136.1374250609999876
+       total_psenergy: -136.1374250609999876
        wfc_cutoff:   0.000000
        rho_cutoff:  16.390000
-       l_max:            2
-       l_max_rho:            0
-       l_local:           -1
+       l_max: 2
+       l_max_rho: 0
+       l_local: -1
        r_max:   0.000000
-       number_of_wfc:            4
+       number_of_wfc: 4
          rcut(  1):  1.510  rcutus(  1):  0.000  n(  1):   0  l(  1):   0
          rcut(  2):  1.510  rcutus(  2):  0.000  n(  2):   0  l(  2):   1
          rcut(  3):  1.510  rcutus(  3):  0.000  n(  3):   0  l(  3):   2
          rcut(  4):  1.510  rcutus(  4):  0.000  n(  4):   0  l(  4):   0
 
-       nat:            1
-       natomwfc:           10
+       nat: 1
+       natomwfc: 10
 
-       number_of_proj:            6
-       mesh_size:         1640
+       number_of_proj: 6
+       mesh_size: 1640
 
 
      ef:  1.582194
@@ -200,7 +183,7 @@
 
 
 
-     >>>>>>>>>>>> PETTIFOR START <<<<<<<<<<<<
+     >>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<
 
        Atom # 1  Mo ==============================================================
 
@@ -208,46 +191,58 @@
 
        Actual r_mt:     2.5738
 
-     atom:   1 spin:   1
+       atom:   1 spin:   1
 
-     E_F      1.58219372 (Ry)
-     V(r_mt)      0.64293583 (Ry)
-     V(r_mt) - E_F     -0.93925789 (Ry)
+       E_F      1.58219371 (Ry)
+       V(r_mt)      0.64293582 (Ry)
+       V(r_mt) - E_F     -0.93925789 (Ry)
 
-     L_0(r_mt) =      -0.67769267
-     dL_0(r_mt) / de =      -1.93473995 (1 / Ry)
+       u_0(r_mt) =      -1.15339023
+       R_0(r_mt) =      -0.44812563
+       L_0(r_mt) =      -0.67769265
+       dL_0(r_mt) / de =      -1.93473994 (1 / Ry)
 
-     L_1(r_mt) =       0.78465152
-     dL_1(r_mt) / de =      -1.44047611 (1 / Ry)
+       u_1(r_mt) =      -1.33669974
+       R_1(r_mt) =      -0.51934671
+       L_1(r_mt) =       0.78465154
+       dL_1(r_mt) / de =      -1.44047611 (1 / Ry)
 
-               M_sp   (      2.57381000):     -1.00889434 (Ry / bohr)
-             M^2_sp   (      2.57381000):      1.01786779 (Ry / bohr)^2
-               M_sp   (      2.57381000):    -25.93971645 (eV / A)
-             M^2_sp   (      2.57381000):    672.86888925 (eV / A)^2
-
-
-     L_1(r_mt) =       0.78465152
-     dL_1(r_mt) / de =      -1.44047611 (1 / Ry)
-
-     L_2(r_mt) =      -2.52480524
-     dL_2(r_mt) / de =      -9.19907472 (1 / Ry)
-
-               M_pd   (      2.57381000):     -0.65318197 (Ry / bohr)
-             M^2_pd   (      2.57381000):      0.42664668 (Ry / bohr)^2
-               M_pd   (      2.57381000):    -16.79398357 (eV / A)
-             M^2_pd   (      2.57381000):    282.03788424 (eV / A)^2
+               M_sp   (      2.57381000):     -1.00889435 (Ry / bohr)
+             M^2_sp   (      2.57381000):      1.01786781 (Ry / bohr)^2
+               M_sp   (      2.57381000):    -25.93971666 (eV / A)
+             M^2_sp   (      2.57381000):    672.86890018 (eV / A)^2
 
 
-     L_2(r_mt) =      -2.52480524
-     dL_2(r_mt) / de =      -9.19907472 (1 / Ry)
+       u_1(r_mt) =      -1.33669974
+       R_1(r_mt) =      -0.51934671
+       L_1(r_mt) =       0.78465154
+       dL_1(r_mt) / de =      -1.44047611 (1 / Ry)
 
-     L_3(r_mt) =       1.88344641
-     dL_3(r_mt) / de =      -1.02219927 (1 / Ry)
+       u_2(r_mt) =       0.52895036
+       R_2(r_mt) =       0.20551259
+       L_2(r_mt) =      -2.52480508
+       dL_2(r_mt) / de =      -9.19907410 (1 / Ry)
 
-               M_df   (      2.57381000):      2.58463795 (Ry / bohr)
-             M^2_df   (      2.57381000):      6.68035333 (Ry / bohr)^2
-               M_df   (      2.57381000):     66.45371354 (eV / A)
-             M^2_df   (      2.57381000):   4416.09604278 (eV / A)^2
+               M_pd   (      2.57381000):     -0.65318198 (Ry / bohr)
+             M^2_pd   (      2.57381000):      0.42664670 (Ry / bohr)^2
+               M_pd   (      2.57381000):    -16.79398399 (eV / A)
+             M^2_pd   (      2.57381000):    282.03789832 (eV / A)^2
+
+
+       u_2(r_mt) =       0.52895036
+       R_2(r_mt) =       0.20551259
+       L_2(r_mt) =      -2.52480508
+       dL_2(r_mt) / de =      -9.19907410 (1 / Ry)
+
+       u_3(r_mt) =       1.58676682
+       R_3(r_mt) =       0.61650503
+       L_3(r_mt) =       1.88344641
+       dL_3(r_mt) / de =      -1.02219927 (1 / Ry)
+
+               M_df   (      2.57381000):      2.58463793 (Ry / bohr)
+             M^2_df   (      2.57381000):      6.68035323 (Ry / bohr)^2
+               M_df   (      2.57381000):     66.45371302 (eV / A)
+             M^2_df   (      2.57381000):   4416.09597389 (eV / A)^2
 
 
      >>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<
@@ -259,9 +254,9 @@
 
        ltetra =  T
        two_fermi_energies =  F
-       nspin =            1
-       nkstot =          413
-       nbnd =           11
+       nspin = 1
+       nkstot = 413
+       nbnd = 11
        omega =   105.0705
        isk(     1) = 1
        isk(   413) = 1
@@ -279,10 +274,10 @@
 
       Computing partial DOS per atom per spin = f(r, E_F)...
 
-      atom #           1 out of            1
+      atom #1 out of 1
 
-       spin #           1 out of            1
-        ir #         401 on [         401,          401]
+       spin #1 out of 1
+        ir #401 on [401, 401]
 
          Precomputing psi_krtau_aux...
          Done precomputing psi_krtau_aux.
@@ -297,9 +292,9 @@
 
       Computing total DOS per atom per spin = f(spin, E_F)...
 
-      spin #           1 out of            1
+      spin #1 out of 1
 
-       n(E_F, 1) =   4.13703509E+00
+       n(E_F, 1) =   4.13703518E+00
       Done computing total DOS per atom per spin = f(spin, E_F).
 
 
@@ -321,13 +316,13 @@
 
        Spin: 1 ---------------------------------------------------------------------
 
-                  E_F =     1.5822 (Ry) =  21.5268  (eV)
+           E_F =     1.5822 (Ry) =  21.5268  (eV)
            V(   2.57381) =     0.6429 (Ry) =     8.7476    (eV)
            V(   2.57381) - E_F =    -0.9393 (Ry) =   -12.7793    (eV)
 
-                  ! E_F:    1.5822
-           ! V:    0.6429
-           ! N(E_F):    4.1370E+00
+           E_F:    1.5822
+           V:    0.6429
+           N(E_F):    4.1370E+00
 
         l:  s ......................................................................
 
@@ -341,7 +336,7 @@
                 n_p(   2.57381) (1 / Ry):    3.5933E-01
                 n_s / n :     1.0281E-02
                 n_p / n :     8.6857E-02
-              ! n_s:    4.2531E-02
+                n_s:    4.2531E-02
 
            eta_sp(   2.57381):    2.5068E-03 (Ry / bohr^2) =    1.2180E-01 (eV / A^2)
 
@@ -359,7 +354,7 @@
                 n_d(   2.57381) (1 / Ry):    3.0001E+00
                 n_p / n :     8.6857E-02
                 n_d / n :     7.2518E-01
-              ! n_p:    3.5933E-01
+                n_p:    3.5933E-01
 
            eta_pd(   2.57381):    2.9647E-02 (Ry / bohr^2) =    1.4404E+00 (eV / A^2)
 
@@ -376,11 +371,11 @@
                 n_d(   2.57381) (1 / Ry):    3.0001E+00
                 n_f(   2.57381) (1 / Ry):    9.9080E-02
                 n_d / n :     7.2518E-01
-                n_f / n :     2.3950E-02
-              ! n_d:    3.0001E+00
-              ! n_f:    9.9080E-02
+                n_f / n :     2.3949E-02
+                n_d:    3.0001E+00
+                n_f:    9.9080E-02
 
-           eta_df(   2.57381):    8.2284E-02 (Ry / bohr^2) =    3.9979E+00 (eV / A^2)
+           eta_df(   2.57381):    8.2283E-02 (Ry / bohr^2) =    3.9979E+00 (eV / A^2)
 
 
         sum_l: total ...............................................................
@@ -390,7 +385,7 @@
 
 
 
-      sum_n_dos:   8.27407019E+00 (1 / Ry)
+      sum_n_dos:   8.27407036E+00 (1 / Ry)
 
 
 
@@ -407,10 +402,10 @@
               M^2_sp(   2.57381):        1.0179   (Ry / bohr)^2
                 M_sp(   2.57381):      -25.9397        (eV / A)
               M^2_sp(   2.57381):      672.8689      (eV / A)^2
-            ! M^2_sp:        1.0179
+              M^2_sp:        1.0179
 
            eta_sp(   2.57381):    2.5068E-03 (Ry / bohr^2) =    1.2180E-01 (eV / A^2)
-         ! eta_sp:    1.2180E-01
+           eta_sp:    1.2180E-01
 
 
         l:  p ......................................................................
@@ -419,10 +414,10 @@
               M^2_pd(   2.57381):        0.4266   (Ry / bohr)^2
                 M_pd(   2.57381):      -16.7940        (eV / A)
               M^2_pd(   2.57381):      282.0379      (eV / A)^2
-            ! M^2_pd:        0.4266
+              M^2_pd:        0.4266
 
            eta_pd(   2.57381):    2.9647E-02 (Ry / bohr^2) =    1.4404E+00 (eV / A^2)
-         ! eta_pd:    1.4404E+00
+           eta_pd:    1.4404E+00
 
 
         l:  d ......................................................................
@@ -431,10 +426,10 @@
               M^2_df(   2.57381):        6.6804   (Ry / bohr)^2
                 M_df(   2.57381):       66.4537        (eV / A)
               M^2_df(   2.57381):     4416.0960      (eV / A)^2
-            ! M^2_df:        6.6804
+              M^2_df:        6.6804
 
-           eta_df(   2.57381):    8.2284E-02 (Ry / bohr^2) =    3.9979E+00 (eV / A^2)
-         ! eta_df:    3.9979E+00
+           eta_df(   2.57381):    8.2283E-02 (Ry / bohr^2) =    3.9979E+00 (eV / A^2)
+           eta_df:    3.9979E+00
 
         sum_l: total ...............................................................
         eta_tot(   2.57381):    1.1444E-01 (Ry / bohr^2) =    5.5601E+00 (eV / A^2)
@@ -466,23 +461,24 @@
      writing dos_nlrf
      writing dos_nrf
      writing etall1rf
+     writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.07s CPU      0.07s WALL (       1 calls)
+     rmta_init    :      0.12s CPU      0.12s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_n    :      0.15s CPU      0.21s WALL (       1 calls)
+     tetra_delta_ :      0.04s CPU      0.04s WALL (       1 calls)
+     set_dos_n    :      0.21s CPU      0.27s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.01s CPU      0.02s WALL (       1 calls)
+     rmta_write   :      0.02s CPU      0.02s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      2.99s CPU      3.09s WALL
+     RMTA         :      3.76s CPU      3.91s WALL
 
  
-   This run was terminated on:  12:59: 7  10Jun2026            
+   This run was terminated on:  13:37:35  17Jul2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
