@@ -8,7 +8,7 @@ MODFLAGS = $(BASEMOD_FLAGS) \
           $(MOD_FLAG)$(QE_ROOT)/PW/src \
           $(MOD_FLAG)$(QE_ROOT)/atomic/src \
           $(MOD_FLAG)$(QE_ROOT)/PP/src \
-          $(MOD_FLAG)./src
+          $(MOD_FLAG)../src
 
 RMTASRC = \
 muffin_tin.f90 \
