@@ -59,9 +59,9 @@
     !  D. Radevych
     !
       USE kinds,             ONLY : DP
-      USE ions_base,         ONLY : ityp ! tau
+      ! USE ions_base,         ONLY : ityp ! tau
       ! USE scf,               ONLY : rho, v_of_0, vltot, vrs, v, kedtau
-      USE gvect,             ONLY : ngl, gl, g ! mill, ecutrho
+      ! USE gvect,             ONLY : gl, g ! ngl, mill, ecutrho
       ! USE cell_base,         ONLY : at, bg, alat, tpiba, omega
       ! USE vlocal,            ONLY : vloc
       ! USE gvecs,             ONLY : doublegrid
@@ -78,7 +78,6 @@
         luse_ref_pot, &
         vlocscr00rf, vlocscf00rf, &
         vlocscrg3d, mt_g, vlocscfg3d, &
-        nchis, nbetas, &
         rmta_ng, mt_nrf, mt_rf
       USE mt_printing, ONLY: check_upf
       USE constants, ONLY: eps12
@@ -207,16 +206,16 @@
       REAL(DP), INTENT(inout) :: vloc00r(:, :, :)
       !! local atomic potential, V(r, spin, atom)
       !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: iat, ispin, ir, ig
+      !! iterators
       REAL(DP) :: gtau
       !! \bm{G} \cdot \bm{tau}
       REAL(DP) :: sinc
       !! value of the sinc function
-      REAL(DP) :: exp_factor
+      COMPLEX(DP) :: exp_factor
       !! exponential factor
-      INTEGER :: iat, ispin, ir, ig
-      !! iterators
-      CHARACTER(len=256) :: routine_name
-      !! name of this subroutine
       !
       routine_name = "vg3d_to_vloc00r"
       !
@@ -258,7 +257,7 @@
               !
               vloc00r(ir, ispin, iat) = &
                 vloc00r(ir, ispin, iat) + &
-                REAL(exp_factor * vg3d(ig, ispin)) * sinc
+                REAL(exp_factor * vg3d(ig, ispin), KIND=DP) * sinc
               !
             END DO ! ig
           END DO ! ir
@@ -292,7 +291,7 @@
         urf, dudrrf, duderf, d2udrderf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, dos_nrf_nodloglde, &
+        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, &
         luse_tot_dos, &
         mll1rf, mll1rf_nodloglde, &
         etall1rf, etall1rf_nodloglde, &
@@ -339,14 +338,14 @@
           1 : norbs, 1 : nspins, 1 : natoms), &
         mt_degauss, fermi_energy, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, dos_nrf_nodloglde)
+        dos_nlmrf_nodloglde, dos_nlrf_nodloglde)
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l
       !
       CALL set_eta(mt_nrf, irf_min, irf_max, &
         natoms, norbs, nspins, &
         dos_nlrf, dos_nrf, &
-        dos_nlrf_nodloglde, dos_nrf_nodloglde, &
+        dos_nlrf_nodloglde, &
         dos_n, luse_tot_dos, &
         mll1rf, mll1rf_nodloglde, &
         etall1rf, etall1rf_nodloglde)
@@ -1357,17 +1356,17 @@
       !
       IF (lhybrid) THEN
         WRITE(stdout, '(/5x, /5x, /5x, &
-          ">>>>>>>>>>>>  HYBRID BEGIN  <<<<<<<<<<<<")')
+          & ">>>>>>>>>>>>  HYBRID BEGIN  <<<<<<<<<<<<")')
       ELSE
         WRITE(stdout, '(/5x, /5x, /5x, &
-          ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
+          & ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
       END IF
       !
       !
       DO iat = 1, natoms
         !
         WRITE(stdout, '(/7x, "Atom # ", I0, A4, &
-          " ==============================================================")') &
+          & " ==============================================================")') &
           iat, upf(ityp(iat))%psd
         rmtf = mt_rf(mt_nrf, ist_i(iat))
         WRITE(stdout, '(/7x, "Desired r_mt: ", F10.4)') mt_rmt(ist_i(iat))
@@ -1463,7 +1462,7 @@
                         "dlogl1de is close to zero at rmt", 1)
                     ELSE IF (dloglde * dlogl1de <= 0.0_dp) THEN
                       WRITE(stdout, '(/5x, &
-                        "WARNING: dloglde * dlogl1de <= 0 at rmt")')
+                        & "WARNING: dloglde * dlogl1de <= 0 at rmt")')
                       WRITE(stdout, '(6x, "dloglde = ", F0.16)') dloglde
                       WRITE(stdout, '(6x, "dlogl1de = ", F0.16)') dlogl1de
                       CALL errore(routine_name, &
@@ -1512,7 +1511,7 @@
             IF (ABS(ul) < eps6) THEN
               WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
                 iorb - 1
-              CALL errore(routine_name, "Adjust rmt.")
+              CALL errore(routine_name, "Adjust rmt.", 1)
             END IF
             !
             WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
@@ -1527,7 +1526,7 @@
             IF (ABS(ul1) < eps6) THEN
               WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
                 iorb
-              CALL errore(routine_name, "Adjust rmt.")
+              CALL errore(routine_name, "Adjust rmt.", 1)
             END IF
             !
             !
@@ -1876,7 +1875,7 @@
       IF ((xf <= xmax) .AND. (xf >= xmin)) THEN
         yf = splint(x(imin : imax), y(imin : imax), d2y, xf)
       ELSE
-        CALL errore(routine_name, "interpolation out of specified bounds")
+        CALL errore(routine_name, "interpolation out of specified bounds", 1)
       END IF
       !
       IF (yf /= yf) THEN
