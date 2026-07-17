@@ -1,1 +1,0 @@
-../aux_scripts/clean.sh
