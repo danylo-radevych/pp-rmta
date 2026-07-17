@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 17Jul2026 at 13:40: 2 
+     Program RMTA v.7.5 starts on 17Jul2026 at 14:31:25 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     1819 MiB available memory on the printing compute node when the environment starts
+     1945 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -464,21 +464,21 @@
      writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.13s CPU      0.14s WALL (       1 calls)
+     rmta_init    :      0.20s CPU      0.20s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_n    :      0.25s CPU      0.32s WALL (       1 calls)
+     tetra_delta_ :      0.04s CPU      0.04s WALL (       1 calls)
+     set_dos_n    :      0.30s CPU      0.38s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
      rmta_write   :      0.02s CPU      0.03s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      3.64s CPU      3.73s WALL
+     RMTA         :      6.44s CPU      6.56s WALL
 
  
-   This run was terminated on:  13:40: 6  17Jul2026            
+   This run was terminated on:  14:31:32  17Jul2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
