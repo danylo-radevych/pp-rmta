@@ -130,7 +130,7 @@
           END IF
         END DO ! irot
         WRITE(stdout, '(6x, "symmetry type: ", I4)') ist_i(iat)
-        WRITE(stdout, '(6x, "# of partners: ", I4)') counter
+        WRITE(stdout, '(6x, "# of pairs: ", I4)') counter
         ! st_wt(iat) = st_wt(iat) / counter
         ! sum_st_wt = sum_st_wt + st_wt(iat)
         ! WRITE(stdout, '(6x, "symmetry weight: ", F10.8)') st_wt(iat)
