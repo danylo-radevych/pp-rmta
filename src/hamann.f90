@@ -348,6 +348,7 @@
     ! rcut is lower cutoff for node counting to avoid small-r noise
     ! this method of "finding" rc is cumbersome but it avoids a lot of re-coding
     ! to simply pass rc or irc along.
+    krc = 0
     DO ii=mch,1,-1
     IF(dabs(vkb(ii,1))>0.0d0) THEN
     krc=ii+1
@@ -638,8 +639,8 @@
       END DO
       !
       ss=ss + al * (23.d0 * rr(nn - 2) * gg(nn - 2) * hh(nn - 2) + &
-        + 28.d0 * rr(nn-1) * gg(nn - 1) * hh(nn - 1) + &
-        +  9.d0 * rr(nn) * gg(nn) * hh(nn)) / 24.d0
+        28.d0 * rr(nn-1) * gg(nn - 1) * hh(nn - 1) + &
+        9.d0 * rr(nn) * gg(nn) * hh(nn)) / 24.d0
       !
       RETURN
       !

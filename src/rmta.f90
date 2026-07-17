@@ -22,14 +22,14 @@
   !  started: 2024/07/20
   !
     !
-    USE command_line_options, ONLY : npool_
+    ! USE command_line_options, ONLY : npool_
     USE io_global, ONLY: stdout, ionode, ionode_id
     USE io_files,         ONLY : prefix, tmp_dir
     USE constants,        ONLY : rytoev
     USE kinds,            ONLY : DP
     USE io_global,        ONLY : ionode, ionode_id
     USE environment,      ONLY : environment_start, environment_end
-    USE mp_world,         ONLY : mpime
+    ! USE mp_world,         ONLY : mpime
     USE mp,               ONLY : mp_size, mp_bcast
     USE mp_global,        ONLY : mp_startup
     USE mp_images,        ONLY : intra_image_comm
@@ -69,8 +69,10 @@
     !
     CHARACTER(LEN=256) :: outdir
     !! outdir of rmta computation
-    CHARACTER(len = 200) :: program_name
+    CHARACTER(len = 256) :: program_name
     !! name of this program
+    CHARACTER(len = 256) :: message
+    !! message
     LOGICAL :: verbose = .TRUE.
     !! set verbosity
     LOGICAL :: needwf = .TRUE.
@@ -115,11 +117,11 @@
     IF (lmpi_single_rank) THEN
       IF (mp_size(intra_image_comm) > 1) THEN
         WRITE(stdout, '(/5x, "Error: full MPI support for ", A, &
-          " is not implemented yet.")') &
+          & " is not implemented yet.")') &
           TRIM(program_name)
         WRITE(stdout, '(5x, "Use: mpirun -n 1 ", A)') &
           TRIM(program_name)
-        CALL errore(program_name, 'Use: mpirun -n 1', 1)
+        CALL errore(program_name, "Use: mpirun -n 1", 1)
       END IF
     END IF
 #endif
@@ -179,8 +181,10 @@
     !
     !
     CALL mp_bcast(ios, ionode_id, intra_image_comm)
-    IF (ios /= 0) CALL errore(rmta_routine, 'reading', rmta_routine, &
-      'namelist', ABS(ios))
+    IF (ios /= 0) THEN
+      message = "reading"//rmta_routine//"namelist"
+      CALL errore(rmta_routine, TRIM(message), ABS(ios))
+    END IF
     !
     ! broadcast variables
     CALL mp_bcast(tmp_dir, ionode_id, intra_image_comm)

@@ -57,7 +57,7 @@
     !!
     !---------------------------------------------------------------------------
       USE io_global, ONLY: stdout
-      USE ions_base, ONLY: nat, tau, ityp
+      USE ions_base, ONLY: nat, ityp
       USE symm_base, ONLY: nrot, irt
       USE uspp_param, ONLY: upf
       !
@@ -101,7 +101,7 @@
       ist_i(:) = 0
       !
       WRITE(stdout, '(/5x, "Checking irt, whether symmetry operations ", &
-        "relate different atoms:")')
+        & "relate different atoms:")')
       DO iat = 1, nat
         WRITE(stdout, '(5x)')
         WRITE(stdout, '(6x, "atom #", I4, " out of ", I4, ": ", A4)') &
@@ -176,7 +176,7 @@
       !
       DO ist = 1, nst
         WRITE(stdout, '(5x, "type #: ", I4, ": ", A, " with ", I4, &
-          " members:")') &
+          & " members:")') &
           ist, st_name(ist), ist_nat(ist)
         !
         WRITE(stdout, '(7x)', ADVANCE = "no")

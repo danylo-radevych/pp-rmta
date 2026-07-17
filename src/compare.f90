@@ -78,19 +78,19 @@
       routine_name = "set_ref_pot"
       !
       WRITE(stdout, '(/1x, A, &
-        ":: START --------------------------------------------------------")') &
+        & ":: START --------------------------------------------------------")') &
         TRIM(routine_name)
       !
       OPEN(UNIT = if_data, FILE = 'pot.txt', STATUS = 'old', ACTION = 'read')
       DO i = 1, 3
-        READ(if_data, *), tmp_char
+        READ(if_data, *) tmp_char
 !         WRITE(stdout, '(1x, A256)') tmp_char
       END DO
       !
-      READ(if_data, *), e_fermi
+      READ(if_data, *) e_fermi
       ref_ef = e_fermi
-      READ(if_data, *), nrow
-      READ(if_data, *), ncol
+      READ(if_data, *) nrow
+      READ(if_data, *) ncol
       WRITE(stdout, '(1x, A, ":: nrow = ", I3, ", ncol = ", I3)') &
         TRIM(routine_name), nrow, ncol
       !
@@ -169,7 +169,7 @@
       END IF
       !
       WRITE(stdout, '(1x, A, &
-        ":: END ----------------------------------------------------------")') &
+        & ":: END ----------------------------------------------------------")') &
         TRIM(routine_name)
       WRITE(stdout, '(1x, "\n")')
       !

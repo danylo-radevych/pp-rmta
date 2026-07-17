@@ -32,7 +32,7 @@
     !---------------------------------------------------------------------------
     SUBROUTINE set_eta(nr, imin, imax, nat, norb, nspin, &
       dos_nlr, dos_nr, &
-      dos_nlr_nodloglde, dos_nr_nodloglde, &
+      dos_nlr_nodloglde, &
       dos_n, luse_tot_dos, &
       mll1, mll1_nodloglde, &
       etall1, etall1_nodloglde)
@@ -69,10 +69,6 @@
       REAL(DP), INTENT(in) :: dos_nlr_nodloglde(:, :, :, :)
       !! reduced by dloglde partial densities n^i_{l}(r, E_F)
       !! dos_nlr(nr, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(in) :: dos_nr_nodloglde(:, :, :)
-      !! reduced by dloglde partial densities n^i(r, E_F), per atom, per spin
-      !! dos_nr(nr, nspin, nat)
       !! lmax = norb - 1
       REAL(DP), INTENT(in) :: dos_n(:)
       !! total densities n(E_F), per spin

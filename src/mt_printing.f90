@@ -47,11 +47,11 @@
       !
       IF (ionode) THEN
         WRITE(stdout,'(/5x, "==================================", &
-          "========================")')
+          & "========================")')
         WRITE(stdout,'(/5x, ">>>>>>>>>>>>>>>>>>>>>>>>>> RMTA ", &
-          "<<<<<<<<<<<<<<<<<<<<<<<<<<")')
+          & "<<<<<<<<<<<<<<<<<<<<<<<<<<")')
         WRITE(stdout,'(/5x, "==================================", &
-          "========================")')
+          & "========================")')
         WRITE(stdout,'()')
         WRITE(stdout,'(/5x, "Please cite:")')
         WRITE(stdout,'(5x, "D. Radevych, T. Shishidou, M. Weinert, ")')
@@ -84,7 +84,7 @@
       USE fft_rho,           ONLY : rho_g2r, rho_r2g
       USE gvect,             ONLY : ngl, gl, g, ngm, mill
       USE uspp_param,        ONLY : upf
-      USE cell_base,         ONLY : at, bg, alat, tpiba, omega
+      USE cell_base,         ONLY : at, alat, tpiba, omega
       USE io_global,         ONLY : stdout
       USE ions_base,         ONLY : ityp
       USE mt_var, ONLY: mt_prec, natoms, norbs, orb_label, &
@@ -554,7 +554,7 @@
       OPEN(UNIT = if_d2udrderf, FILE = TRIM('d2udrderf.dat'), &
         FORM = 'formatted', STATUS = 'unknown')
       WRITE(if_d2udrderf, '(1x, &
-        "d2udrde_l(r, e_f) for each atom, spin, and l")')
+        & "d2udrde_l(r, e_f) for each atom, spin, and l")')
       DO iat = 1, natoms
         DO ispin = 1, nspins
           DO iorb = 1, norbs
@@ -964,7 +964,7 @@
               r3d(:) = alat * r3d(:)
               WRITE(if_vlocionr3d, &
                 '(1x, I3, "  ", I3, "  ", I3, "  ", &
-                F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
+                & F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
                 i, j, k, &
                 r3d(1), r3d(2), r3d(3), &
                 vlocionr3d(ir)
@@ -999,7 +999,7 @@
                 r3d(:) = alat * r3d(:)
                 WRITE(if_vlocscrr3d, &
                   '(1x, I3, "  ", I3, "  ", I3, "  ", &
-                  F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
+                  & F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
                   i, j, k, &
                   r3d(1), r3d(2), r3d(3), &
                   vlocscrr3d(ir, ispin)
@@ -1033,7 +1033,7 @@
                 r3d(:) = alat * r3d(:)
                 WRITE(if_vlocscfr3d, &
                   '(1x, I3, "  ", I3, "  ", I3, "  ", &
-                  F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
+                  & F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
                   i, j, k, &
                   r3d(1), r3d(2), r3d(3), &
                   vlocscfr3d(ir, ispin)
@@ -1068,19 +1068,12 @@
             g3d(:) = tpiba * g3d(:)
             WRITE(if_vlocscrg3d, &
               '(1x, I3, "  ", I3, "  ", I3, "  ", &
-              F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
+              & F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
               mill(1, ig) + ishift(1), &
               mill(2, ig) + ishift(2), &
               mill(3, ig) + ishift(3), &
               g3d(1), g3d(2), g3d(3), &
               REAL(vlocscrg3d(ig, ispin))
-            ! WRITE(if_vlocscrg3d, &
-            !   '(1x, I3, "  ", I3, "  ", I3, "  ", &
-            !   F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
-            !   mill(1, ig), mill(2, ig), mill(3, ig), &
-            !   g3d(1), g3d(2), g3d(3), &
-            !   REAL(vlocscrg3d(ig, ispin)), &
-            !   AIMAG(vlocscrg3d(ig, ispin))
           END DO ! ig
         END DO ! ispin
         CLOSE(if_vlocscrg3d)
@@ -1099,16 +1092,16 @@
           WRITE(if_vlocscfg3d, '(1x, "Vgs for spin ", I0)') ispin
           WRITE(if_vlocscfg3d, '(1x, I0)') ngm
           WRITE(if_vlocscfg3d, '("   h    k    l", &
-            "          gx          gy          gz", &
-            "           g", &
-            "      Re(Vg)      Im(Vg)")')
+            & "          gx          gy          gz", &
+            & "           g", &
+            & "      Re(Vg)      Im(Vg)")')
           DO igm = 1, ngm
             g3d(:) = g(:, igm)
             g3d(:) = tpiba * g3d(:)
             WRITE(if_vlocscfg3d, &
               '(1x, I3, "  ", I3, "  ", I3, "  ", &
-              F10.6, "  ", &
-              F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
+              & F10.6, "  ", &
+              & F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6, "  ", F10.6)') &
               mill(1, igm), mill(2, igm), mill(3, igm), &
               g3d(1), g3d(2), g3d(3), &
               mt_g(4, igm), &
@@ -1372,11 +1365,11 @@
       !
       !
       WRITE(stdout, '(/5x, /5x, /5x, &
-        ">>>>>>>>>", &
-        ">>>>>>>>>>>>", &
-        ">>>>>>>>>>>> OUTPUT BEGIN <<<<<<<<<<<<", &
-        "<<<<<<<<<<<<", &
-        "<<<<<<<<<")')
+        & ">>>>>>>>>", &
+        & ">>>>>>>>>>>>", &
+        & ">>>>>>>>>>>> OUTPUT BEGIN <<<<<<<<<<<<", &
+        & "<<<<<<<<<<<<", &
+        & "<<<<<<<<<")')
       !
       !
       ! per atom
@@ -1384,12 +1377,12 @@
       sum_n_dos = 0._dp
       !
       WRITE(stdout, '(/6x, "################################### ATOMS ######", &
-        "###############################")')
+        & "###############################")')
       !
       DO iat = 1, natoms
         !
         WRITE(stdout, '(/6x, "Atom # ", I4, A4, &
-          " ==============================================================")') &
+          & " ==============================================================")') &
           iat, upf(ityp(iat))%psd
         !
         rmtf = mt_rf(mt_nrf, ist_i(iat))
@@ -1399,8 +1392,8 @@
         DO ispin = 1, nspins
           !
           WRITE(stdout, '(/7x, "Spin: ", I1, &
-            " --------------------------------------------------------------", &
-            "-------")') &
+            & " --------------------------------------------------------------", &
+            & "-------")') &
           ispin
           !
           IF (.NOT. luse_tot_dos) THEN
@@ -1439,8 +1432,8 @@
             IF (iorb < norbs) THEN
               !
               WRITE(stdout, '(/8x, "l: ", A2, &
-                " ........................................................", &
-                ".......", ".......")') &
+                & " ........................................................", &
+                & ".......", ".......")') &
                 orb_label(iorb)
               !
               !   CALL spline_interpolation(mt_nrf, mt_rf(:), &
@@ -1544,7 +1537,7 @@
                 etall1_nodloglde / natoms
               !
               WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
+                & es14.4, A)') &
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
@@ -1553,7 +1546,7 @@
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                  es14.4, A)') &
+                  & es14.4, A)') &
                   "eta-", TRIM(m_label), &
                   "(",  rmtf, "):", &
                   etall1, " (Ry / bohr^2) = ", &
@@ -1562,7 +1555,7 @@
                 IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
                   !
                   WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                    " and ignore eta-", A)') &
+                    & " and ignore eta-", A)') &
                     TRIM(m_label), TRIM(m_label)
                   !
                 END IF
@@ -1573,8 +1566,8 @@
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
-                " ........................................................", &
-                ".......")') &
+                & " ........................................................", &
+                & ".......")') &
                 "total"
               !
               WRITE(stdout, '("")')
@@ -1594,7 +1587,7 @@
                 eta_nodloglde / natoms
               !
               WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
+                & es14.4, A)') &
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta_nodloglde, " (Ry / bohr^2) = ", &
@@ -1602,7 +1595,7 @@
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                  es14.4, A)') &
+                  & es14.4, A)') &
                   "eta-tot", &
                   "(",  rmtf, "):", &
                   eta, " (Ry / bohr^2) = ", &
@@ -1611,7 +1604,7 @@
                 IF (ABS(eta_nodloglde - eta) > eps6) THEN
                   !
                   WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                    " and ignore eta-", A)') &
+                    & " and ignore eta-", A)') &
                     "tot", "tot"
                   !
                 END IF
@@ -1640,11 +1633,11 @@
       ! type-specific
       !
       WRITE(stdout, '(/6x, "########################## SYMMETRY TYPES ######", &
-        "##############################")')
+        & "##############################")')
       DO ist = 1, nst
         !
         WRITE(stdout, '(/6x, "Symmetry type # ", I4, A4, &
-          " =====================================================")') &
+          & " =====================================================")') &
           ist, st_name(ist)
         rmtf = mt_rf(mt_nrf, ist)
         !
@@ -1652,8 +1645,8 @@
         DO ispin = 1, nspins
           !
           WRITE(stdout, '(/7x, "Spin: ", I1, &
-            " --------------------------------------------------------------", &
-            "-------")') &
+            & " --------------------------------------------------------------", &
+            & "-------")') &
           ispin
           !
           DO iorb = 1, norbs
@@ -1662,8 +1655,8 @@
             IF (iorb < norbs) THEN
               !
               WRITE(stdout, '(/8x, "l: ", A2, &
-                " ........................................................", &
-                ".......", ".......")') &
+                & " ........................................................", &
+                & ".......", ".......")') &
                 orb_label(iorb)
               !
               m_label = orb_label(iorb) // orb_label(iorb + 1)
@@ -1703,7 +1696,7 @@
               etall1_nodloglde = etall1_nodloglde_sym_tp(iorb, ispin, ist)
               !
               WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
+                & es14.4, A)') &
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
@@ -1711,7 +1704,7 @@
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
-                  es14.4, A)') &
+                  & es14.4, A)') &
                   "eta-", TRIM(m_label), &
                   "(",  rmtf, "):", &
                   etall1, " (Ry / bohr^2) = ", &
@@ -1721,7 +1714,7 @@
                 IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
                   !
                   WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                    " and ignore eta-", A)') &
+                    & " and ignore eta-", A)') &
                     TRIM(m_label), TRIM(m_label)
                   !
                 END IF
@@ -1736,8 +1729,8 @@
               !
             ELSE
               WRITE(stdout, '(8x, "sum_l: ", A, &
-                " ........................................................", &
-                ".......")') &
+                & " ........................................................", &
+                & ".......")') &
                 "total"
               !
               !
@@ -1745,7 +1738,7 @@
               eta_nodloglde = etall1_nodloglde_sym_tp(norbs, ispin, ist)
               !
               WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                es14.4, A)') &
+                & es14.4, A)') &
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta_nodloglde, " (Ry / bohr^2) = ", &
@@ -1753,7 +1746,7 @@
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
-                  es14.4, A)') &
+                  & es14.4, A)') &
                   "eta-tot", &
                   "(",  rmtf, "):", &
                   eta, " (Ry / bohr^2) = ", &
@@ -1762,7 +1755,7 @@
                 IF (ABS(eta_nodloglde - eta) > eps6) THEN
                   !
                   WRITE(stdout, '(8x, "WARNING: Use eta_", A, &
-                    " and ignore eta-", A)') &
+                    & " and ignore eta-", A)') &
                     "tot", "tot"
                   !
                 END IF
@@ -1784,12 +1777,12 @@
       END DO ! ict
       !
       WRITE(stdout, '(/5x, &
-        ">>>>>>>>>", &
-        ">>>>>>>>>>>>", &
-        ">>>>>>>>>>>>  OUTPUT END  <<<<<<<<<<<<", &
-        "<<<<<<<<<<<<", &
-        "<<<<<<<<<", &
-        /5x, /5x, /5x)')
+        & ">>>>>>>>>", &
+        & ">>>>>>>>>>>>", &
+        & ">>>>>>>>>>>>  OUTPUT END  <<<<<<<<<<<<", &
+        & "<<<<<<<<<<<<", &
+        & "<<<<<<<<<", &
+        & /5x, /5x, /5x)')
       !
       DEALLOCATE(mll1_sym_tp, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
@@ -1865,7 +1858,7 @@
       USE io_global, ONLY : stdout
       USE basis, ONLY: natomwfc
 !       USE projections, ONLY: nlmchi
-      USE ions_base, ONLY : ityp, nat
+      USE ions_base, ONLY : nat
       USE ener, ONLY : ef
       !
       IMPLICIT NONE
@@ -1906,9 +1899,9 @@
         WRITE(stdout, '(7x, "number_of_wfc: ", I0)') upf(ict)%nwfc
         DO j = 1, upf(ict)%nwfc
           WRITE(stdout, '(9x, "rcut(", I3, "): ", F6.3, &
-            "  rcutus(", I3, "): ", F6.3, &
-            "  n(", I3, "): ", I3, &
-            "  l(", I3, "): ", I3)') &
+            & "  rcutus(", I3, "): ", F6.3, &
+            & "  n(", I3, "): ", I3, &
+            & "  l(", I3, "): ", I3)') &
             j, upf(ict)%rcut(j), &
             j, upf(ict)%rcutus(j), &
             j, upf(ict)%nchi(j), &

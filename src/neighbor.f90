@@ -50,7 +50,7 @@
       USE io_global, ONLY: stdout
       USE ions_base, ONLY: nat, tau, ityp
       USE uspp_param, ONLY: upf
-      USE cell_base, ONLY: at, bg, alat, omega
+      USE cell_base, ONLY: at, alat ! bg, omega
       USE const, ONLY: bohrtoang
       USE constants, ONLY: eps6, eps12
       !
@@ -140,7 +140,7 @@
         !
         IF (nn_dist(iat) < 0.0_dp) THEN
           WRITE(stdout, '("Distance to nearest-neighbor of atom ", I0, &
-            " not found")')
+            & " not found")')
           CALL errore(routine_name, "Error in nn_dist", 1)
         END IF
         !
@@ -192,7 +192,7 @@
         !
         IF (ALL(inn_i(iat, :) < 0.0_dp)) THEN
           WRITE(stdout, '("Nearest-neighbor indices of atom ", I0, &
-            " not found")')
+            & " not found")')
           CALL errore(routine_name, "Error in inn_i", 1)
         END IF
         !
@@ -206,7 +206,7 @@
         WRITE(stdout, '(6x, "atom #", I4, " out of ", I4, ": ", A4)') &
           iat, nat, upf(ityp(iat))%psd
         WRITE(stdout, '(7x, "neighbor distance: ", F10.8, " bohr = ", &
-          F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
+          & F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
         !
         WRITE(stdout, '(7x, "neighbor indices:", /8x)', advance='no')
         DO inn = 1, nneighbors(iat)

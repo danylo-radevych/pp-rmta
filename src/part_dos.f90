@@ -343,7 +343,7 @@
       nspin, ngauss, r, &
       tau_cart, dloglde, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n, &
-      dos_nlmr_nodloglde, dos_nlr_nodloglde, dos_nr_nodloglde)
+      dos_nlmr_nodloglde, dos_nlr_nodloglde)
     !---------------------------------------------------------------------------
     !!
     !! Computes partial densities n at Fermi level for each atom i,
@@ -355,15 +355,14 @@
     !
       USE io_global, ONLY: stdout
       USE constants, ONLY: tpi, eps32, eps6, eps4
-      USE cell_base, ONLY: at, bg, alat, tpiba, omega
+      USE cell_base, ONLY: tpiba, omega
       USE parameters, ONLY: npk
       USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
       USE wvfct, ONLY: npwx, et, nbnd
-      USE wavefunctions, ONLY: evc
-      USE io_files, ONLY: prefix, restart_dir, tmp_dir
+      ! USE wavefunctions, ONLY: evc
+      USE io_files, ONLY: restart_dir
       USE pw_restart_new, ONLY: read_collected_wfc
-      USE gvect, ONLY: ngl, gl, g, mill
-      USE ions_base, ONLY : ityp
+      USE gvect, ONLY: g ! mill, gl, ngl
       USE symm_base, ONLY: nrot, irt, nosym
       USE lsda_mod, ONLY: isk
       ! USE lsda_mod, ONLY: nspin, isk, current_spin ! TODO
@@ -428,10 +427,6 @@
       REAL(DP), INTENT(inout) :: dos_nlr_nodloglde(:, :, :, :)
       !! reduced by dloglde partial densities n**i_{l}(r, E_F)
       !! dos_nlr(nr, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_nr_nodloglde(:, :, :)
-      !! reduced by dloglde partial densities n**i(r, E_F), per atom, per spin
-      !! dos_nr(nr, nspin, nat)
       !! lmax = norb - 1
       !
       ! local variables
@@ -631,7 +626,7 @@
       !
       WRITE(stdout, &
         '(/6x, "Reading all stored psi_kg ", &
-        "coefficients of the wavefunctions...")')
+        & "coefficients of the wavefunctions...")')
       !
       ALLOCATE(psi_kg(npwx, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating psi_kg', 1)
@@ -647,7 +642,7 @@
       END DO ! ik
       !
       WRITE(stdout, '(6x, "Done reading all stored psi_kg ", &
-        "coefficients of the wavefunctions.", /6x, /6x)')
+        & "coefficients of the wavefunctions.", /6x, /6x)')
       !
       psi_kg_norm = 0._dp
       DO ik = 1, nkstot
@@ -675,7 +670,6 @@
       !
       dos_nlmr_nodloglde(:, :, :, :) = 0._dp
       dos_nlr_nodloglde(:, :, :, :) = 0._dp
-      dos_nr_nodloglde(:, :, :) = 0._dp
       !
       !
       ! spin!
@@ -723,7 +717,7 @@
             !
             WRITE(stdout, &
               '(/9x, "Precomputing ", &
-              "psi_krtau_aux...")')
+              & "psi_krtau_aux...")')
             !
             DO ik = 1, nkstot
               !
@@ -791,7 +785,7 @@
             !
             !
             WRITE(stdout, '(9x, "Done precomputing ", &
-              "psi_krtau_aux.", /6x)')
+              & "psi_krtau_aux.", /6x)')
             !
             DO iorb = 1, norb
               !
@@ -825,6 +819,8 @@
                   ! loop over KS-states
                   !
                   DO ibnd = 1, nbnd
+                    !
+                    deltaf = 0.0_dp
                     !
                     IF (ltetra) THEN
                       lselect = (ABS(wdk(ibnd, ik)) > eps32)
@@ -901,10 +897,6 @@
                 dos_nr(ir - imin + 1, ispin, iat) = &
                   dos_nr(ir - imin + 1, ispin, iat) + &
                   dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
-                !
-                dos_nr_nodloglde(ir - imin + 1, ispin, iat) = &
-                  dos_nr_nodloglde(ir - imin + 1, ispin, iat) + &
-                  dos_nlmr_nodloglde(ir - imin + 1, l0 + m, ispin, iat)
                 !
                 !
               END DO ! im
@@ -1031,7 +1023,7 @@
           ! updating total DOS, inside MT sphere(s)
           !
           dos_nr(:, :, iat) = 0._dp
-          dos_nr_nodloglde(:, :, iat) = 0._dp
+          !
           DO ispin = 1, nspin
             DO ir = imin, imax
               DO iorb = 1, norb
@@ -1039,11 +1031,6 @@
                 dos_nr(ir - imin + 1, ispin, iat) = &
                   dos_nr(ir - imin + 1, ispin, iat) + &
                   dos_nlr(ir - imin + 1, iorb, ispin, iat)
-                !
-                !
-                dos_nr_nodloglde(ir - imin + 1, ispin, iat) = &
-                  dos_nr_nodloglde(ir - imin + 1, ispin, iat) + &
-                  dos_nlr_nodloglde(ir - imin + 1, iorb, ispin, iat)
                 !
               END DO ! iorb
             END DO ! ir
@@ -1083,7 +1070,7 @@
       !
       !
       WRITE(stdout, '(6x, "Done computing partial DOS per atom per spin", &
-        " = f(r, E_F).", /6x, /6x)')
+        & " = f(r, E_F).", /6x, /6x)')
       !
       !
       ! clean-up
@@ -1161,10 +1148,10 @@
       !
       WRITE(stdout, &
         '(6x, "Done computing total DOS", &
-          " per atom per spin = f(spin, E_F).", /6x, /6x)')
+        & " per atom per spin = f(spin, E_F).", /6x, /6x)')
       !
       WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
-        /5x, /5x, /5x)')
+        & /5x, /5x, /5x)')
       !
       IF (ltetra) THEN
         !
@@ -1322,7 +1309,7 @@
       !! tetrahedron energies
       REAL(DP) :: e21, e31, e41, e32, e42, e43
       !! energy differences
-      REAL(DP) :: C, C1, C2, C3, C4, DC, DC1, DC2, DC3, DC4, E
+      REAL(DP) :: C, C1, C2, C3, DC, DC1, DC2, DC3, E
       !! tmp, aux
       !
       E = ef

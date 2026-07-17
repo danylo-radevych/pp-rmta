@@ -436,6 +436,8 @@
       routine_name = "set_vsemiloc"
       CALL start_clock(routine_name)
       !
+      v0 = 0.0_dp
+      !
       !
       IF (lread_semiloc_from_upf) THEN
         !
@@ -1228,7 +1230,7 @@
             !
             IF (nstop == 1) THEN
               WRITE(stdout, '("WARNING: irregular termination in lschps", &
-                I3)') n + l
+                & I3)') n + l
               ! CALL errore(rmta_routine, &
               !   "irregular termination in lschps", n + l)
             END IF
@@ -1351,6 +1353,7 @@
       mll1rf(:, :, :, :) = 0.0_dp
       mll1rf_nodloglde(:, :, :, :) = 0.0_dp
       mll1rf_label(:, :, :) = "?????"
+      v0 = 0.0_dp
       !
       nin = irf_max
       !

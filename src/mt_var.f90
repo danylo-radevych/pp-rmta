@@ -42,7 +42,7 @@
       vfullrf, rvfullrf, &
       irf_min, irf_max, &
       dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-      dos_nlmrf_nodloglde, dos_nlrf_nodloglde, dos_nrf_nodloglde, &
+      dos_nlmrf_nodloglde, dos_nlrf_nodloglde, &
       etall1rf, etall1rf_nodloglde, &
       loglrf, dloglderf, &
       luse_ref_pot, luse_tot_dos, &
@@ -268,9 +268,6 @@
     REAL(DP), ALLOCATABLE :: dos_nlrf_nodloglde(:, :, :, :)
     !! reduced by dloglde partial densities n^i_{l}(r, E_F)
     !! dos_nlrf(nr, norbs, nspins, natoms)
-    REAL(DP), ALLOCATABLE :: dos_nrf_nodloglde(:, :, :)
-    !! reduced by dloglde total partial densities n^i(r, E_F)
-    !! dos_nrf(nr, nspins, natoms), per atom, per spin
     REAL(DP), ALLOCATABLE :: etall1rf(:, :, :, :)
     !! etall1rf(mt_nrf, norbs, nspins, natoms)
     !! McMillan-Hopfield \eta_l,
@@ -471,21 +468,21 @@
             IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
-                F10.8, " bohr = ", F10.8, " A")') &
+                & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
               CALL errore(routine_name, &
                 "First MT radius guess is too small.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
-                F10.8, " bohr = ", F10.8, " A")') &
+                & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
               CALL errore(routine_name, &
                 "First MT radius guess is too high.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
-                F10.8, " bohr = ", F10.8, " A")') &
+                & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
               CALL errore(routine_name, &
                 "First MT radius guess not assigned.", 1)
@@ -553,11 +550,11 @@
         DO iat = 1, natoms
           IF (mt_rmt(ist_i(iat)) < 0._dp .AND. rmt(iat) > 0._dp) THEN
             WRITE(stdout, '(6x, "MT-radius of atom ", I4, &
-              " is used for the symmetry type ", I4)') iat, ist_i(iat)
+              & " is used for the symmetry type ", I4)') iat, ist_i(iat)
             mt_rmt(ist_i(iat)) = rmt(iat)
           ELSE IF (ABS(mt_rmt(ist_i(iat)) - rmt(iat)) > eps6) THEN
             WRITE(stdout, '(6x, "Check MT-radius of atom ", I4, &
-              " of the symmetry type ", I4)') iat, ist_i(iat)
+              & " of the symmetry type ", I4)') iat, ist_i(iat)
             CALL errore(routine_name, &
               "MT-radii inconsistent for the symmetry type.", 1)
           END IF
@@ -573,14 +570,14 @@
         IF (mt_rmt(ist) < 0._dp) THEN
           !
           WRITE(stdout, '(6x, "MT radius for the type ", I0, &
-            " is not defined")') ist
+            & " is not defined")') ist
           CALL errore(routine_name, "Error in mt_rmt array", 1)
           !
         ELSE IF (mt_rmt(ist) < MAXVAL(upf(ist_ityp(ist))%rcut(:))) THEN
             !
             WRITE(stdout, '(6x, "symmetry type #", I4)') ist
             WRITE(stdout, '(6x, "MT radius: ", &
-              F10.8, " bohr = ", F10.8, " A")') &
+              & F10.8, " bohr = ", F10.8, " A")') &
               mt_rmt(ist), mt_rmt(ist) * bohrtoang
             CALL errore(routine_name, "MT radius is too small.", 1)
             !
@@ -598,7 +595,7 @@
             !
             WRITE(stdout, '(/5x, "Spheres ", I0, " and ", I0, " overlap:")') &
               iat, inn_i(iat, inn)
-            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > " F0.16)') &
+            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", F0.16)') &
               mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(iat, inn))), nn_dist(iat)
             CALL errore(routine_name, "Error for overlapping spheres", 1)
             !
@@ -653,7 +650,7 @@
       USE io_global, ONLY: stdout
       USE sym_type, ONLY: nst
       USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: ityp
+      ! USE ions_base, ONLY: ityp
       !
       IMPLICIT NONE
       !
@@ -893,7 +890,7 @@
       !
       routine_name = "set_tau_cart"
       !
-      ALLOCATE(tau_cart(3, natoms))
+      ALLOCATE(tau_cart(3, natoms), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating tau_cart', 1)
       !
@@ -1010,7 +1007,7 @@
     !!
     !---------------------------------------------------------------------------
       USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: ityp
+      ! USE ions_base, ONLY: ityp
       !
       IMPLICIT NONE
       !
@@ -1185,7 +1182,7 @@
       USE fft_base, ONLY: dfftp
       USE scf, ONLY: vltot, vrs, v, kedtau ! v_of_0
       USE gvecs, ONLY: doublegrid
-      USE gvect, ONLY: ngl, gl, g, ngm ! ecutrho, mill
+      USE gvect, ONLY: ngl, g, ngm ! gl, ecutrho, mill
       USE fft_rho, ONLY: rho_r2g ! rho_g2r
       USE cell_base, ONLY: tpiba ! omega, at, bg, alat
       !
@@ -1367,12 +1364,6 @@
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nlrf_nodloglde', 1)
       dos_nlrf_nodloglde(:, :, :, :) = 0._dp
-      !
-      ALLOCATE(dos_nrf_nodloglde(1 : irf_delta + 1, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, 'Error allocating dos_nrf_nodloglde', 1)
-      dos_nrf_nodloglde(:, :, :) = 0._dp
       !
       ALLOCATE(etall1rf(1 : irf_delta + 1, norbs, &
         nspins, natoms), STAT = ierr)
@@ -1605,10 +1596,6 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating dos_nlrf_nodloglde', 1)
       !
-      DEALLOCATE(dos_nrf_nodloglde, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating dos_nrf_nodloglde', 1)
-      !
       DEALLOCATE(etall1rf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating etall1rf', 1)
@@ -1690,6 +1677,8 @@
       EXTERNAL :: errore
       !
       routine_name = "rmt_default"
+      !
+      rmt_d = 0.0_dp
       !
       SELECT CASE(element_label)
         !
