@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 17Jul2026 at 17:40:32 
+     Program RMTA v.7.5 starts on 17Jul2026 at 21:40: 6 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     16928 MiB available memory on the printing compute node when the environment starts
+     9768 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -103,7 +103,7 @@
        irt(47,  1) = 3: V 
        irt(48,  1) = 4: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   2 out of    8:   V 
        irt( 2,  2) = 1: V 
@@ -147,7 +147,7 @@
        irt(47,  2) = 4: V 
        irt(48,  2) = 3: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   3 out of    8:   V 
        irt( 2,  3) = 4: V 
@@ -191,7 +191,7 @@
        irt(47,  3) = 6: V 
        irt(48,  3) = 5: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   4 out of    8:   V 
        irt( 2,  4) = 3: V 
@@ -235,7 +235,7 @@
        irt(47,  4) = 5: V 
        irt(48,  4) = 6: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   5 out of    8:   V 
        irt( 3,  5) = 6: V 
@@ -279,7 +279,7 @@
        irt(47,  5) = 1: V 
        irt(48,  5) = 1: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   6 out of    8:   V 
        irt( 3,  6) = 5: V 
@@ -323,7 +323,7 @@
        irt(47,  6) = 2: V 
        irt(48,  6) = 2: V 
       symmetry type:    1
-      # of partners:   41
+      # of pairs:   41
 
       atom #   7 out of    8:   Si
        irt( 5,  7) = 8: Si
@@ -351,7 +351,7 @@
        irt(39,  7) = 8: Si
        irt(40,  7) = 8: Si
       symmetry type:    2
-      # of partners:   25
+      # of pairs:   25
 
       atom #   8 out of    8:   Si
        irt( 5,  8) = 7: Si
@@ -379,7 +379,7 @@
        irt(39,  8) = 7: Si
        irt(40,  8) = 7: Si
       symmetry type:    2
-      # of partners:   25
+      # of pairs:   25
 
 
      # of symmetry types:    2
@@ -397,59 +397,83 @@
 
       atom #   1 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          2 
        neighbor types:
          V  
+       neighbor indices:
+          2 
+       neighbor replicas:
+        4.46438326 5.46773051 5.46773051 5.46773051 5.46773051 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   2 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          1 
        neighbor types:
          V  
+       neighbor indices:
+          1 
+       neighbor replicas:
+        4.46438326 5.46773051 5.46773051 5.46773051 5.46773051 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   3 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          4 
        neighbor types:
          V  
+       neighbor indices:
+          4 
+       neighbor replicas:
+        5.46773051 5.46773051 4.46438326 5.46773051 5.46773051 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   4 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          3 
        neighbor types:
          V  
+       neighbor indices:
+          3 
+       neighbor replicas:
+        5.46773051 5.46773051 4.46438326 5.46773051 5.46773051 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   5 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          6 
        neighbor types:
          V  
+       neighbor indices:
+          6 
+       neighbor replicas:
+        5.46773051 5.46773051 5.46773051 5.46773051 4.46438326 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   6 out of    8:   V 
        neighbor distance: 4.46438326 bohr = 2.36244988 A
-       neighbor indices:
-          5 
        neighbor types:
          V  
+       neighbor indices:
+          5 
+       neighbor replicas:
+        5.46773051 5.46773051 5.46773051 5.46773051 4.46438326 4.99133223 4.99133223 
+         V   V   V   V   V   Si  Si 
 
       atom #   7 out of    8:   Si
        neighbor distance: 4.99133223 bohr = 2.64129927 A
-       neighbor indices:
-          1   2   3   4   5   6 
        neighbor types:
          V   V   V   V   V   V  
+       neighbor indices:
+          1   2   3   4   5   6 
+       neighbor replicas:
+        4.99133223 4.99133223 4.99133223 4.99133223 4.99133223 4.99133223 7.73253864 
+         V   V   V   V   V   V   Si 
 
       atom #   8 out of    8:   Si
        neighbor distance: 4.99133223 bohr = 2.64129927 A
-       neighbor indices:
-          1   2   3   4   5   6 
        neighbor types:
          V   V   V   V   V   V  
+       neighbor indices:
+          1   2   3   4   5   6 
+       neighbor replicas:
+        4.99133223 4.99133223 4.99133223 4.99133223 4.99133223 4.99133223 7.73253864 
+         V   V   V   V   V   V   Si 
 
 
 
@@ -1474,6 +1498,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1548,6 +1573,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1622,6 +1648,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1696,6 +1723,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1770,6 +1798,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1844,6 +1873,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.23219):    3.8988E-02 (Ry / bohr^2) =    1.8943E+00 (eV / A^2)
+          ? eta_tot:    1.8943E+00
 
 
 
@@ -1918,6 +1948,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.75914):    1.7538E-03 (Ry / bohr^2) =    8.5214E-02 (eV / A^2)
+          ? eta_tot:    8.5214E-02
 
 
 
@@ -1992,6 +2023,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.75914):    1.7538E-03 (Ry / bohr^2) =    8.5214E-02 (eV / A^2)
+          ? eta_tot:    8.5214E-02
 
 
 
@@ -2120,21 +2152,21 @@
      writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      8.38s CPU      8.44s WALL (       1 calls)
+     rmta_init    :      6.84s CPU      6.87s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.15s CPU      0.15s WALL (       1 calls)
-     set_dos_n    :     10.84s CPU     24.16s WALL (       1 calls)
+     tetra_delta_ :      0.12s CPU      0.13s WALL (       1 calls)
+     set_dos_n    :      9.09s CPU     10.99s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.06s CPU      0.26s WALL (       1 calls)
+     rmta_write   :      0.06s CPU      0.07s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :     23.87s CPU     37.51s WALL
+     RMTA         :     19.75s CPU     21.73s WALL
 
  
-   This run was terminated on:  17:41:10  17Jul2026            
+   This run was terminated on:  21:40:28  17Jul2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.

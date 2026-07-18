@@ -773,8 +773,6 @@
                 !
                 IF (jat /= iat) THEN
                   !
-                  lrmt_fixed(ist_i(iat)) = .TRUE.
-                  !
                   IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
                     nr_dist(jat, iat)) < eps6) THEN
                     !

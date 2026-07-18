@@ -245,7 +245,7 @@
               nr_dist(jat, iat)
           END IF
         END DO
-        WRITE(stdout, '(/8x)')
+        WRITE(stdout, '(/8x)', advance='no')
         DO jat = 1, nat
           IF (jat /= iat) THEN
             WRITE(stdout, '(A3, " ")', advance='no') &
