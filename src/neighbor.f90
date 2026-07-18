@@ -132,9 +132,8 @@
                   jat_dist = tmp_dist
                 END IF
                 !
-                IF (jat /= iat .AND. &
-                  ((tmp_dist < nr_dist(jat, iat)) .OR. &
-                  (nr_dist(jat, iat) < 0.0_dp))) &
+                IF (((tmp_dist < nr_dist(jat, iat)) .OR. &
+                  (nr_dist(jat, iat) < 0.0_dp)) .AND. (tmp_dist > eps6)) &
                   nr_dist(jat, iat) = tmp_dist
                 !
               END DO ! nc1
@@ -146,7 +145,7 @@
             nn_dist(iat) = jat_dist
           END IF
           !
-          IF ((jat /= iat) .AND. (nr_dist(jat, iat) < 0.0_dp)) THEN
+          IF (nr_dist(jat, iat) < 0.0_dp) THEN
             WRITE(stdout, '(5x, "Nearest replica of atom ", I0, &
               & "w.r.t. atom ", I0, " not found")') jat, iat
             CALL errore(routine_name, "Cannot find nearest replica", 1)
@@ -240,17 +239,13 @@
         !
         WRITE(stdout, '(7x, "neighbor replicas:", /8x)', advance='no')
         DO jat = 1, nat
-          IF (jat /= iat) THEN
-            WRITE(stdout, '(F0.8, " ")', advance='no') &
-              nr_dist(jat, iat)
-          END IF
+          WRITE(stdout, '(F0.8, " ")', advance='no') &
+            nr_dist(jat, iat)
         END DO
         WRITE(stdout, '(/8x)', advance='no')
         DO jat = 1, nat
-          IF (jat /= iat) THEN
-            WRITE(stdout, '(A3, " ")', advance='no') &
-              upf(ityp(jat))%psd
-          END IF
+          WRITE(stdout, '(A3, " ")', advance='no') &
+            upf(ityp(jat))%psd
         END DO
         WRITE(stdout, '()')
         !

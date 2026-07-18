@@ -709,25 +709,21 @@
             !
             DO jat = 1, natoms
               !
-              IF (jat /= iat) THEN
+              ! this symmetry type
+              rmt_d_iat = rmt_default(st_name(ist_i(iat)))
+              ! its nearest neighbor symmetry type
+              rmt_d_iat_nn = &
+                rmt_default(st_name(ist_i(jat)))
+              !
+              !
+              rtmp = nr_dist(jat, iat)  * & ! distance to the neighbor
+                rmt_d_iat / & ! this atom
+                (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
+              !
+              IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
+                (mt_rmt(ist_i(iat)) > rtmp)) THEN
                 !
-                ! this symmetry type
-                rmt_d_iat = rmt_default(st_name(ist_i(iat)))
-                ! its nearest neighbor symmetry type
-                rmt_d_iat_nn = &
-                  rmt_default(st_name(ist_i(jat)))
-                !
-                !
-                rtmp = nr_dist(jat, iat)  * & ! distance to the neighbor
-                  rmt_d_iat / & ! this atom
-                  (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
-                !
-                IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
-                  (mt_rmt(ist_i(iat)) > rtmp)) THEN
-                  !
-                  mt_rmt(ist_i(iat)) = rtmp
-                  !
-                END IF
+                mt_rmt(ist_i(iat)) = rtmp
                 !
               END IF
               !
@@ -771,15 +767,11 @@
               !
               DO jat = 1, natoms
                 !
-                IF (jat /= iat) THEN
+                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+                  nr_dist(jat, iat)) < eps6) THEN
                   !
-                  IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
-                    nr_dist(jat, iat)) < eps6) THEN
-                    !
-                    lrmt_fixed(ist_i(iat)) = .TRUE.
-                    lrmt_fixed(ist_i(jat)) = .TRUE.
-                    !
-                  END IF
+                  lrmt_fixed(ist_i(iat)) = .TRUE.
+                  lrmt_fixed(ist_i(jat)) = .TRUE.
                   !
                 END IF
                 !
@@ -793,18 +785,14 @@
                 !
                 DO jat = 1, natoms
                   !
-                  IF (jat /= iat) THEN
-                    !
-                    rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
-                    !
-                    IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
-                      (rtmp < 0.0_dp)) THEN
-                      rtmp = rtmp2
-                    END IF
-                    !
+                  rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
+                  !
+                  IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
+                    (rtmp < 0.0_dp)) THEN
+                    rtmp = rtmp2
                   END IF
                   !
-                END DO ! inn
+                END DO ! jat
                 !
                 IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
                   mt_rmt(ist_i(iat)) = rtmp
@@ -890,8 +878,8 @@
         !
         DO jat = 1, natoms
           !
-          IF ((jat /= iat) .AND. ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
-            nr_dist(jat, iat)) > eps6)) THEN
+          IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+            nr_dist(jat, iat)) > eps6) THEN
             !
             WRITE(stdout, '(/5x, "Replica spheres ", I0, " and ", &
               & I0, " overlap:")') &
