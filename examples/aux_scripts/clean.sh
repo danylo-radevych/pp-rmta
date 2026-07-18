@@ -3,7 +3,7 @@ ORM="-vrf"
 #rm -rf *.in *.out output tempdir *.log CRASH pt.*
 
 
-rm $ORM CRASH *.log output/*.out *.in
+rm $ORM CRASH *.log *.err output/*.out *.in
 rm $ORM *.pdf *.png *.svg
 rm $ORM *.dat
 rm $ORM *.txt
