@@ -447,7 +447,7 @@
               rmt_d_iat = rmt_default(st_name(ist_i(iat)))
               ! its nearest neighbor symmetry type
               rmt_d_iat_nn = &
-                rmt_default(st_name(ist_i(inn_i(iat, inn))))
+                rmt_default(st_name(ist_i(inn_i(inn, iat))))
               !
               !
               rtmp = nn_dist(iat)  * & ! distance to the neighbor
@@ -501,10 +501,12 @@
               !
               DO inn = 1, nneighbors(iat)
                 !
-                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
+                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
                   nn_dist(iat)) < eps6) THEN
+                  !
                   lrmt_fixed(ist_i(iat)) = .TRUE.
-                  lrmt_fixed(ist_i(inn_i(iat, inn))) = .TRUE.
+                  lrmt_fixed(ist_i(inn_i(inn, iat))) = .TRUE.
+                  !
                 END IF
                 !
               END DO ! inn
@@ -515,9 +517,9 @@
                 !
                 DO inn = 1, nneighbors(iat)
                   !
-                  ! IF (lrmt_fixed(ist_i(inn_i(iat, inn)))) THEN
+                  ! IF (lrmt_fixed(ist_i(inn_i(inn, iat)))) THEN
                     !
-                    rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(iat, inn)))
+                    rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(inn, iat)))
                     !
                     IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
                       (rtmp < 0.0_dp)) THEN
@@ -590,13 +592,13 @@
         !
         DO inn = 1, nneighbors(iat)
           !
-          IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(iat, inn))) - &
+          IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
             nn_dist(iat)) > eps6) THEN
             !
             WRITE(stdout, '(/5x, "Spheres ", I0, " and ", I0, " overlap:")') &
-              iat, inn_i(iat, inn)
+              iat, inn_i(inn, iat)
             WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", F0.16)') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(iat, inn))), nn_dist(iat)
+              mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(inn, iat))), nn_dist(iat)
             CALL errore(routine_name, "Error for overlapping spheres", 1)
             !
           END IF
