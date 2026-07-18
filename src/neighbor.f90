@@ -224,6 +224,13 @@
         WRITE(stdout, '(7x, "neighbor distance: ", F10.8, " bohr = ", &
           & F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
         !
+        WRITE(stdout, '(7x, "neighbor types:", /8x)', advance='no')
+        DO inn = 1, nneighbors(iat)
+          WRITE(stdout, '(A3, " ")', advance='no') &
+            upf(ityp(inn_i(inn, iat)))%psd
+        END DO
+        WRITE(stdout, '()')
+        !
         WRITE(stdout, '(7x, "neighbor indices:", /8x)', advance='no')
         DO inn = 1, nneighbors(iat)
           WRITE(stdout, '(I3, " ")', advance='no') &
@@ -231,10 +238,19 @@
         END DO
         WRITE(stdout, '()')
         !
-        WRITE(stdout, '(7x, "neighbor types:", /8x)', advance='no')
-        DO inn = 1, nneighbors(iat)
-          WRITE(stdout, '(A3, " ")', advance='no') &
-            upf(ityp(inn_i(inn, iat)))%psd
+        WRITE(stdout, '(7x, "neighbor replicas:", /8x)', advance='no')
+        DO jat = 1, nat
+          IF (jat /= iat) THEN
+            WRITE(stdout, '(F0.8, " ")', advance='no') &
+              nr_dist(jat, iat)
+          END IF
+        END DO
+        WRITE(stdout, '(/8x)')
+        DO jat = 1, nat
+          IF (jat /= iat) THEN
+            WRITE(stdout, '(A3, " ")', advance='no') &
+              upf(ityp(jat))%psd
+          END IF
         END DO
         WRITE(stdout, '()')
         !

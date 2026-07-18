@@ -368,6 +368,272 @@
     END SUBROUTINE rmta_set_vars
     !---------------------------------------------------------------------------
     !
+    ! !
+    ! !---------------------------------------------------------------------------
+    ! SUBROUTINE set_rmt()
+    ! !---------------------------------------------------------------------------
+    ! !!
+    ! !! Sets MT radii for each symmetry type as a minimum of the 
+    ! !! nearest-neighbor distance divided in ratio of internal MT radii 
+    ! !! defaults, then ensuring that the spheres do touch...
+    ! !! ... more in the code below
+    ! !!
+    ! !---------------------------------------------------------------------------
+    ! !
+    ! !  D. Radevych
+    ! !
+    !   !
+    !   USE io_global, ONLY: stdout
+    !   USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
+    !   USE neighbor, ONLY: nneighbors, nn_dist, inn_i
+    !   USE constants, ONLY: eps6
+    !   USE uspp_param, ONLY: upf
+    !   USE ions_base, ONLY: ityp
+    !   !
+    !   IMPLICIT NONE
+    !   !
+    !   CHARACTER(len=256) :: routine_name
+    !   !! name of this subroutine
+    !   LOGICAL :: ltouch
+    !   !! if true, make additional pass to ensure touching spheres
+    !   !! only if lrmt = .false.
+    !   LOGICAL, ALLOCATABLE :: lrmt_fixed(:)
+    !   !! if true, mt_rmt(ist) is already constrained 
+    !   INTEGER :: ierr
+    !   !! error code
+    !   INTEGER :: ist, iat, inn !, jat
+    !   !! iterators
+    !   REAL(DP) :: rtmp, rtmp2
+    !   !! real temporary vars
+    !   REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
+    !   !! temprary default MT radii
+    !   !
+    !   EXTERNAL :: errore
+    !   !
+    !   routine_name = "set_rmt"
+    !   !
+    !   ltouch = .FALSE.
+    !   !
+    !   ALLOCATE(mt_rmt(nst), STAT = ierr)
+    !   IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
+    !   ALLOCATE(lrmt_fixed(nst), STAT = ierr)
+    !   IF (ierr /= 0) CALL errore(routine_name, 'Error allocating lrmt_fixed', 1)
+    !   !
+    !   mt_rmt(:) = -1.0_dp
+    !   lrmt_fixed(:) = .FALSE.
+    !   !
+    !   IF (.NOT. lrmt) THEN
+    !     !
+    !     ! automatically generated MT radii
+    !     !
+    !     IF (TRIM(rmt_method) == "default") THEN
+    !       !
+    !       ! from MT-radius table
+    !       !
+    !       DO ist = 1, nst
+    !         mt_rmt(ist) = rmt_default(st_name(ist))
+    !       END DO ! ist
+    !       !
+    !     ELSE IF (TRIM(rmt_method) == "neighbor" .OR. &
+    !       TRIM(rmt_method) == "touching") THEN
+    !       !
+    !       ! based on the nearest-neighbor distances
+    !       !
+    !       DO iat = 1, natoms
+    !         !
+    !         DO inn = 1, nneighbors(iat)
+    !           !
+    !           ! this symmetry type
+    !           rmt_d_iat = rmt_default(st_name(ist_i(iat)))
+    !           ! its nearest neighbor symmetry type
+    !           rmt_d_iat_nn = &
+    !             rmt_default(st_name(ist_i(inn_i(inn, iat))))
+    !           !
+    !           !
+    !           rtmp = nn_dist(iat)  * & ! distance to the neighbor
+    !             rmt_d_iat / & ! this atom
+    !             (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
+    !           !
+    !           IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
+    !             (mt_rmt(ist_i(iat)) > rtmp)) THEN
+    !             !
+    !             mt_rmt(ist_i(iat)) = rtmp
+    !             !
+    !           END IF
+    !           !
+    !         END DO ! inn
+    !         !
+    !         !
+    !         !
+    !         IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
+    !           WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+    !           WRITE(stdout, '(6x, "MT radius: ", &
+    !             & F10.8, " bohr = ", F10.8, " A")') &
+    !             mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+    !           CALL errore(routine_name, &
+    !             "First MT radius guess is too small.", 1)
+    !         ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
+    !           WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+    !           WRITE(stdout, '(6x, "MT radius: ", &
+    !             & F10.8, " bohr = ", F10.8, " A")') &
+    !             mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+    !           CALL errore(routine_name, &
+    !             "First MT radius guess is too high.", 1)
+    !         ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
+    !           WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+    !           WRITE(stdout, '(6x, "MT radius: ", &
+    !             & F10.8, " bohr = ", F10.8, " A")') &
+    !             mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+    !           CALL errore(routine_name, &
+    !             "First MT radius guess not assigned.", 1)
+    !         END IF
+    !         !
+    !         !
+    !       END DO ! iat
+    !       !
+    !       IF (TRIM(rmt_method) == "touching") THEN
+    !         ltouch = .TRUE.
+    !       END IF
+    !       !
+    !       IF (ltouch) THEN
+    !         !
+    !         DO iat = 1, natoms
+    !           !
+    !           DO inn = 1, nneighbors(iat)
+    !             !
+    !             IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
+    !               nn_dist(iat)) < eps6) THEN
+    !               !
+    !               lrmt_fixed(ist_i(iat)) = .TRUE.
+    !               lrmt_fixed(ist_i(inn_i(inn, iat))) = .TRUE.
+    !               !
+    !             END IF
+    !             !
+    !           END DO ! inn
+    !           !
+    !           IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
+    !             !
+    !             rtmp = -1.0_dp
+    !             !
+    !             DO inn = 1, nneighbors(iat)
+    !               !
+    !               ! IF (lrmt_fixed(ist_i(inn_i(inn, iat)))) THEN
+    !                 !
+    !                 rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(inn, iat)))
+    !                 !
+    !                 IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
+    !                   (rtmp < 0.0_dp)) THEN
+    !                   rtmp = rtmp2
+    !                 END IF
+    !                 !
+    !               ! END IF
+    !               !
+    !             END DO ! inn
+    !             !
+    !             IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
+    !               mt_rmt(ist_i(iat)) = rtmp
+    !             END IF
+    !             !
+    !             lrmt_fixed(ist_i(iat)) = .TRUE.
+    !             !
+    !             !
+    !           END IF
+    !           !
+    !         END DO ! iat
+    !         !
+    !       END IF ! ltouch
+    !       !
+    !     END IF ! rmt_method
+    !     !
+    !   ELSE
+    !     !
+    !     ! user-specified MT radii
+    !     !
+    !     DO iat = 1, natoms
+    !       IF (mt_rmt(ist_i(iat)) < 0._dp .AND. rmt(iat) > 0._dp) THEN
+    !         WRITE(stdout, '(6x, "MT-radius of atom ", I4, &
+    !           & " is used for the symmetry type ", I4)') iat, ist_i(iat)
+    !         mt_rmt(ist_i(iat)) = rmt(iat)
+    !       ELSE IF (ABS(mt_rmt(ist_i(iat)) - rmt(iat)) > eps6) THEN
+    !         WRITE(stdout, '(6x, "Check MT-radius of atom ", I4, &
+    !           & " of the symmetry type ", I4)') iat, ist_i(iat)
+    !         CALL errore(routine_name, &
+    !           "MT-radii inconsistent for the symmetry type.", 1)
+    !       END IF
+    !     END DO
+    !     !
+    !   END IF ! lrmt
+    !   !
+    !   !
+    !   ! check
+    !   !
+    !   DO ist = 1, nst
+    !     !
+    !     IF (mt_rmt(ist) < 0._dp) THEN
+    !       !
+    !       WRITE(stdout, '(6x, "MT radius for the type ", I0, &
+    !         & " is not defined")') ist
+    !       CALL errore(routine_name, "Error in mt_rmt array", 1)
+    !       !
+    !     ELSE IF (mt_rmt(ist) < MAXVAL(upf(ist_ityp(ist))%rcut(:))) THEN
+    !         !
+    !         WRITE(stdout, '(6x, "symmetry type #", I4)') ist
+    !         WRITE(stdout, '(6x, "MT radius: ", &
+    !           & F10.8, " bohr = ", F10.8, " A")') &
+    !           mt_rmt(ist), mt_rmt(ist) * bohrtoang
+    !         CALL errore(routine_name, "MT radius is too small.", 1)
+    !         !
+    !     END IF
+    !     !
+    !   END DO
+    !   !
+    !   !
+    !   DO iat = 1, natoms
+    !     !
+    !     DO inn = 1, nneighbors(iat)
+    !       !
+    !       IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
+    !         nn_dist(iat)) > eps6) THEN
+    !         !
+    !         WRITE(stdout, '(/5x, "Spheres ", I0, " and ", I0, " overlap:")') &
+    !           iat, inn_i(inn, iat)
+    !         WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", F0.16)') &
+    !           mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(inn, iat))), nn_dist(iat)
+    !         CALL errore(routine_name, "Error for overlapping spheres", 1)
+    !         !
+    !       END IF
+    !       !
+    !     END DO ! inn
+    !     !
+    !   END DO ! iat
+    !   !
+    !   !
+    !   ! printing
+    !   !
+    !   WRITE(stdout, '(/5x, "MT radii for symmetry types")')
+    !   DO ist = 1, nst
+    !     WRITE(stdout, '(5x)')
+    !     WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
+    !     WRITE(stdout, '(6x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
+    !       mt_rmt(ist), mt_rmt(ist) * bohrtoang
+    !   END DO ! ist
+    !   WRITE(stdout, '(/5x, /5x)')
+    !   !
+    !   WRITE(stdout, '(/5x, "MT radii for atoms")')
+    !   DO iat = 1, natoms
+    !     WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
+    !       iat, mt_rmt(ist_i(iat))
+    !   END DO ! iat
+    !   WRITE(stdout, '(/5x, /5x)')
+    !   !
+    !   DEALLOCATE(lrmt_fixed, STAT = ierr)
+    !   IF (ierr /= 0) &
+    !     CALL errore(routine_name, 'Error deallocating lrmt_fixed', 1)
+    !   !
+    ! !---------------------------------------------------------------------------
+    ! END SUBROUTINE set_rmt
+    ! !---------------------------------------------------------------------------
+
     !
     !---------------------------------------------------------------------------
     SUBROUTINE set_rmt()
@@ -385,7 +651,7 @@
       !
       USE io_global, ONLY: stdout
       USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
-      USE neighbor, ONLY: nneighbors, nn_dist, inn_i
+      USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
       USE ions_base, ONLY: ityp
@@ -401,7 +667,7 @@
       !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
       !! error code
-      INTEGER :: ist, iat, inn !, jat
+      INTEGER :: ist, iat, jat, inn
       !! iterators
       REAL(DP) :: rtmp, rtmp2
       !! real temporary vars
@@ -441,27 +707,31 @@
           !
           DO iat = 1, natoms
             !
-            DO inn = 1, nneighbors(iat)
+            DO jat = 1, natoms
               !
-              ! this symmetry type
-              rmt_d_iat = rmt_default(st_name(ist_i(iat)))
-              ! its nearest neighbor symmetry type
-              rmt_d_iat_nn = &
-                rmt_default(st_name(ist_i(inn_i(inn, iat))))
-              !
-              !
-              rtmp = nn_dist(iat)  * & ! distance to the neighbor
-                rmt_d_iat / & ! this atom
-                (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
-              !
-              IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
-                (mt_rmt(ist_i(iat)) > rtmp)) THEN
+              IF (jat /= iat) THEN
                 !
-                mt_rmt(ist_i(iat)) = rtmp
+                ! this symmetry type
+                rmt_d_iat = rmt_default(st_name(ist_i(iat)))
+                ! its nearest neighbor symmetry type
+                rmt_d_iat_nn = &
+                  rmt_default(st_name(ist_i(jat)))
+                !
+                !
+                rtmp = nr_dist(jat, iat)  * & ! distance to the neighbor
+                  rmt_d_iat / & ! this atom
+                  (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
+                !
+                IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
+                  (mt_rmt(ist_i(iat)) > rtmp)) THEN
+                  !
+                  mt_rmt(ist_i(iat)) = rtmp
+                  !
+                END IF
                 !
               END IF
               !
-            END DO ! inn
+            END DO ! jat
             !
             !
             !
@@ -499,34 +769,42 @@
             !
             DO iat = 1, natoms
               !
-              DO inn = 1, nneighbors(iat)
+              DO jat = 1, natoms
                 !
-                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
-                  nn_dist(iat)) < eps6) THEN
+                IF (jat /= iat) THEN
                   !
                   lrmt_fixed(ist_i(iat)) = .TRUE.
-                  lrmt_fixed(ist_i(inn_i(inn, iat))) = .TRUE.
+                  !
+                  IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+                    nr_dist(jat, iat)) < eps6) THEN
+                    !
+                    lrmt_fixed(ist_i(iat)) = .TRUE.
+                    lrmt_fixed(ist_i(jat)) = .TRUE.
+                    !
+                  END IF
                   !
                 END IF
                 !
-              END DO ! inn
+              END DO ! jat
+              !
+              !
               !
               IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
                 !
                 rtmp = -1.0_dp
                 !
-                DO inn = 1, nneighbors(iat)
+                DO jat = 1, natoms
                   !
-                  ! IF (lrmt_fixed(ist_i(inn_i(inn, iat)))) THEN
+                  IF (jat /= iat) THEN
                     !
-                    rtmp2 = nn_dist(iat) - mt_rmt(ist_i(inn_i(inn, iat)))
+                    rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
                     !
                     IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
                       (rtmp < 0.0_dp)) THEN
                       rtmp = rtmp2
                     END IF
                     !
-                  ! END IF
+                  END IF
                   !
                 END DO ! inn
                 !
@@ -595,10 +873,34 @@
           IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
             nn_dist(iat)) > eps6) THEN
             !
-            WRITE(stdout, '(/5x, "Spheres ", I0, " and ", I0, " overlap:")') &
+            WRITE(stdout, '(/5x, "Neighboring spheres ", I0, " and ", &
+              & I0, " overlap:")') &
               iat, inn_i(inn, iat)
-            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", F0.16)') &
+            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", &
+              & F0.16)') &
               mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(inn, iat))), nn_dist(iat)
+            CALL errore(routine_name, "Error for overlapping spheres", 1)
+            !
+          END IF
+          !
+        END DO ! inn
+        !
+      END DO ! iat
+      !
+      !
+      DO iat = 1, natoms
+        !
+        DO jat = 1, natoms
+          !
+          IF ((jat /= iat) .AND. ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+            nr_dist(jat, iat)) > eps6)) THEN
+            !
+            WRITE(stdout, '(/5x, "Replica spheres ", I0, " and ", &
+              & I0, " overlap:")') &
+              iat, inn_i(inn, iat)
+            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", &
+              & F0.16)') &
+              mt_rmt(ist_i(iat)), mt_rmt(ist_i(jat)), nr_dist(jat, iat)
             CALL errore(routine_name, "Error for overlapping spheres", 1)
             !
           END IF
@@ -633,6 +935,11 @@
     !---------------------------------------------------------------------------
     END SUBROUTINE set_rmt
     !---------------------------------------------------------------------------
+
+
+
+
+
     !
     !
     !
