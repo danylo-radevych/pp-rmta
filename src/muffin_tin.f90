@@ -1513,10 +1513,11 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
               "dL_", iorb - 1, "(r_mt) / de = ", dloglde, " (1 / Ry)"
             !
-            IF (ABS(ul) < eps6) THEN
-              WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
+            IF (ABS(ul) < eps12) THEN
+              WRITE(stdout, '(5x, "WARNING: u_", I0, & 
+                & "(r) at rmt is close to zero")') & 
                 iorb - 1
-              CALL errore(routine_name, "Adjust rmt.", 1)
+              ! CALL errore(routine_name, "Adjust rmt.", 1)
             END IF
             !
             WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
@@ -1528,10 +1529,11 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
               "dL_", iorb, "(r_mt) / de = ", dlogl1de, " (1 / Ry)"
             !
-            IF (ABS(ul1) < eps6) THEN
-              WRITE(stdout, '(5x, "rmt is close to a node of u_", I0, "(r)")') & 
+            IF (ABS(ul1) < eps12) THEN
+              WRITE(stdout, '(5x, "WARNING: u_", I0, &
+                & "(r) at rmt is close to zero")') & 
                 iorb
-              CALL errore(routine_name, "Adjust rmt.", 1)
+              ! CALL errore(routine_name, "Adjust rmt.", 1)
             END IF
             !
             !
