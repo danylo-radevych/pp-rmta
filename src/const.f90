@@ -20,8 +20,12 @@
     !
     IMPLICIT NONE
     !
-    REAL(DP), PARAMETER :: bohrtoang = bohr_radius_si * 1.0E10_DP
+    REAL(DP), PARAMETER :: bohrtoang = bohr_radius_si * 1.0E+10_DP
     !! Bohr radius in angstroms
+    REAL(DP), PARAMETER :: zero = 0.0_DP
+    !! real zero
+    COMPLEX(DP), PARAMETER :: czero = CMPLX(0.0_DP, 0.0_DP, KIND=DP)
+    !! complex zero
     !
   !=============================================================================
   END MODULE const

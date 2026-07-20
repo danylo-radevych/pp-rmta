@@ -1,6 +1,6 @@
 muffin_tin.o : muffin_tin.f90 const.o hamann.o mh_eta.o part_dos.o mt_printing.o mt_var.o neighbor.o sym_type.o compare.o 
 mh_eta.o : mh_eta.f90 
-part_dos.o : part_dos.f90 
+part_dos.o : part_dos.f90 const.o 
 hamann.o : hamann.f90 
 compare.o : compare.f90 
 sym_type.o : sym_type.f90 

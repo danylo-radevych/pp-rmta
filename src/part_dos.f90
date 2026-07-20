@@ -355,6 +355,7 @@
     !
       USE io_global, ONLY: stdout
       USE constants, ONLY: tpi, eps32, eps6, eps4
+      USE const, ONLY: zero
       USE cell_base, ONLY: tpiba, omega
       USE parameters, ONLY: npk
       USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
@@ -548,6 +549,7 @@
         !
         ALLOCATE(wdk(nbnd, nkstot), STAT = ierr)
         IF (ierr /= 0) CALL errore(routine_name, 'Error allocating wdk', 1)
+        wdk(:, :) = zero
         !
         DO ispin = 1, nspin
           !
