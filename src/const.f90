@@ -24,7 +24,17 @@
     !! Bohr radius in angstroms
     REAL(DP), PARAMETER :: zero = 0.0_DP
     !! real zero
-    COMPLEX(DP), PARAMETER :: czero = CMPLX(0.0_DP, 0.0_DP, KIND=DP)
+    REAL(DP), PARAMETER :: one = 1.0_DP
+    !! real one
+    REAL(DP), PARAMETER :: two = 2.0_DP
+    !! real two
+    REAL(DP), PARAMETER :: three = 3.0_DP
+    !! real three
+    REAL(DP), PARAMETER :: four = 4.0_DP
+    !! real four
+    REAL(DP), PARAMETER :: five = 5.0_DP
+    !! real five
+    COMPLEX(DP), PARAMETER :: czero = CMPLX(0.0_DP, 0.0_DP, KIND = DP)
     !! complex zero
     !
   !=============================================================================
