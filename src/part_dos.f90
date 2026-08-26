@@ -1359,9 +1359,11 @@
       !
       !$OMP PARALLEL DEFAULT(NONE) &
       !$OMP & SHARED(nspin_lsda, is, nks, s_tetra, l_tetra, nbnd, et, tetra, &
-      !$OMP & wdk, ef, ntetra) &
+      !$OMP & wdk, E, rfac) &
       !$OMP & PRIVATE(ns, nk, nt, ibnd, i, etetra, itetra, e1, e2, e3, e4, &
-      !$OMP & kp1, kp2, kp3, kp4)
+      !$OMP & kp1, kp2, kp3, kp4, &
+      !$OMP & e21, e31, e41, e32, e42, e43, &
+      !$OMP & C, C1, C2, C3, DC, DC1, DC2, DC3)
       !
       DO ns = 1, nspin_lsda
         !
@@ -1425,7 +1427,7 @@
             !
             ! calculate weights wg
             !
-            ! IF (e1 > ef .OR. ef >= e4) THEN
+            ! IF (e1 > E .OR. E >= e4) THEN
             !   !
             !   ! redundancy
             !   !
@@ -1435,22 +1437,22 @@
             !   wdk(ibnd, kp4) = 0._dp
             !   !
             ! ELSE
-            IF (e1 <= ef .AND. ef < e2) THEN
+            IF (e1 <= E .AND. E < e2) THEN
               !
-              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) + rfac * (ef - e1)**2 / &
+              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) + rfac * (E - e1)**2 / &
               !   (e21 * e31 * e41) * &
-              !   (-(ef - e1) * (1._dp / e21 + 1._dp / e31 + 1._dp / e41) + &
+              !   (-(E - e1) * (1._dp / e21 + 1._dp / e31 + 1._dp / e41) + &
               !   3._dp)
               ! !
-              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) + rfac * (ef - e1)**3 / &
+              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) + rfac * (E - e1)**3 / &
               !   (e21 * e31 * e41) / &
               !   e21
               ! !
-              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) + rfac * (ef - e1)**3 / &
+              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) + rfac * (E - e1)**3 / &
               !   (e21 * e31 * e41) / &
               !   e31
               ! !
-              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (ef - e1)**3 / &
+              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (E - e1)**3 / &
               !   (e21 * e31 * e41) / &
               !   e41
               !
@@ -1469,19 +1471,19 @@
               wdk(ibnd, kp4) = wdk(ibnd, kp4) + &
                 DC*(E-e1)/(e4-e1)+C/(e4-e1)
               !
-            ELSEIF (e2 <= ef .AND. ef < e3) THEN
+            ELSEIF (e2 <= E .AND. E < e3) THEN
               !
               ! wdk(ibnd, kp1) = wdk(ibnd, kp1) + rfac * &
-              !   (ef**3 * e1**2 - 2._dp * ef**3 * e1 * e3 - &
-              !   2._dp * ef**3 * e1 * e4 + 2._dp * e2 * ef**3 * e1 + &
-              !   ef**3 * e3**2 + ef**3 * e3 * e4 - e2 * ef**3 * e3 + &
-              !   ef**3 * e4**2 - e2 * ef**3 * e4 - 3._dp * e2 * ef**2 * e1**2 + &
-              !   6._dp * ef**2 * e1 * e3 * e4 - 3._dp * ef**2 * e3**2 * e4 - &
-              !   3._dp * ef**2 * e3 * e4**2 + 3._dp * e2 * ef**2 * e3 * e4 - &
-              !   3._dp * ef * e1**2 * e3 * e4 + 3._dp * e2 * ef * e1**2 * e3 + &
-              !   3._dp * e2 * ef * e1**2 * e4 - &
-              !   6._dp * e2 * ef * e1 * e3 * e4 + &
-              !   3._dp * ef* e3**2 * e4**2 + e1**2 * e3**2 * e4 - &
+              !   (E**3 * e1**2 - 2._dp * E**3 * e1 * e3 - &
+              !   2._dp * E**3 * e1 * e4 + 2._dp * e2 * E**3 * e1 + &
+              !   E**3 * e3**2 + E**3 * e3 * e4 - e2 * E**3 * e3 + &
+              !   E**3 * e4**2 - e2 * E**3 * e4 - 3._dp * e2 * E**2 * e1**2 + &
+              !   6._dp * E**2 * e1 * e3 * e4 - 3._dp * E**2 * e3**2 * e4 - &
+              !   3._dp * E**2 * e3 * e4**2 + 3._dp * e2 * E**2 * e3 * e4 - &
+              !   3._dp * E * e1**2 * e3 * e4 + 3._dp * e2 * E * e1**2 * e3 + &
+              !   3._dp * e2 * E * e1**2 * e4 - &
+              !   6._dp * e2 * E * e1 * e3 * e4 + &
+              !   3._dp * E* e3**2 * e4**2 + e1**2 * e3**2 * e4 - &
               !   e2 * e1**2 * e3**2 + e1**2 * e3 * e4**2 - &
               !   e2 * e1**2 * e3 * e4 - e2 * e1**2 * e4**2 - &
               !   2._dp * e1 * e3**2 * e4**2 + 2._dp * e2 * e1 * e3**2 * e4 + &
@@ -1489,16 +1491,16 @@
               !   (e31 * e32 * e41 * e42) / (e31 * e41)
               ! !
               ! wdk(ibnd, kp2) = wdk(ibnd, kp2) + rfac * &
-              !   (ef**3 * e2**2 - 2._dp * ef**3 * e2 * e3 - &
-              !   2._dp * ef**3 * e2 * e4 + 2._dp * e1 * ef**3 * e2 + &
-              !   ef**3 * e3**2 + ef**3 * e3 * e4 - e1 * ef**3 * e3 + &
-              !   ef**3 * e4**2 - e1 * ef**3 * e4 - 3._dp * e1 * ef**2 * e2**2 + &
-              !   6._dp * ef**2 * e2 * e3 * e4 - 3._dp * ef**2 * e3**2 * e4 - &
-              !   3._dp * ef**2 * e3 * e4**2 + 3._dp * e1 * ef**2 * e3 * e4 - &
-              !   3._dp * ef * e2**2 * e3 * e4 + 3._dp * e1 * ef * e2**2 * e3 + &
-              !   3._dp * e1 * ef * e2**2 * e4 - &
-              !   6._dp * e1 * ef * e2 * e3 * e4 + &
-              !   3._dp * ef * e3**2 * e4**2 + e2**2 * e3**2 * e4 - &
+              !   (E**3 * e2**2 - 2._dp * E**3 * e2 * e3 - &
+              !   2._dp * E**3 * e2 * e4 + 2._dp * e1 * E**3 * e2 + &
+              !   E**3 * e3**2 + E**3 * e3 * e4 - e1 * E**3 * e3 + &
+              !   E**3 * e4**2 - e1 * E**3 * e4 - 3._dp * e1 * E**2 * e2**2 + &
+              !   6._dp * E**2 * e2 * e3 * e4 - 3._dp * E**2 * e3**2 * e4 - &
+              !   3._dp * E**2 * e3 * e4**2 + 3._dp * e1 * E**2 * e3 * e4 - &
+              !   3._dp * E * e2**2 * e3 * e4 + 3._dp * e1 * E * e2**2 * e3 + &
+              !   3._dp * e1 * E * e2**2 * e4 - &
+              !   6._dp * e1 * E * e2 * e3 * e4 + &
+              !   3._dp * E * e3**2 * e4**2 + e2**2 * e3**2 * e4 - &
               !   e1 * e2**2 * e3**2 + e2**2 * e3 * e4**2 - &
               !   e1 * e2**2 * e3 * e4 - e1 * e2**2 * e4**2 - &
               !   2._dp * e2 * e3**2 * e4**2 + 2._dp * e1 * e2 * e3**2 * e4 + &
@@ -1506,15 +1508,15 @@
               !   (e31 * e32 * e41 * e42) / (e32 * e42)
               ! !
               ! wdk(ibnd, kp3) = wdk(ibnd, kp3) - rfac * &
-              !   (ef**3 * e1**2 + ef**3 * e1 * e2 - 2._dp * ef**3 * e1 * e3 - &
-              !   e4 * ef**3 * e1 + ef**3 * e2**2 - 2._dp * ef**3 * e2 * e3 - &
-              !   e4 * ef**3 * e2 + ef**3 * e3**2 + 2._dp * e4 * ef**3 * e3 - &
-              !   3._dp * ef**2 * e1**2 * e2 - 3._dp * ef**2 * e1 * e2**2 + &
-              !   6._dp * ef**2 * e1 * e2 * e3 + 3._dp * e4 * ef**2 * e1 * e2 - &
-              !   3._dp * e4 * ef**2 * e3**2 + 3._dp * ef * e1**2 * e2**2 - &
-              !   3._dp * ef * e1 * e2 * e3**2 - &
-              !   6._dp * e4 * ef * e1 * e2 * e3 + &
-              !   3._dp * e4 * ef * e1 * e3**2 + 3._dp * e4 * ef * e2 * e3**2 - &
+              !   (E**3 * e1**2 + E**3 * e1 * e2 - 2._dp * E**3 * e1 * e3 - &
+              !   e4 * E**3 * e1 + E**3 * e2**2 - 2._dp * E**3 * e2 * e3 - &
+              !   e4 * E**3 * e2 + E**3 * e3**2 + 2._dp * e4 * E**3 * e3 - &
+              !   3._dp * E**2 * e1**2 * e2 - 3._dp * E**2 * e1 * e2**2 + &
+              !   6._dp * E**2 * e1 * e2 * e3 + 3._dp * e4 * E**2 * e1 * e2 - &
+              !   3._dp * e4 * E**2 * e3**2 + 3._dp * E * e1**2 * e2**2 - &
+              !   3._dp * E * e1 * e2 * e3**2 - &
+              !   6._dp * e4 * E * e1 * e2 * e3 + &
+              !   3._dp * e4 * E * e1 * e3**2 + 3._dp * e4 * E * e2 * e3**2 - &
               !   2._dp * e1**2 * e2**2 * e3 - e4 * e1**2 * e2**2 + &
               !   e1**2 * e2 * e3**2 + 2._dp * e4 * e1**2 * e2 * e3 - &
               !   e4 * e1**2 * e3**2 + e1 * e2**2 * e3**2 + &
@@ -1523,15 +1525,15 @@
               !   (e31 * e32 * e41 * e42) / (e31 * e32)
               ! !
               ! wdk(ibnd, kp4) = wdk(ibnd, kp4) - rfac * &
-              !   (ef**3 * e1**2 + ef**3 * e1 * e2 - 2._dp * ef**3 * e1 * e4 - &
-              !   e3 * ef**3 * e1 + ef**3 * e2**2 - 2._dp * ef**3 * e2 * e4 - &
-              !   e3 * ef**3 * e2 + ef**3 * e4**2 + 2._dp * e3 * ef**3 * e4 - &
-              !   3._dp * ef**2 * e1**2 * e2 - 3._dp * ef**2 * e1 * e2**2 + &
-              !   6._dp * ef**2 * e1 * e2 * e4 + 3._dp * e3 * ef**2 * e1 * e2 - &
-              !   3._dp * e3 * ef**2 * e4**2 + 3._dp * ef * e1**2 * e2**2 - &
-              !   3._dp * ef * e1 * e2 * e4**2 - &
-              !   6._dp * e3 * ef * e1 * e2 * e4 + &
-              !   3._dp * e3 * ef * e1 * e4**2 + 3._dp * e3 * ef * e2 * e4**2 - &
+              !   (E**3 * e1**2 + E**3 * e1 * e2 - 2._dp * E**3 * e1 * e4 - &
+              !   e3 * E**3 * e1 + E**3 * e2**2 - 2._dp * E**3 * e2 * e4 - &
+              !   e3 * E**3 * e2 + E**3 * e4**2 + 2._dp * e3 * E**3 * e4 - &
+              !   3._dp * E**2 * e1**2 * e2 - 3._dp * E**2 * e1 * e2**2 + &
+              !   6._dp * E**2 * e1 * e2 * e4 + 3._dp * e3 * E**2 * e1 * e2 - &
+              !   3._dp * e3 * E**2 * e4**2 + 3._dp * E * e1**2 * e2**2 - &
+              !   3._dp * E * e1 * e2 * e4**2 - &
+              !   6._dp * e3 * E * e1 * e2 * e4 + &
+              !   3._dp * e3 * E * e1 * e4**2 + 3._dp * e3 * E * e2 * e4**2 - &
               !   2._dp * e1**2 * e2**2 * e4 - e3 * e1**2 * e2**2 + &
               !   e1**2 * e2 * e4**2 + 2._dp * e3 * e1**2 * e2 * e4 - &
               !   e3 * e1**2 * e4**2 + e1 * e2**2 * e4**2 + &
@@ -1564,20 +1566,20 @@
                 (DC1+DC2+DC3)*(E-e1)/(e4-e1)+DC3*(E-e2)/(e4-e2) &
                 +(C1+C2+C3)/(e4-e1)+C3/(e4-e2)
               !
-            ELSEIF (e3 <= ef .AND. ef < e4) THEN
+            ELSEIF (e3 <= E .AND. E < e4) THEN
               !
-              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) - rfac * (ef - e4)**3 / &
+              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) - rfac * (E - e4)**3 / &
               !   (e41 * e42 * e43) / e41
               ! !
-              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) - rfac * (ef - e4)**3 / &
+              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) - rfac * (E - e4)**3 / &
               !   (e41 * e42 * e43) / e42
               ! !
-              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) - rfac * (ef - e4)**3 / &
+              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) - rfac * (E - e4)**3 / &
               !   (e41 * e42 * e43) / e43
               ! !
-              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (ef - e4)**2 / &
+              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (E - e4)**2 / &
               !   (e41 * e42 * e43) * &
-              !   ((ef - e4) * (1._dp / e41 + 1._dp / e42 + 1._dp / e43) + 3._dp)
+              !   ((E - e4) * (1._dp / e41 + 1._dp / e42 + 1._dp / e43) + 3._dp)
               !
               C = rfac / 4. * (e4-E)**3 / (e4-e1) / (e4-e2) / (e4-e3)
               DC = rfac / 4. * -3*(e4-E)**2 / (e4-e1) / (e4-e2) / (e4-e3)
