@@ -193,6 +193,8 @@
       !
       IMPLICIT NONE
       !
+      EXTERNAL :: errore
+      !
       INTEGER, INTENT(in) :: nat
       !! number of atoms
       INTEGER, INTENT(in) :: nspin
@@ -220,12 +222,14 @@
       !! name of this subroutine
       INTEGER :: iat, ispin, ir, ig
       !! iterators
+      INTEGER :: ierr
+      !! error code
       REAL(DP) :: gtau
       !! \bm{G} \cdot \bm{tau}
       REAL(DP) :: sinc
       !! value of the sinc function
-      COMPLEX(DP) :: exp_factor
-      !! exponential factor
+      COMPLEX(DP), ALLOCATABLE :: exp_factor(:, :)
+      !! exponential factor, exp_factor(ng, nat)
       !
       routine_name = "vg3d_to_vloc00r"
       !
@@ -240,9 +244,15 @@
       ! V(\bm{G}) sin(G r) / (G r)
       !
       !
-      DO ig = 1, ng
-        !
-        DO iat = 1, nat
+      ALLOCATE(exp_factor(ng, nat), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error allocating exp_factor', 1)
+      !
+      !$OMP PARALLEL DO DEFAULT(NONE) &
+      !$OMP & PRIVATE(iat, ig, gtau) &
+      !$OMP & SHARED(nat, ng, g, tau, exp_factor)
+      DO iat = 1, nat
+        DO ig = 1, ng
           !
           ! \bm{G} \cdot \bm{tau}
           !
@@ -251,12 +261,25 @@
           ! exponential factor
           !
           ! old
-          ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND = DP)
+          ! exp_factor(ig, iat) = CMPLX(COS(gtau), -SIN(gtau), KIND = DP)
           !
           ! agreed with literature
-          exp_factor = CMPLX(COS(gtau), +SIN(gtau), KIND = DP)
+          exp_factor(ig, iat) = CMPLX(COS(gtau), +SIN(gtau), KIND = DP)
           !
-          DO ir = 1, nr
+        END DO
+      END DO
+      !$OMP END PARALLEL DO
+      !
+      !
+      !$OMP PARALLEL DO COLLAPSE(2) &
+      !$OMP & DEFAULT(NONE) &
+      !$OMP & PRIVATE(iat, ir, ig, ispin, sinc) &
+      !$OMP & SHARED(nat, nr, ng, nspin, g, r, stp, vg3d, &
+      !$OMP &   exp_factor, vloc00r)
+      DO iat = 1, nat
+        DO ir = 1, nr
+          !
+          DO ig = 1, ng
             !
             ! value of the sinc function
             !
@@ -273,15 +296,21 @@
               !
               vloc00r(ir, ispin, iat) = &
                 vloc00r(ir, ispin, iat) + &
-                REAL(exp_factor * vg3d(ig, ispin), KIND = DP) * sinc
+                REAL(exp_factor(ig, iat) * vg3d(ig, ispin), KIND = DP) * sinc
               !
             END DO ! ispin
             !
-          END DO ! ir
+          END DO ! ig
           !
-        END DO ! iat
+        END DO ! ir
         !
-      END DO ! ig
+      END DO ! iat
+      !$OMP END PARALLEL DO
+      !
+      !
+      DEALLOCATE(exp_factor, STAT = ierr)
+      IF (ierr /= 0) &
+          CALL errore(routine_name, 'Error deallocating exp_factor', 1)
       !
       ! CALL errore(routine_name, "Test DONE", 1)
       !

@@ -1359,11 +1359,11 @@
       !
       !$OMP PARALLEL DEFAULT(NONE) &
       !$OMP & SHARED(nspin_lsda, is, nks, s_tetra, l_tetra, nbnd, et, tetra, &
-      !$OMP & wdk, E, rfac) &
+      !$OMP &   wdk, E, rfac) &
       !$OMP & PRIVATE(ns, nk, nt, ibnd, i, etetra, itetra, e1, e2, e3, e4, &
-      !$OMP & kp1, kp2, kp3, kp4, &
-      !$OMP & e21, e31, e41, e32, e42, e43, &
-      !$OMP & C, C1, C2, C3, DC, DC1, DC2, DC3)
+      !$OMP &   kp1, kp2, kp3, kp4, &
+      !$OMP &   e21, e31, e41, e32, e42, e43, &
+      !$OMP &   C, C1, C2, C3, DC, DC1, DC2, DC3)
       !
       DO ns = 1, nspin_lsda
         !
