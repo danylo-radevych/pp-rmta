@@ -218,9 +218,14 @@
     ! read xml data file produced by pw.x or cp.x
     CALL read_file_new(needwf)
     !
-    IF ( ALL(upf%typ(:) == "SL") ) THEN
+    IF ( ALL(upf(:)%typ == "SL") ) THEN
       lsemilocupf = .TRUE.
       CALL mp_bcast(lsemilocupf, ionode_id, intra_image_comm)
+    END IF
+    !
+    IF ( ANY(upf(:)%tpawp) ) THEN
+      CALL errore(program_name, &
+        'PAW pseudopotentials are not supported.', 1)
     END IF
     !
     !
