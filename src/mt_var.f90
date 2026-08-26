@@ -30,6 +30,7 @@
     USE kinds, ONLY: DP
     USE radial_grids, ONLY: radial_grid_type
     USE constants, ONLY: bohr_radius_si
+    USE const, ONLY: bohr_to_ang
     !
     IMPLICIT NONE
     !
@@ -75,8 +76,6 @@
     !
     INTEGER, PARAMETER :: natmax = 256
     !! max number of atoms
-    REAL(DP), PARAMETER :: bohr_to_ang = bohr_radius_si * 1.0E10_DP
-    !! Bohr radius in angstroms
     !
     CHARACTER(LEN=12), SAVE :: rmta_code = 'RMTA'
     !! Name of the code
