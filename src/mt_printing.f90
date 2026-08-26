@@ -1,12 +1,21 @@
-  ! Copyright (C) 2024-2026 Danylo Radevych
-  !                                                                            
-  ! This file is distributed under the terms of the MIT Non-AI License. 
-  ! See the file `LICENSE' in the root directory of the               
-  ! present distribution, or 
-  ! https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-MIT .
-  !
-  ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7
-  !
+  !---------------------------------------------------------------------------!
+  ! Copyright (C) 2024-2026 Danylo Radevych                                   !
+  !                                                                           !
+  ! PP-RMTA is free software: you can redistribute it and/or modify           !
+  ! it under the terms of the GNU General Public License as published by the  !
+  ! Free Software Foundation, either version 3 of the License, or             !
+  ! (at your option) any later version.                                       !
+  !                                                                           !
+  ! PP-RMTA is distributed in the hope that it will be useful,                !
+  ! but WITHOUT ANY WARRANTY; without even the implied warranty of            !
+  ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                      !
+  ! See the GNU General Public License for more details.                      !
+  !                                                                           !
+  ! You should have received a copy of the GNU General Public License along   !
+  ! with PP-RMTA. If not, see <https://www.gnu.org/licenses/>.                !
+  !                                                                           !
+  ! Please cite: DOI: https://doi.org/10.1038/s41524-026-02141-7              !
+  !---------------------------------------------------------------------------!
   !
   !=============================================================================
   MODULE mt_printing

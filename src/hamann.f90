@@ -1,7 +1,13 @@
-  !
-  ! Subroutines in this module are adopted, with slight modifications,
-  ! from the ONCVPSP code, which retains the full credit:
-  ! https://github.com/oncvpsp/oncvpsp
+  !---------------------------------------------------------------------------!
+  ! Subroutines in this module are adopted, with slight modifications,        !
+  ! from the ONCVPSP code, which retains the full credit:                     !
+  ! https://github.com/oncvpsp/oncvpsp                                        !
+  !                                                                           !
+  ! ONCVPSP code is distributed under the terms of the                        !
+  ! GNU General Public License.                                               !
+  ! You should have received a copy of the GNU General Public License.        !
+  ! If not, see <https://www.gnu.org/licenses/>.                              !
+  !---------------------------------------------------------------------------!
   !
   !=============================================================================
   MODULE hamann
