@@ -248,7 +248,8 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating exp_factor', 1)
       !
-      !$OMP PARALLEL DO DEFAULT(NONE) &
+      !$OMP PARALLEL DO COLLAPSE(2) &
+      !$OMP & DEFAULT(NONE) &
       !$OMP & PRIVATE(iat, ig, gtau) &
       !$OMP & SHARED(nat, ng, g, tau, exp_factor)
       DO iat = 1, nat
@@ -266,8 +267,8 @@
           ! agreed with literature
           exp_factor(ig, iat) = CMPLX(COS(gtau), +SIN(gtau), KIND = DP)
           !
-        END DO
-      END DO
+        END DO ! ig
+      END DO ! iat
       !$OMP END PARALLEL DO
       !
       !
