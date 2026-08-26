@@ -27,27 +27,27 @@
   !!
   !
   !  Danylo Radevych
-  !  updated: 2026/06/04
+  !  updated: 2026/08/26
   !  started: 2024/07/20
   !
     !
     ! USE command_line_options, ONLY : npool_
     USE io_global, ONLY: stdout, ionode, ionode_id
-    USE io_files,         ONLY : prefix, tmp_dir
-    USE constants,        ONLY : rytoev
-    USE kinds,            ONLY : DP
-    USE io_global,        ONLY : ionode, ionode_id
-    USE environment,      ONLY : environment_start, environment_end
-    ! USE mp_world,         ONLY : mpime
-    USE mp,               ONLY : mp_size, mp_bcast
-    USE mp_global,        ONLY : mp_startup
-    USE mp_images,        ONLY : intra_image_comm
-    ! USE paw_variables,    ONLY : okpaw
-    ! USE noncollin_module, ONLY : noncolin, lforcet
-    ! USE control_flags,    ONLY : gamma_only
-    USE klist,            ONLY : degauss, ngauss
+    USE io_files, ONLY : prefix, tmp_dir
+    USE constants, ONLY: rytoev
+    USE kinds, ONLY: DP
+    USE io_global, ONLY: ionode, ionode_id
+    USE environment, ONLY: environment_start, environment_end
+    ! USE mp_world, ONLY : mpime
+    USE mp, ONLY: mp_size, mp_bcast
+    USE mp_global, ONLY: mp_startup
+    USE mp_images, ONLY: intra_image_comm
+    ! USE paw_variables, ONLY: okpaw
+    ! USE noncollin_module, ONLY: noncolin, lforcet
+    ! USE control_flags, ONLY: gamma_only
+    USE klist, ONLY : degauss, ngauss
     ! following modules needed for generation of tetrahedra
-    USE ktetra,          ONLY : tetra_init
+    USE ktetra, ONLY : tetra_init
     USE symm_base, ONLY: nsym, s, time_reversal, t_rev
     USE klist, ONLY: nks, xk
     USE start_k, ONLY: k1, k2, k3, nk1, nk2, nk3
