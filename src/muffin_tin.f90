@@ -189,6 +189,7 @@
     !  Danylo Radevych
     !
       USE constants, ONLY: eps12
+      USE const, ONLY: zero, one
       !
       IMPLICIT NONE
       !
@@ -228,6 +229,8 @@
       !
       routine_name = "vg3d_to_vloc00r"
       !
+      vloc00r(:, :, :) = zero
+      !
       ! OLD
       ! V(r) = \sum_{\bm{G}} e^{- i \bm{G} \cdot \bm{tau}}
       ! V(\bm{G}) sin(G r) / (G r)
@@ -236,42 +239,49 @@
       ! V(r) = \sum_{\bm{G}} e^{+ i \bm{G} \cdot \bm{tau}}
       ! V(\bm{G}) sin(G r) / (G r)
       !
-      DO iat = 1, nat
-        DO ispin = 1, nspin
+      !
+      DO ig = 1, ng
+        !
+        DO iat = 1, nat
+          !
+          ! \bm{G} \cdot \bm{tau}
+          !
+          gtau = DOT_PRODUCT(g(1 : 3, ig), tau(:, iat))
+          !
+          ! exponential factor
+          !
+          ! old
+          ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND=DP)
+          !
+          ! agreed with literature
+          exp_factor = CMPLX(COS(gtau), +SIN(gtau), KIND=DP)
+          !
           DO ir = 1, nr
-            DO ig = 1, ng
-              !
-              ! \bm{G} \cdot \bm{tau}
-              !
-              gtau = DOT_PRODUCT(g(1 : 3, ig), tau(:, iat))
-              !
-              ! exponential factor
-              !
-              ! old
-              ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND=DP)
-              !
-              ! agreed with literature
-              exp_factor = CMPLX(COS(gtau), +SIN(gtau), KIND=DP)
-              !
-              ! value of the sinc function
-              !
-              sinc = g(4, ig) * r(ir, stp(iat))
-              IF (ABS(sinc) > eps12) THEN
-                ! definition of sinc
-                sinc = SIN(sinc) / sinc
-              ELSE
-                ! zero-argument limit is 1
-                sinc = 1.0_dp
-              END IF
+            !
+            ! value of the sinc function
+            !
+            sinc = g(4, ig) * r(ir, stp(iat))
+            IF (ABS(sinc) > eps12) THEN
+              ! definition of sinc
+              sinc = SIN(sinc) / sinc
+            ELSE
+              ! zero-argument limit is 1
+              sinc = one
+            END IF
+            !
+            DO ispin = 1, nspin
               !
               vloc00r(ir, ispin, iat) = &
                 vloc00r(ir, ispin, iat) + &
                 REAL(exp_factor * vg3d(ig, ispin), KIND=DP) * sinc
               !
-            END DO ! ig
+            END DO ! ispin
+            !
           END DO ! ir
-        END DO ! ispin
-      END DO ! iat
+          !
+        END DO ! iat
+        !
+      END DO ! ig
       !
       ! CALL errore(routine_name, "Test DONE", 1)
       !
