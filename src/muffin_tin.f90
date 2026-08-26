@@ -251,10 +251,10 @@
           ! exponential factor
           !
           ! old
-          ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND=DP)
+          ! exp_factor = CMPLX(COS(gtau), -SIN(gtau), KIND = DP)
           !
           ! agreed with literature
-          exp_factor = CMPLX(COS(gtau), +SIN(gtau), KIND=DP)
+          exp_factor = CMPLX(COS(gtau), +SIN(gtau), KIND = DP)
           !
           DO ir = 1, nr
             !
@@ -273,7 +273,7 @@
               !
               vloc00r(ir, ispin, iat) = &
                 vloc00r(ir, ispin, iat) + &
-                REAL(exp_factor * vg3d(ig, ispin), KIND=DP) * sinc
+                REAL(exp_factor * vg3d(ig, ispin), KIND = DP) * sinc
               !
             END DO ! ispin
             !
