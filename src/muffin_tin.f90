@@ -189,7 +189,7 @@
     !  Danylo Radevych
     !
       USE constants, ONLY: eps12
-      USE const, ONLY: zero, one
+      USE const, ONLY: zero, one, czero
       !
       IMPLICIT NONE
       !
@@ -247,6 +247,7 @@
       ALLOCATE(exp_factor(ng, nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating exp_factor', 1)
+      exp_factor(:, :) = czero
       !
       !$OMP PARALLEL DO COLLAPSE(2) &
       !$OMP & DEFAULT(NONE) &

@@ -45,6 +45,8 @@
     !! real five
     COMPLEX(DP), PARAMETER :: czero = CMPLX(0.0_DP, 0.0_DP, KIND = DP)
     !! complex zero
+    COMPLEX(DP), PARAMETER :: cone = CMPLX(1.0_DP, 0.0_DP, KIND = DP)
+    !! complex one
     !
   !=============================================================================
   END MODULE const
