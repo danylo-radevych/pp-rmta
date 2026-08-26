@@ -62,7 +62,7 @@
       USE ions_base, ONLY: nat, tau, ityp
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, alat ! bg, omega
-      USE const, ONLY: bohrtoang
+      USE const, ONLY: bohr_to_ang
       USE constants, ONLY: eps6, eps12
       !
       IMPLICIT NONE
@@ -230,7 +230,7 @@
         WRITE(stdout, '(6x, "atom #", I4, " out of ", I4, ": ", A4)') &
           iat, nat, upf(ityp(iat))%psd
         WRITE(stdout, '(7x, "neighbor distance: ", F10.8, " bohr = ", &
-          & F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohrtoang
+          & F10.8, " A")') nn_dist(iat), nn_dist(iat) * bohr_to_ang
         !
         WRITE(stdout, '(7x, "neighbor types:", /8x)', advance='no')
         DO inn = 1, nneighbors(iat)

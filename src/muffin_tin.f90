@@ -1298,7 +1298,7 @@
       USE uspp_param, ONLY: upf
       USE io_global, ONLY : stdout
       USE constants, ONLY : rytoev
-      USE const, ONLY : bohrtoang
+      USE const, ONLY : bohr_to_ang
       USE ions_base, ONLY: ityp
       USE mt_var, ONLY: ldebug, &
         natoms, norbs, orb_label, &
@@ -1574,14 +1574,14 @@
               " M_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt * &
-              (rytoev / bohrtoang), &
+              (rytoev / bohr_to_ang), &
               " (eV / A)"
             WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
               " M^2_", mll1rf_label(iorb, ispin, iat), &
               "(",  rmtf, "):", &
               mll1_at_rmt * &
               mll1_at_rmt * &
-              (rytoev / bohrtoang)**2, &
+              (rytoev / bohr_to_ang)**2, &
               " (eV / A)^2"
             !
             WRITE(stdout, '("")')

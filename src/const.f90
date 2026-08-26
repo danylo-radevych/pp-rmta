@@ -29,7 +29,7 @@
     !
     IMPLICIT NONE
     !
-    REAL(DP), PARAMETER :: bohrtoang = bohr_radius_si * 1.0E+10_DP
+    REAL(DP), PARAMETER :: bohr_to_ang = bohr_radius_si * 1.0E+10_DP
     !! Bohr radius in angstroms
     REAL(DP), PARAMETER :: zero = 0.0_DP
     !! real zero

@@ -1291,7 +1291,7 @@
       USE ions_base, ONLY: ityp
       USE uspp_param, ONLY: upf
       USE constants, ONLY: rytoev, eps6, eps12
-      USE const, ONLY: bohrtoang
+      USE const, ONLY: bohr_to_ang
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
       USE mt_var, ONLY: ldebug, natoms, norbs, orb_label, &
         nspins, fermi_energy, &
@@ -1478,11 +1478,11 @@
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * (rytoev / bohrtoang), " (eV / A)"
+                mll1 * (rytoev / bohr_to_ang), " (eV / A)"
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M^2_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
+                mll1 * mll1 * (rytoev / bohr_to_ang)**2, " (eV / A)^2"
               !
               !
               WRITE(stdout, '("")')
@@ -1550,7 +1550,7 @@
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
-                etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+                etall1_nodloglde * rytoev / bohr_to_ang**2, " (eV / A^2)"
               !
               !
               IF (ldebug) THEN
@@ -1559,7 +1559,7 @@
                   "eta-", TRIM(m_label), &
                   "(",  rmtf, "):", &
                   etall1, " (Ry / bohr^2) = ", &
-                  etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+                  etall1 * rytoev / bohr_to_ang**2, " (eV / A^2)"
                 !
                 IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
                   !
@@ -1600,7 +1600,7 @@
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta_nodloglde, " (Ry / bohr^2) = ", &
-                eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+                eta_nodloglde * rytoev / bohr_to_ang**2, " (eV / A^2)"
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
@@ -1608,7 +1608,7 @@
                   "eta-tot", &
                   "(",  rmtf, "):", &
                   eta, " (Ry / bohr^2) = ", &
-                  eta * rytoev / bohrtoang**2, " (eV / A^2)"
+                  eta * rytoev / bohr_to_ang**2, " (eV / A^2)"
                 !
                 IF (ABS(eta_nodloglde - eta) > eps6) THEN
                   !
@@ -1621,7 +1621,7 @@
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
                 "? eta_tot:", &
-                eta_nodloglde * rytoev / bohrtoang**2
+                eta_nodloglde * rytoev / bohr_to_ang**2
               !
               WRITE(stdout, '("")')
               !
@@ -1692,11 +1692,11 @@
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * (rytoev / bohrtoang), " (eV / A)"
+                mll1 * (rytoev / bohr_to_ang), " (eV / A)"
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
                 " M^2_", TRIM(m_label), &
                 "(",  rmtf, "):", &
-                mll1 * mll1 * (rytoev / bohrtoang)**2, " (eV / A)^2"
+                mll1 * mll1 * (rytoev / bohr_to_ang)**2, " (eV / A)^2"
               !
               WRITE(stdout, '(8x, A10, A, A, F14.4)') &
                 "M^2_", TRIM(m_label), &
@@ -1713,7 +1713,7 @@
                 "eta_", TRIM(m_label), &
                 "(",  rmtf, "):", &
                 etall1_nodloglde, " (Ry / bohr^2) = ", &
-                etall1_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+                etall1_nodloglde * rytoev / bohr_to_ang**2, " (eV / A^2)"
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, A, F10.5, A, es14.4, A16, &
@@ -1721,7 +1721,7 @@
                   "eta-", TRIM(m_label), &
                   "(",  rmtf, "):", &
                   etall1, " (Ry / bohr^2) = ", &
-                  etall1 * rytoev / bohrtoang**2, " (eV / A^2)"
+                  etall1 * rytoev / bohr_to_ang**2, " (eV / A^2)"
                 !
                 !
                 IF (ABS(etall1_nodloglde - etall1) > eps6) THEN
@@ -1735,7 +1735,7 @@
               !
               WRITE(stdout, '(8x, A7, A, A, es14.4)') &
                 "eta_", TRIM(m_label), &
-                ":", etall1_nodloglde * rytoev / bohrtoang**2
+                ":", etall1_nodloglde * rytoev / bohr_to_ang**2
               !
               WRITE(stdout, '("")')
               !
@@ -1755,7 +1755,7 @@
                 "eta_tot", &
                 "(",  rmtf, "):", &
                 eta_nodloglde, " (Ry / bohr^2) = ", &
-                eta_nodloglde * rytoev / bohrtoang**2, " (eV / A^2)"
+                eta_nodloglde * rytoev / bohr_to_ang**2, " (eV / A^2)"
               !
               IF (ldebug) THEN
                 WRITE(stdout, '(8x, A7, A, F10.5, A, es14.4, A16, &
@@ -1763,7 +1763,7 @@
                   "eta-tot", &
                   "(",  rmtf, "):", &
                   eta, " (Ry / bohr^2) = ", &
-                  eta * rytoev / bohrtoang**2, " (eV / A^2)"
+                  eta * rytoev / bohr_to_ang**2, " (eV / A^2)"
                 !
                 IF (ABS(eta_nodloglde - eta) > eps6) THEN
                   !
@@ -1776,7 +1776,7 @@
               !
               WRITE(stdout, '(8x, A12, es14.4)') &
                 "! eta_tot:", &
-                eta_nodloglde * rytoev / bohrtoang**2
+                eta_nodloglde * rytoev / bohr_to_ang**2
               !
               WRITE(stdout, '("")')
               !

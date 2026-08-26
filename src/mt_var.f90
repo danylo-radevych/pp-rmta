@@ -75,7 +75,7 @@
     !
     INTEGER, PARAMETER :: natmax = 256
     !! max number of atoms
-    REAL(DP), PARAMETER :: bohrtoang = bohr_radius_si * 1.0E10_DP
+    REAL(DP), PARAMETER :: bohr_to_ang = bohr_radius_si * 1.0E10_DP
     !! Bohr radius in angstroms
     !
     CHARACTER(LEN=12), SAVE :: rmta_code = 'RMTA'
@@ -479,21 +479,21 @@
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
-                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
                 "First MT radius guess is too small.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
-                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
                 "First MT radius guess is too high.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
-                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohrtoang
+                mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
                 "First MT radius guess not assigned.", 1)
             END IF
@@ -588,7 +588,7 @@
             WRITE(stdout, '(6x, "symmetry type #", I4)') ist
             WRITE(stdout, '(6x, "MT radius: ", &
               & F10.8, " bohr = ", F10.8, " A")') &
-              mt_rmt(ist), mt_rmt(ist) * bohrtoang
+              mt_rmt(ist), mt_rmt(ist) * bohr_to_ang
             CALL errore(routine_name, "MT radius is too small.", 1)
             !
         END IF
@@ -647,7 +647,7 @@
         WRITE(stdout, '(5x)')
         WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
         WRITE(stdout, '(6x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
-          mt_rmt(ist), mt_rmt(ist) * bohrtoang
+          mt_rmt(ist), mt_rmt(ist) * bohr_to_ang
       END DO ! ist
       WRITE(stdout, '(/5x, /5x)')
       !
