@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 17Jul2026 at 13:58: 7 
+     Program RMTA v.7.5 starts on 27Aug2026 at 12:13:26 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -26,10 +26,12 @@
      in publications or presentations arising from this work. More details at
      http://www.quantum-espresso.org/quote
 
-     Parallel version (MPI), running on     1 processors
+     Parallel version (MPI & OpenMP), running on      14 processor cores
+     Number of MPI processes:                 1
+     Threads/MPI process:                    14
 
      MPI processes distributed on     1 nodes
-     1354 MiB available memory on the printing compute node when the environment starts
+     450 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -63,7 +65,7 @@
 
       atom #   1 out of    1:   Nb
       symmetry type:    1
-      # of partners:    1
+      # of pairs:    1
 
 
      # of symmetry types:    1
@@ -79,9 +81,12 @@
 
       atom #   1 out of    1:   Nb
        neighbor distance: 5.40259850 bohr = 2.85893201 A
+       neighbor types:
+         Nb 
        neighbor indices:
           1 
-       neighbor types:
+       neighbor replicas:
+        5.40259850 
          Nb 
 
 
@@ -209,7 +214,7 @@
                M_sp   (      2.70129925):     -0.87362359 (Ry / bohr)
              M^2_sp   (      2.70129925):      0.76321818 (Ry / bohr)^2
                M_sp   (      2.70129925):    -22.46176561 (eV / A)
-             M^2_sp   (      2.70129925):    504.53091423 (eV / A)^2
+             M^2_sp   (      2.70129925):    504.53091439 (eV / A)^2
 
 
        u_1(r_mt) =      -1.31285711
@@ -225,7 +230,7 @@
                M_pd   (      2.70129925):     -0.67758174 (Ry / bohr)
              M^2_pd   (      2.70129925):      0.45911702 (Ry / bohr)^2
                M_pd   (      2.70129925):    -17.42132703 (eV / A)
-             M^2_pd   (      2.70129925):    303.50263537 (eV / A)^2
+             M^2_pd   (      2.70129925):    303.50263540 (eV / A)^2
 
 
        u_2(r_mt) =       0.65493695
@@ -239,9 +244,9 @@
        dL_3(r_mt) / de =      -1.10182616 (1 / Ry)
 
                M_df   (      2.70129925):      2.08861502 (Ry / bohr)
-             M^2_df   (      2.70129925):      4.36231270 (Ry / bohr)^2
-               M_df   (      2.70129925):     53.70045121 (eV / A)
-             M^2_df   (      2.70129925):   2883.73846007 (eV / A)^2
+             M^2_df   (      2.70129925):      4.36231269 (Ry / bohr)^2
+               M_df   (      2.70129925):     53.70045119 (eV / A)
+             M^2_df   (      2.70129925):   2883.73845810 (eV / A)^2
 
 
      >>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<
@@ -380,6 +385,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.70130):    1.8648E-01 (Ry / bohr^2) =    9.0606E+00 (eV / A^2)
+          ? eta_tot:    9.0606E+00
 
 
 
@@ -463,21 +469,21 @@
      writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.12s CPU      0.12s WALL (       1 calls)
+     rmta_init    :      0.36s CPU      0.03s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_n    :      0.23s CPU      0.29s WALL (       1 calls)
+     tetra_delta_ :      0.12s CPU      0.01s WALL (       1 calls)
+     set_dos_n    :      5.54s CPU      0.45s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.02s CPU      0.02s WALL (       1 calls)
+     rmta_write   :      0.58s CPU      0.17s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      3.55s CPU      3.64s WALL
+     RMTA         :     12.47s CPU      3.68s WALL
 
  
-   This run was terminated on:  13:58:11  17Jul2026            
+   This run was terminated on:  12:13:29  27Aug2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
