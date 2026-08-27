@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 17Jul2026 at 13:45:17 
+     Program RMTA v.7.5 starts on 27Aug2026 at 12:50:50 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -26,10 +26,12 @@
      in publications or presentations arising from this work. More details at
      http://www.quantum-espresso.org/quote
 
-     Parallel version (MPI), running on     1 processors
+     Parallel version (MPI & OpenMP), running on      14 processor cores
+     Number of MPI processes:                 1
+     Threads/MPI process:                    14
 
      MPI processes distributed on     1 nodes
-     1235 MiB available memory on the printing compute node when the environment starts
+     2613 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -63,7 +65,7 @@
 
       atom #   1 out of    1:   V 
       symmetry type:    1
-      # of partners:    1
+      # of pairs:    1
 
 
      # of symmetry types:    1
@@ -79,9 +81,12 @@
 
       atom #   1 out of    1:   V 
        neighbor distance: 4.95433013 bohr = 2.62171860 A
+       neighbor types:
+         V  
        neighbor indices:
           1 
-       neighbor types:
+       neighbor replicas:
+        4.95433013 
          V  
 
 
@@ -108,6 +113,9 @@
 
 
       n_chem_types: 1
+
+
+     Pseudo for   V contains explicit SL parts that will be used.
 
        FFT vrs to vgs
        DONE FFT vrs to vgs
@@ -210,7 +218,7 @@
                M_sp   (      2.47716507):     -0.81860247 (Ry / bohr)
              M^2_sp   (      2.47716507):      0.67011000 (Ry / bohr)^2
                M_sp   (      2.47716507):    -21.04711573 (eV / A)
-             M^2_sp   (      2.47716507):    442.98108048 (eV / A)^2
+             M^2_sp   (      2.47716507):    442.98108053 (eV / A)^2
 
 
        u_1(r_mt) =      -1.34241191
@@ -226,7 +234,7 @@
                M_pd   (      2.47716507):     -0.49143523 (Ry / bohr)
              M^2_pd   (      2.47716507):      0.24150859 (Ry / bohr)^2
                M_pd   (      2.47716507):    -12.63530785 (eV / A)
-             M^2_pd   (      2.47716507):    159.65100447 (eV / A)^2
+             M^2_pd   (      2.47716507):    159.65100452 (eV / A)^2
 
 
        u_2(r_mt) =       0.52820232
@@ -240,9 +248,9 @@
        dL_3(r_mt) / de =      -0.83726577 (1 / Ry)
 
                M_df   (      2.47716507):      2.43855404 (Ry / bohr)
-             M^2_df   (      2.47716507):      5.94654580 (Ry / bohr)^2
-               M_df   (      2.47716507):     62.69774517 (eV / A)
-             M^2_df   (      2.47716507):   3931.00724904 (eV / A)^2
+             M^2_df   (      2.47716507):      5.94654581 (Ry / bohr)^2
+               M_df   (      2.47716507):     62.69774519 (eV / A)
+             M^2_df   (      2.47716507):   3931.00725188 (eV / A)^2
 
 
      >>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<
@@ -365,7 +373,7 @@
                 M_df(   2.47717):        2.4386     (Ry / bohr)
               M^2_df(   2.47717):        5.9465   (Ry / bohr)^2
                 M_df(   2.47717):       62.6977        (eV / A)
-              M^2_df(   2.47717):     3931.0072      (eV / A)^2
+              M^2_df(   2.47717):     3931.0073      (eV / A)^2
 
                   n(   2.47717) (1 / Ry):    1.3039E+01
                 n_d(   2.47717) (1 / Ry):    9.7048E+00
@@ -381,6 +389,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.47717):    1.6493E-01 (Ry / bohr^2) =    8.0134E+00 (eV / A^2)
+          ? eta_tot:    8.0134E+00
 
 
 
@@ -425,7 +434,7 @@
                 M_df(   2.47717):        2.4386     (Ry / bohr)
               M^2_df(   2.47717):        5.9465   (Ry / bohr)^2
                 M_df(   2.47717):       62.6977        (eV / A)
-              M^2_df(   2.47717):     3931.0072      (eV / A)^2
+              M^2_df(   2.47717):     3931.0073      (eV / A)^2
               M^2_df:        5.9465
 
            eta_df(   2.47717):    1.0497E-01 (Ry / bohr^2) =    5.1001E+00 (eV / A^2)
@@ -441,44 +450,22 @@
 
 
 
-     writing chir
-     writing betar
-     writing vlocionr
-     writing vsemilocr
-     writing vsemilocr
-     writing vlocscr00rf
-     writing vlocscf00rf
-     writing vsemilocrf
-     writing urf
-     writing duderf
-     writing dudrrf
-     writing d2udrderf
-     writing mll1rf
-     writing vfullrf
-     writing rvfullrf
-     writing rvfullrf
-     writing dos_nlmrf
-     writing dos_nlrf
-     writing dos_nrf
-     writing etall1rf
-     writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.10s CPU      0.11s WALL (       1 calls)
+     rmta_init    :      0.39s CPU      0.03s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_n    :      0.20s CPU      0.26s WALL (       1 calls)
+     tetra_delta_ :      0.18s CPU      0.01s WALL (       1 calls)
+     set_dos_n    :      4.50s CPU      0.35s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
-     print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.02s CPU      0.02s WALL (       1 calls)
+     print_at_rmt :      0.01s CPU      0.00s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      3.65s CPU      3.73s WALL
+     RMTA         :     10.89s CPU      3.41s WALL
 
  
-   This run was terminated on:  13:45:21  17Jul2026            
+   This run was terminated on:  12:50:54  27Aug2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
