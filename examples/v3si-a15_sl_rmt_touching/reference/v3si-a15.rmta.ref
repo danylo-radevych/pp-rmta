@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 27Aug2026 at 12:19:59 
+     Program RMTA v.7.5 starts on 27Aug2026 at 12:40:35 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -31,7 +31,7 @@
      Threads/MPI process:                    14
 
      MPI processes distributed on     1 nodes
-     2948 MiB available memory on the printing compute node when the environment starts
+     4487 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -517,6 +517,10 @@
 
 
       n_chem_types: 2
+
+
+     Pseudo for   V contains explicit SL parts that will be used.
+     Pseudo for  Si contains explicit SL parts that will be used.
 
        FFT vrs to vgs
        DONE FFT vrs to vgs
@@ -2154,21 +2158,21 @@
      writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :     14.11s CPU      1.15s WALL (       1 calls)
+     rmta_init    :     14.66s CPU      1.24s WALL (       1 calls)
      set_vsemiloc :      0.01s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.32s CPU      0.03s WALL (       1 calls)
-     set_dos_n    :    658.72s CPU     74.36s WALL (       1 calls)
+     tetra_delta_ :      0.78s CPU      0.06s WALL (       1 calls)
+     set_dos_n    :    731.30s CPU     69.33s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.07s CPU      0.36s WALL (       1 calls)
+     rmta_write   :      0.06s CPU      0.16s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :  11m20.67s CPU   1m19.98s WALL
+     RMTA         :  12m33.87s CPU   1m14.94s WALL
 
  
-   This run was terminated on:  12:21:19  27Aug2026            
+   This run was terminated on:  12:41:50  27Aug2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
