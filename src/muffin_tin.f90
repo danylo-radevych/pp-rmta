@@ -95,12 +95,10 @@
       !
       INTEGER :: iat, ispin
       !! iterators
-      CHARACTER(len=256) :: routine_name
+      CHARACTER(len = 256) :: routine_name
       !! name of this subroutine
       !
-      EXTERNAL :: sph_bes
-      EXTERNAL :: lschps
-      EXTERNAL :: errore, start_clock, stop_clock
+      EXTERNAL :: start_clock, stop_clock
       !
       !
       routine_name = "rmta_init"
@@ -116,11 +114,6 @@
       !
       ! RMTA vars
       CALL rmta_set_vars()
-      !
-      !
-      !
-      !
-      !
       !
       ! check upf data
       CALL check_upf()
