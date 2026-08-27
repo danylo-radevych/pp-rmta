@@ -33,7 +33,7 @@
     !
     ! USE command_line_options, ONLY : npool_
     USE io_global, ONLY: stdout, ionode, ionode_id
-    USE io_files, ONLY : prefix, tmp_dir
+    USE io_files, ONLY: prefix, tmp_dir
     USE constants, ONLY: rytoev
     USE kinds, ONLY: DP
     USE io_global, ONLY: ionode, ionode_id

@@ -1060,7 +1060,7 @@
       !
       ! pseudopotentials (upf)
       !
-      ! identify what pseudos have explicit SL part
+      ! identify what pseudos have explicit SL parts
       ALLOCATE(lsemilocupf(n_chem_types), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating lsemilocupf", 1)
