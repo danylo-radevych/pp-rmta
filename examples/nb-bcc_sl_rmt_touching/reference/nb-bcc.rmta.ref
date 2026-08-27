@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 27Aug2026 at 12:13:26 
+     Program RMTA v.7.5 starts on 27Aug2026 at 12:43:48 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -31,7 +31,7 @@
      Threads/MPI process:                    14
 
      MPI processes distributed on     1 nodes
-     450 MiB available memory on the printing compute node when the environment starts
+     4679 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -112,6 +112,9 @@
 
 
       n_chem_types: 1
+
+
+     Pseudo for  Nb contains explicit SL parts that will be used.
 
        FFT vrs to vgs
        DONE FFT vrs to vgs
@@ -469,21 +472,21 @@
      writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.36s CPU      0.03s WALL (       1 calls)
+     rmta_init    :      0.71s CPU      0.06s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.12s CPU      0.01s WALL (       1 calls)
-     set_dos_n    :      5.54s CPU      0.45s WALL (       1 calls)
+     tetra_delta_ :      0.11s CPU      0.01s WALL (       1 calls)
+     set_dos_n    :    127.13s CPU     10.76s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.58s CPU      0.17s WALL (       1 calls)
+     rmta_write   :      0.02s CPU      0.25s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :     12.47s CPU      3.68s WALL
+     RMTA         :   2m14.16s CPU     14.19s WALL
 
  
-   This run was terminated on:  12:13:29  27Aug2026            
+   This run was terminated on:  12:44: 3  27Aug2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
