@@ -1043,6 +1043,7 @@
     !!
     !---------------------------------------------------------------------------
       USE uspp_param, ONLY: upf
+      USE io_global, ONLY: stdout
       ! USE ions_base, ONLY: ityp
       !
       IMPLICIT NONE
@@ -1068,6 +1069,11 @@
       DO ict = 1, n_chem_types
         IF (lsemiloc .AND. (upf(ict)%typ == "SL")) THEN
           lsemilocupf(ict) = .TRUE.
+          WRITE(stdout, '(/5x, "Pseudo for ", A3, " contains explicit SL ", &
+            & "parts that will be used.")') TRIM(upf(ict)%psd)
+        ELSE
+          WRITE(stdout, '(/5x, "Pseudo for ", A3, " contains only NL parts: ", &
+            & "SL will be calculated from NL.")') TRIM(upf(ict)%psd)
         END IF
       END DO ! ict
       !
