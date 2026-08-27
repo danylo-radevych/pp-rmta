@@ -108,7 +108,7 @@ recalculated from `chi` functions and `beta` projectors.
 
 **`$PPRMTA_ROOT/examples/nbn-b1_sl_rmt_touching`**: *B*1 NbN compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
 
-**`$PPRMTA_ROOT/examples/v3sn-a15_sl_rmt_touching`**: *A*15 V<sub>3</sub>Sn compound with manually specified MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
+**`$PPRMTA_ROOT/examples/v3sn-a15_sl**: *A*15 V<sub>3</sub>Sn compound with manually specified MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
 
 
 
