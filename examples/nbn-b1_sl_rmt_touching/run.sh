@@ -9,11 +9,11 @@ ncpu=8
 EXEC="mpirun"
 ECHO=echo
 
-lrun_scf=false
+lrun_scf=true
 lrun_rmta=true
 
-lsave_tmp_dir=true
-lsave_tmp_dir_tar=true
+lsave_tmp_dir=false
+lsave_tmp_dir_tar=false
 
 PREFIX='nbn-b1'
 IBRAV=2
@@ -236,7 +236,7 @@ cat > ${NAME}.in << EOF
 &rmta
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
-  lwrite_dat = .true.
+  lwrite_dat = .false.
 /
 EOF
 $EXEC -n 1 $PPRMTA_ROOT/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
