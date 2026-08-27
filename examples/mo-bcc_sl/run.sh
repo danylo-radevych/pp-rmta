@@ -12,8 +12,8 @@ ECHO=echo
 lrun_scf=true
 lrun_rmta=true
 
-lsave_tmp_dir=true
-lsave_tmp_dir_tar=true
+lsave_tmp_dir=false
+lsave_tmp_dir_tar=false
 
 PREFIX='mo-bcc'
 IBRAV="-3"
@@ -232,7 +232,7 @@ cat > ${NAME}.in << EOF
 &rmta
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
-  lwrite_dat = .true.
+  lwrite_dat = .false.
   lrmt = .true.
   rmt(1) = $RMT1
 /
