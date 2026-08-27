@@ -45,9 +45,9 @@
     ! USE paw_variables, ONLY: okpaw
     ! USE noncollin_module, ONLY: noncolin, lforcet
     ! USE control_flags, ONLY: gamma_only
-    USE klist, ONLY : degauss, ngauss
+    USE klist, ONLY: degauss, ngauss
     ! following modules needed for generation of tetrahedra
-    USE ktetra, ONLY : tetra_init
+    USE ktetra, ONLY: tetra_init
     USE symm_base, ONLY: nsym, s, time_reversal, t_rev
     USE klist, ONLY: nks, xk
     USE start_k, ONLY: k1, k2, k3, nk1, nk2, nk3
