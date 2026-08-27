@@ -1066,13 +1066,14 @@
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating lsemilocupf", 1)
       lsemilocupf(:) = .FALSE.
+      WRITE(stdout, '(/5x)')
       DO ict = 1, n_chem_types
         IF (lsemiloc .AND. (upf(ict)%typ == "SL")) THEN
           lsemilocupf(ict) = .TRUE.
-          WRITE(stdout, '(/5x, "Pseudo for ", A3, " contains explicit SL ", &
+          WRITE(stdout, '(5x, "Pseudo for ", A3, " contains explicit SL ", &
             & "parts that will be used.")') TRIM(upf(ict)%psd)
         ELSE
-          WRITE(stdout, '(/5x, "Pseudo for ", A3, " contains only NL parts: ", &
+          WRITE(stdout, '(5x, "Pseudo for ", A3, " contains only NL parts: ", &
             & "SL will be calculated from NL.")') TRIM(upf(ict)%psd)
         END IF
       END DO ! ict
