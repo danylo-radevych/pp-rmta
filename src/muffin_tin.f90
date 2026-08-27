@@ -430,10 +430,13 @@
       USE ions_base, ONLY: nat, ityp
       USE mt_var, ONLY: luse_ref_pot, mt_nr, mt_r, nchis, nbetas
       USE constants, ONLY: eps12, eps32
+      USE const, ONLY: zero
       !
       IMPLICIT NONE
       !
-      LOGICAL, INTENT(in) :: lread_semiloc_from_upf
+      EXTERNAL :: errore, start_clock, stop_clock
+      !
+      LOGICAL, INTENT(in) :: lread_semiloc_from_upf(:)
       !! if true, read V_SL(r) from upf file;
       !! if false, compute V_SL from V_NL(r)
       INTEGER, INTENT(in) :: norb
@@ -459,12 +462,20 @@
       REAL(DP), INTENT(out) :: vsemilocrf(:, :, :)
       !! V_SL(r) on fine r grid
       !
+      CHARACTER(len = 256) :: routine_name
+      !! name of this subroutine
+      LOGICAL, ALLOCATABLE :: lvlfound(:)
+      !! indicate if corresponding l is found
+      INTEGER, ALLOCATABLE :: lvlchiindx(:)
+      !! index of chi corresponding to l
       INTEGER :: ir, ichi, ibeta, jbeta, iorb, ict, iat
       !! iterators
       INTEGER :: l
       !! l number
       INTEGER :: lmax
       !! max l number
+      INTEGER :: ierr
+      !! error code
       REAL(DP) :: betachi
       !! local integral \int d r' beta(r') chi(r')
       REAL(DP) :: rmin = 0.01_dp ! bohr
@@ -472,28 +483,15 @@
       !! values below rmin are "extrapolated"
       REAL(DP) :: v0
       !! set V_SL(r < rmin) value
-      LOGICAL, ALLOCATABLE :: lvlfound(:)
-      !! indicate if corresponding l is found
-      INTEGER, ALLOCATABLE :: lvlchiindx(:)
-      !! index of chi corresponding to l
-      CHARACTER(len=256) :: routine_name
-      !! name of this subroutine
-      INTEGER :: ierr
-      !! error code
-      !
-      EXTERNAL :: errore, start_clock, stop_clock
       !
       routine_name = "set_vsemiloc"
       CALL start_clock(routine_name)
       !
-      v0 = 0.0_dp
-      !
-      !
-      IF (lread_semiloc_from_upf) THEN
+      DO ict = 1, n_chem_tp
         !
-        ! read semilocal from upf
-        !
-        DO ict = 1, n_chem_tp
+        IF (lread_semiloc_from_upf(ict)) THEN
+          !
+          ! read semilocal from upf
           !
           lmax = 0
           DO ichi = 1, nchis(ict)
@@ -513,13 +511,10 @@
             END DO ! ir
             !
           END DO ! iorb
-        END DO ! ict
-        !
-      ELSE
-        !
-        ! recover semilocal from non-local
-        !
-        DO ict = 1, n_chem_tp
+          !
+        ELSE
+          !
+          ! recover semilocal from non-local
           !
           lmax = 0
           DO ichi = 1, nchis(ict)
@@ -583,6 +578,7 @@
                 !
                 ! clean-up of the region r -> 0
                 !
+                v0 = zero
                 DO ir = mt_nr(ict), 1, - 1
                   IF (mt_r(ir, ict) >= rmin) THEN
                     v0 = vsemilocr(ir, l + 1, ict)
@@ -607,10 +603,11 @@
           DEALLOCATE(lvlchiindx, STAT = ierr)
           IF (ierr /= 0) &
             CALL errore(routine_name, 'Error deallocating lvlchiindx', 1)
-          !
-        END DO ! ict
         !
-      END IF ! read from upf
+        END IF ! read from upf
+        !
+      END DO ! ict
+      !
       !
       ! on the fine rf grid >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
       !
@@ -630,7 +627,7 @@
             !
             DO ir =  1, nrf
               IF (ABS(vsemilocrf(ir, iorb, iat)) < eps32) THEN
-                vsemilocrf(ir, iorb, iat) = 0.0_dp
+                vsemilocrf(ir, iorb, iat) = zero
               END IF
             END DO
             !

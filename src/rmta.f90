@@ -61,7 +61,7 @@
       luse_ref_pot, luse_tot_dos, &
       rmta_code, rmta_routine, & ! variables
       atomic_type, lsemiloc, lhybrid, &
-      lsemilocupf, lnonlocal, &
+      lnonlocal, &
       lwrite_dat, mt_ngauss, mt_degauss, &
       irf_delta, lrmt, &
       ltetra, ldense_r_grid, &
@@ -158,7 +158,6 @@
     lhybrid = .FALSE.
     lnonlocal = .FALSE. ! non-local form is not functional at this point
     lsemiloc = .TRUE.
-    lsemilocupf = .FALSE. ! will reset to .TRUE. if pseudo has PP_SEMILOCAL
     luse_ref_pot = .FALSE. ! only for debug with FLAPW potential
     luse_tot_dos = .TRUE.
     atomic_type = "na" ! obsolete
@@ -179,8 +178,6 @@
       ENDIF
       !
       ! variables from input
-      IF (.NOT. lsemiloc) &
-        lsemilocupf = .FALSE.
       irf_delta = dnr
       mt_ngauss = ngauss
       mt_degauss = degauss
@@ -200,7 +197,6 @@
     CALL mp_bcast(prefix, ionode_id, intra_image_comm)
     CALL mp_bcast(atomic_type, ionode_id, intra_image_comm)
     CALL mp_bcast(lsemiloc, ionode_id, intra_image_comm)
-    CALL mp_bcast(lsemilocupf, ionode_id, intra_image_comm)
     CALL mp_bcast(lhybrid, ionode_id, intra_image_comm)
     CALL mp_bcast(lnonlocal, ionode_id, intra_image_comm)
     CALL mp_bcast(lrmt, ionode_id, intra_image_comm)
@@ -217,11 +213,6 @@
     !
     ! read xml data file produced by pw.x or cp.x
     CALL read_file_new(needwf)
-    !
-    IF ( ALL(upf(:)%typ == "SL") ) THEN
-      lsemilocupf = .TRUE.
-      CALL mp_bcast(lsemilocupf, ionode_id, intra_image_comm)
-    END IF
     !
     IF ( ANY(upf(:)%tpawp) ) THEN
       CALL errore(program_name, &

@@ -115,8 +115,6 @@
     !! 4 <-> s, p, d, f
     LOGICAL :: lsemiloc
     !! Include V^l_SL(r) pieces
-    LOGICAL :: lsemilocupf
-    !! Read V^l_SL(r) pieces from UPF
     LOGICAL :: lhybrid
     !! use hybrid Pettifor formula
     ! REAL(DP), ALLOCATABLE :: rmta_pse(:)
@@ -128,6 +126,8 @@
     !! set rmt from file
     LOGICAL :: lmpi_single_rank
     !! if true, give an error when multiple ranks are used
+    LOGICAL, ALLOCATABLE :: lsemilocupf(:)
+    !! Read V^l_SL(r) pieces from UPFs
     INTEGER :: rmta_lmax
     !! maximum l for RMTA
     INTEGER :: natoms
@@ -1060,6 +1060,17 @@
       !
       ! pseudopotentials (upf)
       !
+      ! identify what pseudos have explicit SL part
+      ALLOCATE(lsemilocupf(n_chem_types), STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, "Error allocating lsemilocupf", 1)
+      lsemilocupf(:) = .FALSE.
+      DO ict = 1, n_chem_types
+        IF (lsemiloc .AND. (upf(ict)%typ == "SL")) THEN
+          lsemilocupf(ict) = .TRUE.
+        END IF
+      END DO ! ict
+      !
       ! number of points on r mesh from upf for each atom
       ALLOCATE(mt_nr(n_chem_types), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, "Error allocating mt_nr", 1)
@@ -1471,6 +1482,10 @@
       EXTERNAL :: errore
       !
       routine_name = "deallocate_rmta_vars"
+      !
+      DEALLOCATE(lsemilocupf, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating lsemilocupf', 1)
       !
       DEALLOCATE(mt_rmt, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
