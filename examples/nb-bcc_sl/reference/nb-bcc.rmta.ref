@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 17Jul2026 at 13:39:32 
+     Program RMTA v.7.5 starts on 27Aug2026 at 12:47:15 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -26,10 +26,12 @@
      in publications or presentations arising from this work. More details at
      http://www.quantum-espresso.org/quote
 
-     Parallel version (MPI), running on     1 processors
+     Parallel version (MPI & OpenMP), running on      14 processor cores
+     Number of MPI processes:                 1
+     Threads/MPI process:                    14
 
      MPI processes distributed on     1 nodes
-     1391 MiB available memory on the printing compute node when the environment starts
+     3638 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -63,7 +65,7 @@
 
       atom #   1 out of    1:   Nb
       symmetry type:    1
-      # of partners:    1
+      # of pairs:    1
 
 
      # of symmetry types:    1
@@ -79,9 +81,12 @@
 
       atom #   1 out of    1:   Nb
        neighbor distance: 5.40259850 bohr = 2.85893201 A
+       neighbor types:
+         Nb 
        neighbor indices:
           1 
-       neighbor types:
+       neighbor replicas:
+        5.40259850 
          Nb 
 
 
@@ -108,6 +113,9 @@
 
 
       n_chem_types: 1
+
+
+     Pseudo for  Nb contains explicit SL parts that will be used.
 
        FFT vrs to vgs
        DONE FFT vrs to vgs
@@ -210,7 +218,7 @@
                M_sp   (      2.69853000):     -0.87891840 (Ry / bohr)
              M^2_sp   (      2.69853000):      0.77249756 (Ry / bohr)^2
                M_sp   (      2.69853000):    -22.59790068 (eV / A)
-             M^2_sp   (      2.69853000):    510.66511504 (eV / A)^2
+             M^2_sp   (      2.69853000):    510.66511518 (eV / A)^2
 
 
        u_1(r_mt) =      -1.31340274
@@ -226,7 +234,7 @@
                M_pd   (      2.69853000):     -0.68053237 (Ry / bohr)
              M^2_pd   (      2.69853000):      0.46312431 (Ry / bohr)^2
                M_pd   (      2.69853000):    -17.49719070 (eV / A)
-             M^2_pd   (      2.69853000):    306.15168234 (eV / A)^2
+             M^2_pd   (      2.69853000):    306.15168238 (eV / A)^2
 
 
        u_2(r_mt) =       0.65565193
@@ -242,7 +250,7 @@
                M_df   (      2.69853000):      2.09585973 (Ry / bohr)
              M^2_df   (      2.69853000):      4.39262799 (Ry / bohr)^2
                M_df   (      2.69853000):     53.88672014 (eV / A)
-             M^2_df   (      2.69853000):   2903.77860738 (eV / A)^2
+             M^2_df   (      2.69853000):   2903.77860768 (eV / A)^2
 
 
      >>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<
@@ -381,6 +389,7 @@
         sum_l: total ...............................................................
 
         eta_tot(   2.69853):    1.8666E-01 (Ry / bohr^2) =    9.0692E+00 (eV / A^2)
+          ? eta_tot:    9.0692E+00
 
 
 
@@ -441,44 +450,22 @@
 
 
 
-     writing chir
-     writing betar
-     writing vlocionr
-     writing vsemilocr
-     writing vsemilocr
-     writing vlocscr00rf
-     writing vlocscf00rf
-     writing vsemilocrf
-     writing urf
-     writing duderf
-     writing dudrrf
-     writing d2udrderf
-     writing mll1rf
-     writing vfullrf
-     writing rvfullrf
-     writing rvfullrf
-     writing dos_nlmrf
-     writing dos_nlrf
-     writing dos_nrf
-     writing etall1rf
-     writing etall1rf_nodloglde
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.14s CPU      0.14s WALL (       1 calls)
+     rmta_init    :      0.32s CPU      0.03s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
-     tetra_delta_ :      0.04s CPU      0.04s WALL (       1 calls)
-     set_dos_n    :      0.29s CPU      0.38s WALL (       1 calls)
+     tetra_delta_ :      0.09s CPU      0.01s WALL (       1 calls)
+     set_dos_n    :      4.72s CPU      0.37s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.02s CPU      0.03s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      4.50s CPU      4.62s WALL
+     RMTA         :     12.01s CPU      3.44s WALL
 
  
-   This run was terminated on:  13:39:36  17Jul2026            
+   This run was terminated on:  12:47:19  27Aug2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
