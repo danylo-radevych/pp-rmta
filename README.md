@@ -36,14 +36,15 @@ make all
 
 ## Workflow
 
-SCF `$QE_ROOT/bin/pw.x` ---> RMTA `$PPRMTA_ROOT/bin/rmta.x`
+SCF `$QE_ROOT/bin/pw.x` ---> [NSCF `$QE_ROOT/bin/pw.x`] ---> RMTA `$PPRMTA_ROOT/bin/rmta.x`
 
 ## Executable
 `rmta.x` in the installation `bin` folder ---> calculate electronic McMillan-Hopfield factors
 
 ```
-mpirun -n $SLURM_NTASKS $QE_ROOT/bin/pw.x < $prefix.scf.in > $prefix.scf.out
-mpirun -n 1 $PPRMTA_ROOT/bin/rmta.x < $prefix.rmta.in > $prefix.rmta.out
+ mpirun -n $SLURM_NTASKS $QE_ROOT/bin/pw.x < $prefix.scf.in > $prefix.scf.out
+[mpirun -n $SLURM_NTASKS $QE_ROOT/bin/pw.x < $prefix.nscf.in > $prefix.nscf.out]
+ mpirun -n 1 $PPRMTA_ROOT/bin/rmta.x < $prefix.rmta.in > $prefix.rmta.out
 ```
 
 ---
