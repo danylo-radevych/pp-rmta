@@ -92,6 +92,8 @@ recalculated from `chi` functions and `beta` projectors.
 
 **`$PPRMTA_ROOT/examples/v3si-a15_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
 
+**`$PPRMTA_ROOT/examples/v3si-a15_nscf_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks. SCF is performed on coarse *k*-point grid, and optional NSCF step is used to get finer *k*-point grid for the subsequent RMTA calculation.
+
 ... *also*...
 
 **`$PPRMTA_ROOT/examples/nb-bcc`**: bcc Nb simple metal with manually specified MT radii and standard pseudopotential from PseudoDojo
