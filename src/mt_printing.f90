@@ -1285,7 +1285,7 @@
     SUBROUTINE print_at_rmt()
     !---------------------------------------------------------------------------
     !!
-    !! Printes RMTA results interpolated exactly at MT-radii
+    !! Prints RMTA results interpolated exactly at MT-radii
     !!
       USE io_global, ONLY: stdout
       USE ions_base, ONLY: ityp
