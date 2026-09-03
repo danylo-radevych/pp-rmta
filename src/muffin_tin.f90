@@ -799,6 +799,7 @@
     !
        USE kinds, ONLY: DP
        USE constants, ONLY: eps12
+       USE const, ONLY: zero
        !
        IMPLICIT NONE
        !
@@ -844,6 +845,9 @@
        routine_name = "set_log_ders"
        !
        CALL start_clock(routine_name)
+       !
+       logl(:, :, :, :) = zero
+       dloglde(:, :, :, :) = zero
        !
        DO iat = 1, nat
          DO iorb = 1, norb
@@ -1499,6 +1503,7 @@
                 ELSE
                   !
                   IF (ir == nin) THEN
+                    !
                     IF (ABS(dloglde) <= eps12) THEN
                       CALL errore(routine_name, &
                         "dloglde is close to zero at rmt", 1)
@@ -1516,6 +1521,7 @@
                       CALL errore(routine_name, &
                         "problem with dloglde or dlogl1de", 1)
                     END IF
+                    !
                   END IF
                   !
                 END IF
