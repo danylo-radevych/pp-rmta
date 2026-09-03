@@ -1297,9 +1297,9 @@
         nspins, fermi_energy, &
         luse_tot_dos, &
         irf_min, irf_max, &
-        dos_nrf, dos_n, dos_nlrf, &
+        dos_nrf, dos_n, dos_nlrf, dos_nlrf_nodloglde, &
         vlocscr00rf, &
-        mll1rf_label, mll1rf, etall1rf, etall1rf_nodloglde, &
+        mll1rf_label, mll1rf, mll1rf_nodloglde, etall1rf, etall1rf_nodloglde, &
         mt_nrf, mt_rf
       !
       IMPLICIT NONE
@@ -1312,6 +1312,8 @@
       !! MT-radius on fine grid
       REAL(DP) :: mll1
       !! current value of M_{l, l+1}
+      REAL(DP) :: mll1_nodloglde
+      !! current value of M'_{l, l+1}, without dloglde
       CHARACTER(len=256) :: m_label
       !! label of M_{l, l+1}
       REAL(DP) :: veff
@@ -1322,6 +1324,10 @@
       !! n_{l} DOS inside MT-sphere
       REAL(DP) :: nl1
       !! n_{l+1} DOS inside MT-sphere
+      REAL(DP) :: nl_nodloglde
+      !! n'_{l}, without dloglde, DOS inside MT-sphere
+      REAL(DP) :: nl1_nodloglde
+      !! n'_{l+1}, without dloglde, DOS inside MT-sphere
       REAL(DP) :: etall1
       !! \eta_{l, l+1}
       REAL(DP) :: eta
@@ -1484,6 +1490,14 @@
                 "(",  rmtf, "):", &
                 mll1 * mll1 * (rytoev / bohr_to_ang)**2, " (eV / A)^2"
               !
+              IF (ldebug) THEN
+                mll1_nodloglde = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
+                WRITE(stdout, '(8x, A10, A, A, F10.5, A, F14.4, A16)') &
+                " M'_", TRIM(m_label), &
+                "(",  rmtf, "):", &
+                mll1_nodloglde, " ()"
+              END IF
+              !
               !
               WRITE(stdout, '("")')
               !
@@ -1496,10 +1510,27 @@
               ! WRITE(stdout, '(8x, A21, I1, A2, es14.4, A12)') &
               !   "N(E_F, ", ispin, "):", &
               !   dos_n(ispin) * natoms, " (1 / Ry)"
+              !
               WRITE(stdout, '(8x, A11, A, F10.5, A, es14.4)') &
                 "n", &
                 "(",  rmtf, ") (1 / Ry):", &
                 ntot
+              !
+              IF (ldebug) THEN
+                nl_nodloglde = dos_nlrf_nodloglde(mt_nrf - irf_min + 1, &
+                  iorb, ispin, iat)
+                nl1_nodloglde = dos_nlrf_nodloglde(mt_nrf - irf_min + 1, &
+                  iorb + 1, ispin, iat)
+                WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
+                  "n'_", TRIM(orb_label(iorb)), &
+                  "(",  rmtf, ") ():", &
+                  nl_nodloglde
+                WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
+                  "n'_", TRIM(orb_label(iorb + 1)), &
+                  "(",  rmtf, ") ():", &
+                  nl1_nodloglde
+              END IF ! ldebug
+              !
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
                 "n_", TRIM(orb_label(iorb)), &
                 "(",  rmtf, ") (1 / Ry):", &

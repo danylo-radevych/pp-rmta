@@ -210,6 +210,7 @@
     CALL mp_bcast(irf_delta, ionode_id, intra_image_comm)
     CALL mp_bcast(ltetra, ionode_id, intra_image_comm)
     CALL mp_bcast(ldense_r_grid, ionode_id, intra_image_comm)
+    CALL mp_bcast(ldebug, ionode_id, intra_image_comm)
     !
     ! read xml data file produced by pw.x or cp.x
     CALL read_file_new(needwf)
