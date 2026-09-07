@@ -325,7 +325,7 @@
     !  D. Radevych
     !
       USE mt_var, ONLY: norbs, ltetra
-      USE part_dos, ONLY: set_dos_n
+      USE part_dos, ONLY: set_dos_nlm
       USE mh_eta, ONLY: set_eta
       USE mt_var, ONLY: &
         mt_nr, mt_r, vsemilocr, &
@@ -373,7 +373,7 @@
       !
       ! partial DOS
       !
-      CALL set_dos_n(ltetra, mt_nrf, irf_min, irf_max, &
+      CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
         ist_i, &
         natoms, norbs, nspins, mt_ngauss, mt_rf, &
         tau_cart(1 : 3, 1 : natoms), &
