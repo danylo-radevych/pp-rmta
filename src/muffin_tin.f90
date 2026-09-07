@@ -372,24 +372,23 @@
       !
       ! partial DOS
       !
-      CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
-        ist_i, &
-        natoms, norbs, nspins, mt_ngauss, mt_rf, &
-        tau_cart(1 : 3, 1 : natoms), &
-        dloglderf(1 : irf_max, &
-        1 : norbs, 1 : nspins, 1 : natoms), &
-        mt_degauss, fermi_energy, &
-        dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
-      !
-      ! CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, &
+      ! CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
       !   ist_i, &
       !   natoms, norbs, nspins, mt_ngauss, mt_rf, &
       !   tau_cart(1 : 3, 1 : natoms), &
-      !   urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-      !   dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-      !   wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+      !   dloglderf(1 : irf_max, &
+      !   1 : norbs, 1 : nspins, 1 : natoms), &
       !   mt_degauss, fermi_energy, &
       !   dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      !
+      CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, ist_i, &
+        natoms, norbs, nspins, mt_ngauss, mt_rf, &
+        tau_cart(1 : 3, 1 : natoms), &
+        urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+        dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+        wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+        mt_degauss, fermi_energy, &
+        dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l
       !
@@ -397,8 +396,7 @@
         natoms, norbs, nspins, &
         dos_nlrf, dos_nrf, &
         dos_n, luse_tot_dos, &
-        mll1rf, &
-        etall1rf)
+        mll1rf, etall1rf)
       !
       ! Interpolate and print quantities at specified MT-radius
       !

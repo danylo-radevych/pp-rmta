@@ -208,6 +208,7 @@
       !
       lmax = norbs - 1
       !
+      WRITE(stdout, '(5x, A)') "Writing dat files..."
       !
       ! chir
       !
@@ -1192,6 +1193,8 @@
         CLOSE(if_dos_nlnrf)
         !
       END IF ! lskip_nonessential
+      !
+      WRITE(stdout, '(5x, A, /)') "Done writing dat files."
       !
       !
       CALL stop_clock(routine_name)
