@@ -43,6 +43,8 @@
     !! real four
     REAL(DP), PARAMETER :: five = 5.0_DP
     !! real five
+    REAL(DP), PARAMETER :: half = 0.5_DP
+    !! real half
     COMPLEX(DP), PARAMETER :: czero = CMPLX(0.0_DP, 0.0_DP, KIND = DP)
     !! complex zero
     COMPLEX(DP), PARAMETER :: cone = CMPLX(1.0_DP, 0.0_DP, KIND = DP)
