@@ -1435,7 +1435,8 @@
       nin = irf_max
       !
       WRITE(stdout, '(/5x, /5x, /5x, &
-        & ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
+        ! & ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
+        & ">>>>>>>>>> PARTIAL E-PH BEGIN <<<<<<<<<<")')
       !
       !
       DO iat = 1, natoms
@@ -1659,7 +1660,8 @@
       END DO ! iat
       !
       WRITE(stdout, &
-        '(/5x, ">>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<", /5x, /5x, /5x)')
+        ! '(/5x, ">>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<", /5x, /5x, /5x)')
+        '(/5x, ">>>>>>>>>>  PARTIAL E-PH END  <<<<<<<<<<", /5x, /5x, /5x)')
       !
       CALL stop_clock(routine_name)
       !

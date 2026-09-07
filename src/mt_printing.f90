@@ -1290,6 +1290,8 @@
       !! maximum index of defined partial DOS
       REAL(DP), ALLOCATABLE :: mll1_sym_tp(:, :, :)
       !! value of m_{l, l + 1} for each type
+      REAL(DP), ALLOCATABLE :: nl_sym_tp(:, :, :)
+      !! value of n_{l} for each type
       REAL(DP), ALLOCATABLE :: etall1_sym_tp(:, :, :)
       !! value of eta_{l, l + 1} for each type,
       !! last element etall1_sym_tp(norbs, :) is eta_tot
@@ -1310,6 +1312,11 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating mll1_sym_tp', 1)
       mll1_sym_tp(:, :, :) = zero
+      !
+      ALLOCATE(nl_sym_tp(norbs, nspins, nst), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error allocating nl_sym_tp', 1)
+      nl_sym_tp(:, :, :) = zero
       !
       ALLOCATE(etall1_sym_tp(norbs, nspins, nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
@@ -1437,14 +1444,28 @@
               nl1 = dos_nlrf(mt_nrf - irf_min + 1, &
                 iorb + 1, ispin, iat)
               !
+              nl_sym_tp(iorb, ispin, ist_i(iat)) = &
+                nl_sym_tp(iorb, ispin, ist_i(iat)) + &
+                nl / ist_nat(ist_i(iat))
+              !
+              IF (iorb == norbs - 1) THEN
+                nl_sym_tp(iorb + 1, ispin, ist_i(iat)) = &
+                  nl_sym_tp(iorb + 1, ispin, ist_i(iat)) + &
+                  nl1 / ist_nat(ist_i(iat))
+              END IF
+              !
               ! WRITE(stdout, '(8x, A21, I1, A2, es14.4, A12)') &
               !   "N(E_F, ", ispin, "):", &
               !   dos_n(ispin) * natoms, " (1 / Ry)"
               !
               WRITE(stdout, '(8x, A11, A, F10.5, A, es14.4)') &
+                "N", &
+                "(",  rmtf, ") (1 / Ry):", &
+                ntot * natoms ! DOS per cell per spin
+              WRITE(stdout, '(8x, A11, A, F10.5, A, es14.4)') &
                 "n", &
                 "(",  rmtf, ") (1 / Ry):", &
-                ntot
+                ntot ! DOS per atom per spin
               !
               WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
                 "n_", TRIM(orb_label(iorb)), &
@@ -1554,6 +1575,12 @@
         !
         DO ispin = 1, nspins
           !
+          IF (.NOT. luse_tot_dos) THEN
+            ntot = dos_nrf(mt_nrf - irf_min + 1, ispin, iat)
+          ELSE
+            ntot = dos_n(ispin)
+          END IF
+          !
           WRITE(stdout, '(/7x, "Spin: ", I1, &
             & " --------------------------------------------------------------", &
             & "-------")') &
@@ -1598,6 +1625,38 @@
               WRITE(stdout, '(8x, A10, A, A, F14.4)') &
                 "M^2_", TRIM(m_label), &
                 ":", mll1 * mll1
+              !
+              WRITE(stdout, '("")')
+              !
+              !
+              nl = nl_sym_tp(iorb, ispin, ist)
+              nl1 = nl_sym_tp(iorb + 1, ispin, ist)
+              !
+              WRITE(stdout, '(8x, A11, A, F10.5, A, es14.4)') &
+                "N", &
+                "(",  rmtf, ") (1 / Ry):", &
+                ntot * natoms ! DOS per cell per spin
+              WRITE(stdout, '(8x, A11, A, F10.5, A, es14.4)') &
+                "n", &
+                "(",  rmtf, ") (1 / Ry):", &
+                ntot ! DOS per atom per spin
+              !
+              WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
+                "n_", TRIM(orb_label(iorb)), &
+                "(",  rmtf, ") (1 / Ry):", &
+                nl
+              WRITE(stdout, '(8x, A10, A, A, F10.5, A, es14.4)') &
+                "n_", TRIM(orb_label(iorb + 1)), &
+                "(",  rmtf, ") (1 / Ry):", &
+                nl1
+              WRITE(stdout, '(8x, A10, A, A, es14.4)') &
+                "n_", TRIM(orb_label(iorb)), &
+                " / n : ", &
+                nl / ntot
+              WRITE(stdout, '(8x, A10, A, A, es14.4)') &
+                "n_", TRIM(orb_label(iorb + 1)), &
+                " / n : ", &
+                nl1 / ntot
               !
               WRITE(stdout, '("")')
               !
@@ -1660,6 +1719,10 @@
       DEALLOCATE(mll1_sym_tp, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating mll1_sym_tp', 1)
+      !
+      DEALLOCATE(nl_sym_tp, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating nl_sym_tp', 1)
       !
       DEALLOCATE(etall1_sym_tp, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
