@@ -331,7 +331,7 @@
         mt_nr, mt_r, vsemilocr, &
         vsemilocrf, &
         irf_min, irf_max, &
-        urf, dudrrf, duderf, d2udrderf, &
+        urf, dudrrf, duderf, d2udrderf, wrf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
         dos_nlmrf_nodloglde, dos_nlrf_nodloglde, &
@@ -365,7 +365,7 @@
       CALL set_log_ders(irf_max, mt_dx, mt_rf, &
         natoms, ist_i, norbs, nspins, lhybrid, &
         urf, dudrrf, duderf, d2udrderf, &
-        loglrf, dloglderf)
+        loglrf, dloglderf, wrf)
       !
       ! Pettifor's M_{l, l+1}
       !
@@ -789,7 +789,7 @@
     !---------------------------------------------------------------------------
     SUBROUTINE set_log_ders(nin, dx, rf, nat, stp, &
       norb, nspins, lhybrid, urf, dudrrf, duderf, d2udrderf, &
-      logl, dloglde)
+      logl, dloglde, Wl)
     !---------------------------------------------------------------------------
     !!
     !! Sets log derivatives of radial functions
@@ -800,7 +800,7 @@
     !
        USE kinds, ONLY: DP
        USE constants, ONLY: eps12
-       USE const, ONLY: zero
+       USE const, ONLY: zero, one
        !
        IMPLICIT NONE
        !
@@ -833,6 +833,8 @@
        !! L_l(r, E_F)
        REAL(DP), INTENT(inout) :: dloglde(:, :, :, :)
        !! d L_l(r, E_F) / d e
+       REAL(DP), INTENT(inout) :: wl(:, :, :, :)
+       !! Wronskian, or normalization integral \int dr u^2(r, e)
        !
        REAL(DP) :: rmtf
        !! current MT radius, on fine grid
@@ -849,39 +851,45 @@
        !
        logl(:, :, :, :) = zero
        dloglde(:, :, :, :) = zero
+       wl(:, :, :, :) = zero
        !
        DO iat = 1, nat
          DO iorb = 1, norb
            DO ispin = 1, nspins
              DO ir = 1, nin
                !
+               rmtf = rf(ir, stp(iat))
+               !
                IF (ABS(urf(ir, iorb, ispin, iat)) > eps12) THEN
-                 !
-                 rmtf = rf(ir, stp(iat))
-                 !
                  logl(ir, iorb, ispin, iat) = &
                    rmtf * dudrrf(ir, iorb, ispin, iat) / &
-                   urf(ir, iorb, ispin, iat) - 1.0_dp
+                   urf(ir, iorb, ispin, iat) - one
+               END IF ! urf
+               !
+               IF (.NOT. lhybrid) THEN
                  !
-                 IF (.NOT. lhybrid) THEN
-                   dloglde(ir, iorb, ispin, iat) = rmtf / &
-                     (urf(ir, iorb, ispin, iat) * &
-                     urf(ir, iorb, ispin, iat)) * &
-                     (d2udrderf(ir, iorb, ispin, iat) * &
-                     urf(ir, iorb, ispin, iat) - &
-                     dudrrf(ir, iorb, ispin, iat) * &
-                     duderf(ir, iorb, ispin, iat))
-                 ELSE
-                   !
-                   dloglde(ir, iorb, ispin, iat) =  - rmtf / &
-                     (urf(ir, iorb, ispin, iat) * &
-                     urf(ir, iorb, ispin, iat)) * &
-                     rmta_integrate_u2(ir, dx(stp(iat)), rf(:, stp(iat)), &
-                     urf(:, iorb, ispin, iat), iorb - 1)
-                   !
-                 END IF ! lhybrid
+                 wl(ir, iorb, ispin, iat) = &
+                   (dudrrf(ir, iorb, ispin, iat) * &
+                   duderf(ir, iorb, ispin, iat) - &
+                   urf(ir, iorb, ispin, iat) * &
+                   d2udrderf(ir, iorb, ispin, iat))
                  !
-               END IF ! urf > eps12
+               ELSE
+                 !
+                 wl(ir, iorb, ispin, iat) = &
+                   rmta_integrate_u2(ir, dx(stp(iat)), rf(:, stp(iat)), &
+                   urf(:, iorb, ispin, iat), iorb - 1)
+                 !
+               END IF ! lhybrid
+               !
+               IF (ABS(urf(ir, iorb, ispin, iat)) > eps12) THEN
+                 !
+                 dloglde(ir, iorb, ispin, iat) = rmtf / &
+                   (urf(ir, iorb, ispin, iat) * &
+                   urf(ir, iorb, ispin, iat)) * &
+                   (- wl(ir, iorb, ispin, iat))
+                 !
+               END IF ! urf
                !
              END DO ! ir
            END DO ! ispin
@@ -1668,8 +1676,8 @@
         irf_max, &
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
-        urf, dudrrf, duderf, d2udrderf, &
-        loglrf, dloglderf
+        urf, dudrrf, &
+        wrf, loglrf
       USE sym_type, ONLY: ist_i
       USE constants, ONLY: eps6, eps12
       USE const, ONLY: zero, half
@@ -1704,17 +1712,17 @@
       !! du_l(r, e) / dr
       REAL(DP) :: dul1dr
       !! du_l+1(r, e) / dr
-      REAL(DP) :: dulde
-      !! du_l(r, e) / de
-      REAL(DP) :: dul1de
-      !! du_l+1(r, e) / de
-      REAL(DP) :: d2uldrde
-      !! d^2u_l(r, e) / drde
-      REAL(DP) :: d2ul1drde
-      !! d^2u_l+1(r, e) / drde
-      REAL(DP) :: Wl
+      ! REAL(DP) :: dulde
+      ! !! du_l(r, e) / de
+      ! REAL(DP) :: dul1de
+      ! !! du_l+1(r, e) / de
+      ! REAL(DP) :: d2uldrde
+      ! !! d^2u_l(r, e) / drde
+      ! REAL(DP) :: d2ul1drde
+      ! !! d^2u_l+1(r, e) / drde
+      REAL(DP) :: wl
       !! Wronskian for u_l(r, e)
-      REAL(DP) :: Wl1
+      REAL(DP) :: wl1
       !! Wronskian for u_{l+1}(r, e)
       REAL(DP) :: rl
       !! R_l(r) = u_l(r) / r
@@ -1724,10 +1732,10 @@
       !! L_l(r) = r R' / R = r u' / u - 1
       REAL(DP) :: logl1
       !! L_{l + 1}(r)
-      REAL(DP) :: dloglde
-      !! d L_l(r) / d e = r / u_l^2 [(d2 u / de dr) u - (d u / d r) (d u / d e)]
-      REAL(DP) :: dlogl1de
-      !! d L_{l + 1}(r) / d e
+      ! REAL(DP) :: dloglde
+      ! !! d L_l(r) / d e = r / u_l^2 [(d2 u / de dr) u - (d u / d r) (d u / d e)]
+      ! REAL(DP) :: dlogl1de
+      ! !! d L_{l + 1}(r) / d e
       REAL(DP) :: mll1_at_rmt
       !! Value of M_{l, l+1} at r_mt
       REAL(DP) :: mll1_nodloglde_at_rmt
@@ -1814,14 +1822,14 @@
               r = mt_rf(ir, ist_i(iat))
               !
               logl = loglrf(ir, iorb, ispin, iat)
-              dloglde = dloglderf(ir, iorb, ispin, iat)
+              ! dloglde = dloglderf(ir, iorb, ispin, iat)
               !
               !
               ! WRITE(*, *) "logl == ", logl
               ! WRITE(*, *) "dloglde == ", dloglde
               !
               logl1 = loglrf(ir, iorb + 1, ispin, iat)
-              dlogl1de = dloglderf(ir, iorb + 1, ispin, iat)
+              ! dlogl1de = dloglderf(ir, iorb + 1, ispin, iat)
               !
               !
               ! WRITE(*, *) "logl1 == ", logl1
@@ -1840,12 +1848,12 @@
                 ul1 = urf(ir, iorb + 1, ispin, iat)
                 duldr = dudrrf(ir, iorb, ispin, iat)
                 dul1dr = dudrrf(ir, iorb + 1, ispin, iat)
-                dulde = duderf(ir, iorb, ispin, iat)
-                dul1de = duderf(ir, iorb + 1, ispin, iat)
-                d2uldrde = d2udrderf(ir, iorb, ispin, iat)
-                d2ul1drde = d2udrderf(ir, iorb + 1, ispin, iat)
-                Wl = (ul * d2uldrde - dulde * duldr)
-                Wl1 = (ul1 * d2ul1drde - dul1de * dul1dr)
+                ! dulde = duderf(ir, iorb, ispin, iat)
+                ! dul1de = duderf(ir, iorb + 1, ispin, iat)
+                ! d2uldrde = d2udrderf(ir, iorb, ispin, iat)
+                ! d2ul1drde = d2udrderf(ir, iorb + 1, ispin, iat)
+                wl = wrf(ir, iorb, ispin, iat)
+                wl1 = wrf(ir, iorb + 1, ispin, iat)
                 !
                 IF ((ABS(Wl) > eps12) .AND. (ABS(Wl1) > eps12)) THEN
                   !
@@ -1860,18 +1868,18 @@
                   mll1rf(ir, iorb, ispin, iat) = mll1rf(ir, iorb, ispin, iat) / &
                     (r * r)
                   mll1rf(ir, iorb, ispin, iat) = mll1rf(ir, iorb, ispin, iat) / &
-                    SQRT(ABS(Wl * Wl1))
+                    SQRT(ABS(wl * wl1))
                   !
                 ELSE
                   !
                   ! WRITE(stdout, '(7x, "WARNING: r = ", ES0.6, " l = ", I0, &
                   !   & ", W_l = ", ES0.6, &
-                  !   & ", W_l+1 = ", ES0.6)') r, l, Wl, Wl1
+                  !   & ", W_l+1 = ", ES0.6)') r, l, wl, wl1
                   !
                   IF (ir == nin) THEN
                     WRITE(stdout, '(7x, "r = ", ES0.6, " l = ", I0, &
                     & ", W_l = ", ES0.6, &
-                    & ", W_l+1 = ", ES0.6)') r, l, Wl, Wl1
+                    & ", W_l+1 = ", ES0.6)') r, l, wl, wl1
                     CALL errore(routine_name, &
                       "Wronskian at r_MT is too close to zero", 1)
                   END IF
@@ -1897,22 +1905,26 @@
             ul1 = urf(mt_nrf, iorb + 1, ispin, iat)
             rl = ul / rmtf
             rl1 = ul1 / rmtf
-            logl = loglrf(mt_nrf, iorb, ispin, iat)
-            logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
-            dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
-            dlogl1de = dloglderf(mt_nrf, iorb + 1, ispin, iat)
+            wl = wrf(mt_nrf, iorb, ispin, iat)
+            wl1 = wrf(mt_nrf, iorb + 1, ispin, iat)
+            ! logl = loglrf(mt_nrf, iorb, ispin, iat)
+            ! logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
+            ! dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
+            ! dlogl1de = dloglderf(mt_nrf, iorb + 1, ispin, iat)
             !
             WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
               "u_", iorb - 1, "(r_mt) = ", ul
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb - 1, "(r_mt) = ", rl
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "L_", iorb - 1, "(r_mt) = ", logl
-            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
-              "dL_", iorb - 1, "(r_mt) / de = ", dloglde, " (1 / Ry)"
+              "W_", iorb - 1, "(r_mt) = ", wl
+            ! WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+            !   "L_", iorb - 1, "(r_mt) = ", logl
+            ! WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
+            !   "dL_", iorb - 1, "(r_mt) / de = ", dloglde, " (1 / Ry)"
             !
-            IF (ABS(ul) < eps12) THEN
-              WRITE(stdout, '(5x, "WARNING: u_", I0, &
+            IF (ABS(wl) < eps12) THEN
+              WRITE(stdout, '(5x, "WARNING: W_", I0, &
                 & "(r) at rmt is close to zero")') &
                 iorb - 1
               ! CALL errore(routine_name, "Adjust rmt.", 1)
@@ -1923,12 +1935,14 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb, "(r_mt) = ", rl1
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "L_", iorb, "(r_mt) = ", logl1
-            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
-              "dL_", iorb, "(r_mt) / de = ", dlogl1de, " (1 / Ry)"
+              "W_", iorb, "(r_mt) = ", wl1
+            ! WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+            !   "L_", iorb, "(r_mt) = ", logl1
+            ! WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
+            !   "dL_", iorb, "(r_mt) / de = ", dlogl1de, " (1 / Ry)"
             !
-            IF (ABS(ul1) < eps12) THEN
-              WRITE(stdout, '(5x, "WARNING: u_", I0, &
+            IF (ABS(wl1) < eps12) THEN
+              WRITE(stdout, '(5x, "WARNING: W_", I0, &
                 & "(r) at rmt is close to zero")') &
                 iorb
               ! CALL errore(routine_name, "Adjust rmt.", 1)

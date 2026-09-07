@@ -284,6 +284,10 @@
     !! etall1rf_nodloglde(mt_nrf, norbs, nspins, natoms)
     !! McMillan-Hopfield \eta_l,
     !! on fine r grid, calculated without normalization integrals
+    REAL(DP), ALLOCATABLE :: wrf(:, :, :, :)
+    !! wrf(mt_nrf, norbs, nspins, natoms)
+    !! Wronskians, or normalization integrals
+    !! \int dr u^2_l(r, e), on fine r grid
     REAL(DP), ALLOCATABLE :: loglrf(:, :, :, :)
     !! loglrf(mt_nrf, norbs, nspins, natoms)
     !! computed log derivatives of radial functions
@@ -1239,6 +1243,7 @@
       USE gvect, ONLY: ngl, g, ngm ! gl, ecutrho, mill
       USE fft_rho, ONLY: rho_r2g ! rho_g2r
       USE cell_base, ONLY: tpiba ! omega, at, bg, alat
+      USE const, ONLY: zero
       !
       IMPLICIT NONE
       !
@@ -1311,7 +1316,7 @@
       ALLOCATE(vlocscrg3d(ngm, nspins), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating vlocscrg3d", 1)
-      vlocscrg3d(:, :) = 0.0_dp
+      vlocscrg3d(:, :) = zero
       !
       WRITE(stdout, '(/7x, A)') "FFT vrs to vgs"
       CALL rho_r2g(dfftp, v%of_r(:, :), vlocscrg3d(:, :), v=vltot)
@@ -1339,6 +1344,7 @@
     !! Initialize empty arrays.
     !!
     !---------------------------------------------------------------------------
+      USE const, ONLY: zero
       !
       IMPLICIT NONE
       !
@@ -1354,29 +1360,35 @@
       !
       ! allocate other arrays
       !
+      ALLOCATE(wrf(mt_nrf, norbs, nspins, natoms), &
+        STAT = ierr)
+      IF (ierr /= 0) &
+         CALL errore(routine_name, "Error allocating wrf", 1)
+      wrf(:, :, :, :) = zero
+      !
       ALLOCATE(loglrf(mt_nrf, norbs, nspins, natoms), &
         STAT = ierr)
       IF (ierr /= 0) &
          CALL errore(routine_name, "Error allocating loglrf", 1)
-      loglrf(:, :, :, :) = 0._dp
+      loglrf(:, :, :, :) = zero
       !
       ALLOCATE(dloglderf(mt_nrf, norbs, nspins, natoms), &
         STAT = ierr)
       IF (ierr /= 0) &
          CALL errore(routine_name, "Error allocating dloglderf", 1)
-      dloglderf(:, :, :, :) = 0._dp
+      dloglderf(:, :, :, :) = zero
       !
       ALLOCATE(mll1rf(mt_nrf, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating mll1rf", 1)
-      mll1rf(:, :, :, :) = 0.0_dp
+      mll1rf(:, :, :, :) = zero
       !
       ALLOCATE(mll1rf_nodloglde(mt_nrf, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating mll1rf_nodloglde", 1)
-      mll1rf_nodloglde(:, :, :, :) = 0.0_dp
+      mll1rf_nodloglde(:, :, :, :) = zero
       !
       ALLOCATE(mll1rf_label(norbs, &
         nspins, natoms), STAT = ierr)
@@ -1388,48 +1400,48 @@
         (rmta_lmax + 1) * (rmta_lmax + 1), nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nlmrf', 1)
-      dos_nlmrf(:, :, :, :) = 0._dp
+      dos_nlmrf(:, :, :, :) = zero
       !
       ALLOCATE(dos_nlrf(1 : irf_delta + 1, &
         norbs, nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nlrf', 1)
-      dos_nlrf(:, :, :, :) = 0._dp
+      dos_nlrf(:, :, :, :) = zero
       !
       ALLOCATE(dos_nrf(1 : irf_delta + 1, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nrf', 1)
-      dos_nrf(:, :, :) = 0._dp
+      dos_nrf(:, :, :) = zero
       !
       ALLOCATE(dos_n(nspins), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_n', 1)
-      dos_n(:) = 0._dp
+      dos_n(:) = zero
       !
       ALLOCATE(dos_nlmrf_nodloglde(1 : irf_delta + 1, &
         (rmta_lmax + 1) * (rmta_lmax + 1), nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nlmrf_nodloglde', 1)
-      dos_nlmrf_nodloglde(:, :, :, :) = 0._dp
+      dos_nlmrf_nodloglde(:, :, :, :) = zero
       !
       ALLOCATE(dos_nlrf_nodloglde(1 : irf_delta + 1, &
         norbs, nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating dos_nlrf_nodloglde', 1)
-      dos_nlrf_nodloglde(:, :, :, :) = 0._dp
+      dos_nlrf_nodloglde(:, :, :, :) = zero
       !
       ALLOCATE(etall1rf(1 : irf_delta + 1, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating etall1rf", 1)
-      etall1rf(:, :, :, :) = 0.0_dp
+      etall1rf(:, :, :, :) = zero
       !
       ALLOCATE(etall1rf_nodloglde(1 : irf_delta + 1, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating etall1rf_nodloglde", 1)
-      etall1rf_nodloglde(:, :, :, :) = 0.0_dp
+      etall1rf_nodloglde(:, :, :, :) = zero
       !
       ! V_SL
       !
@@ -1439,21 +1451,21 @@
         STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating vsemilocr', 1)
-      vsemilocr(:, :, :) = 0.0_dp
+      vsemilocr(:, :, :) = zero
       !
       ! on RMTA grid
       !
       ALLOCATE(vsemilocrf(mt_nrf, norbs, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating vsemilocrf', 1)
-      vsemilocrf(:, :, :) = 0.0_dp
+      vsemilocrf(:, :, :) = zero
       !
       ! Vlocscr00
       !
       ALLOCATE(vlocscr00rf(mt_nrf, nspins, natoms))
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating vlocscr00rf', 1)
-      vlocscr00rf(:, :, :) = 0.0_dp
+      vlocscr00rf(:, :, :) = zero
       !
       ! Vlocscf00
       ! TODO: not useful
@@ -1461,7 +1473,7 @@
       ALLOCATE(vlocscf00rf(mt_nrf, nspins, natoms))
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error allocating vlocscf00rf', 1)
-      vlocscf00rf(:, :, :) = 0.0_dp
+      vlocscf00rf(:, :, :) = zero
       !
       ! CALL errore(routine_name, "Test DONE", 1)
       !
@@ -1661,6 +1673,10 @@
       DEALLOCATE(etall1rf_nodloglde, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating etall1rf_nodloglde', 1)
+      !
+      DEALLOCATE(wrf, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating wrf', 1)
       !
       DEALLOCATE(loglrf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
