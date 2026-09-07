@@ -325,7 +325,7 @@
     !  D. Radevych
     !
       USE mt_var, ONLY: norbs, ltetra
-      USE part_dos, ONLY: set_dos_nlm
+      USE part_dos, ONLY: set_dos_nlm, set_dos_nlm_form2
       USE mh_eta, ONLY: set_eta
       USE mt_var, ONLY: &
         mt_nr, mt_r, vsemilocr, &
@@ -334,10 +334,9 @@
         urf, dudrrf, duderf, d2udrderf, wrf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-        dos_nlmrf_nodloglde, dos_nlrf_nodloglde, &
         luse_tot_dos, &
-        mll1rf, mll1rf_nodloglde, &
-        etall1rf, etall1rf_nodloglde, &
+        mll1rf, &
+        etall1rf, &
         natoms, tau_cart, n_chem_types, &
         nspins, fermi_energy, &
         lsemilocupf, mt_rab, &
@@ -369,8 +368,7 @@
       !
       ! Pettifor's M_{l, l+1}
       !
-      ! CALL set_pet_mll1()
-      CALL set_pet_mll1_form2() ! improved formulation
+      CALL set_pet_mll1()
       !
       ! partial DOS
       !
@@ -379,20 +377,28 @@
         natoms, norbs, nspins, mt_ngauss, mt_rf, &
         tau_cart(1 : 3, 1 : natoms), &
         dloglderf(1 : irf_max, &
-          1 : norbs, 1 : nspins, 1 : natoms), &
+        1 : norbs, 1 : nspins, 1 : natoms), &
         mt_degauss, fermi_energy, &
-        dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-        dos_nlmrf_nodloglde, dos_nlrf_nodloglde)
+        dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      !
+      ! CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, &
+      !   ist_i, &
+      !   natoms, norbs, nspins, mt_ngauss, mt_rf, &
+      !   tau_cart(1 : 3, 1 : natoms), &
+      !   urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+      !   dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+      !   wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+      !   mt_degauss, fermi_energy, &
+      !   dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l
       !
       CALL set_eta(mt_nrf, irf_min, irf_max, &
         natoms, norbs, nspins, &
         dos_nlrf, dos_nrf, &
-        dos_nlrf_nodloglde, &
         dos_n, luse_tot_dos, &
-        mll1rf, mll1rf_nodloglde, &
-        etall1rf, etall1rf_nodloglde)
+        mll1rf, &
+        etall1rf)
       !
       ! Interpolate and print quantities at specified MT-radius
       !
@@ -1331,331 +1337,6 @@
     SUBROUTINE set_pet_mll1()
     !---------------------------------------------------------------------------
     !!
-    !! Computes matrix elements M_{l, l + 1}, as defined by Pettifor
-    !! in 10.1088/0305-4608/7/6/017,
-    !! on fine r grid
-    !!
-    !---------------------------------------------------------------------------
-    !
-    !  D. Radevych
-    !
-      USE kinds, ONLY: DP
-      USE uspp_param, ONLY: upf
-      USE io_global, ONLY : stdout
-      USE constants, ONLY : rytoev
-      USE const, ONLY : bohr_to_ang
-      USE ions_base, ONLY: ityp
-      USE mt_var, ONLY: ldebug, &
-        natoms, norbs, orb_label, &
-        nspins, fermi_energy, &
-        mll1rf_label, mll1rf, mll1rf_nodloglde, &
-        irf_max, &
-        mt_nrf, mt_rf, mt_rmt, &
-        vlocscr00rf, vsemilocrf, &
-        urf, loglrf, dloglderf, &
-        lhybrid
-      USE sym_type, ONLY: ist_i
-      USE constants, ONLY: eps6, eps12
-      !
-      IMPLICIT NONE
-      !
-      INTEGER :: nin
-      !! max index used for integration of u(r)
-      ! INTEGER :: imt
-      ! !! index of fine-grid point closest to r_{MT}
-      INTEGER :: iat, iorb, ispin, ir
-      !! iterators
-      ! INTEGER :: l1, l2
-      ! !! l values
-      ! INTEGER :: n1, n2
-      ! !! n values
-      REAL(DP) :: v0
-      !! V_{L=00}(r)
-      REAL(DP) :: veff
-      !! V(r) - E_F
-      REAL(DP) :: rmtf
-      !! current r_{MT} radius, on fine grid
-      REAL(DP) :: ul
-      !! u_l(r)
-      REAL(DP) :: ul1
-      !! u_l+1(r)
-      REAL(DP) :: rl
-      !! R_l(r) = u_l(r) / r
-      REAL(DP) :: rl1
-      !! R_l+1(r) = u_l+1(r) / r
-      REAL(DP) :: logl
-      !! L_l(r) = r R' / R = r u' / u - 1
-      REAL(DP) :: logl1
-      !! L_{l + 1}(r)
-      REAL(DP) :: dloglde
-      !! d L_l(r) / d e = r / u_l^2 [(d2 u / de dr) u - (d u / d r) (d u / d e)]
-      REAL(DP) :: dlogl1de
-      !! d L_{l + 1}(r) / d e
-      REAL(DP) :: mll1_at_rmt
-      !! Value of M_{l, l+1} at r_mt
-      REAL(DP) :: mll1_nodloglde_at_rmt
-      !! Value of m_{l, l+1} at r_mt
-      !
-      EXTERNAL :: errore
-      !
-      CHARACTER(len=256) :: routine_name
-      !! name of this subroutine
-      !
-      EXTERNAL :: start_clock, stop_clock
-      !
-      routine_name = "set_pet_mll1"
-      CALL start_clock(routine_name)
-      !
-      mll1rf(:, :, :, :) = 0.0_dp
-      mll1rf_nodloglde(:, :, :, :) = 0.0_dp
-      mll1rf_label(:, :, :) = "?????"
-      v0 = 0.0_dp
-      !
-      nin = irf_max
-      !
-      IF (lhybrid) THEN
-        WRITE(stdout, '(/5x, /5x, /5x, &
-          & ">>>>>>>>>>>>  HYBRID BEGIN  <<<<<<<<<<<<")')
-      ELSE
-        WRITE(stdout, '(/5x, /5x, /5x, &
-          & ">>>>>>>>>>>> PETTIFOR BEGIN <<<<<<<<<<<<")')
-      END IF
-      !
-      !
-      DO iat = 1, natoms
-        !
-        WRITE(stdout, '(/7x, "Atom # ", I0, A4, &
-          & " ==============================================================")') &
-          iat, upf(ityp(iat))%psd
-        rmtf = mt_rf(mt_nrf, ist_i(iat))
-        WRITE(stdout, '(/7x, "Desired r_mt: ", F10.4)') mt_rmt(ist_i(iat))
-        WRITE(stdout, '(/7x, "Actual r_mt: ", F10.4)') rmtf
-        !
-        DO ispin = 1, nspins
-          !
-          WRITE(stdout, '(/7x, A, I3, A, I3)') &
-              "atom: ", iat, " spin: ", ispin
-          !
-          ! interpolate veff
-          !
-          v0 = vlocscr00rf(mt_nrf, ispin, iat)
-          !
-          ! TODO 2025/04/18: try to use rmta_vlocscrrf - DR: bad idea
-          !
-          veff = v0 - fermi_energy(ispin)
-          !
-          WRITE(stdout, '(/7x, A, F16.8, A)') &
-            "E_F", fermi_energy(ispin), " (Ry)"
-          WRITE(stdout, '(7x, A, F16.8, A)') &
-            "V(r_mt)", v0, " (Ry)"
-          WRITE(stdout, '(7x, A, F16.8, A)') &
-           "V(r_mt) - E_F", veff, " (Ry)"
-          !
-          !
-          DO iorb = 1, norbs - 1
-            !
-            mll1rf_label(iorb, ispin, iat) = &
-              orb_label(iorb) // &
-              orb_label(iorb + 1)
-            !
-            DO ir = 1, nin
-              !
-              v0 = vlocscr00rf(ir, ispin, iat)
-              !
-              ! TODO 2025/04/18: try to use rmta_vlocscrrf - DR: bad idea
-              !
-              ! v0 = rmta_vlocscrrf(ir, ispin, iat)
-              !
-              !
-              ! need to add 1 / 2 [V_l + V_l+1],
-              ! although it is zero at r_mt
-              !
-              v0 = v0 + &
-                0.5_dp * (vsemilocrf(ir, iorb, iat) + &
-                vsemilocrf(ir, iorb + 1, iat))
-              !
-              veff = v0 - fermi_energy(ispin)
-              rmtf = mt_rf(ir, ist_i(iat))
-              !
-              logl = loglrf(ir, iorb, ispin, iat)
-              dloglde = dloglderf(ir, iorb, ispin, iat)
-              !
-              !
-              ! WRITE(*, *) "logl == ", logl
-              ! WRITE(*, *) "dloglde == ", dloglde
-              !
-              logl1 = loglrf(ir, iorb + 1, ispin, iat)
-              dlogl1de = dloglderf(ir, iorb + 1, ispin, iat)
-              !
-              !
-              ! WRITE(*, *) "logl1 == ", logl1
-              ! WRITE(*, *) "dlogl1de == ", dlogl1de
-              !
-              !
-              IF (ABS(rmtf) > eps12) THEN
-                !
-                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
-                  veff * rmtf * rmtf - &
-                  (logl - (iorb - 1)) * (logl1 + (iorb - 1) + 2)
-                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
-                  mll1rf_nodloglde(ir, iorb, ispin, iat) / rmtf
-                !
-                IF (ABS(dloglde) > eps12 .AND. &
-                  ABS(dlogl1de) > eps12 .AND. &
-                  (dloglde * dlogl1de > 0.0_dp)) THEN
-                  !
-                  mll1rf(ir, iorb, ispin, iat) = &
-                    mll1rf_nodloglde(ir, iorb, ispin, iat)
-                  mll1rf(ir, iorb, ispin, iat) = &
-                    mll1rf(ir, iorb, ispin, iat) / &
-                    SQRT(ABS(dloglde * dlogl1de))
-                  !
-                ELSE
-                  !
-                  IF (ir == nin) THEN
-                    !
-                    IF (ABS(dloglde) <= eps12) THEN
-                      CALL errore(routine_name, &
-                        "dloglde is close to zero at rmt", 1)
-                    ELSE IF (ABS(dlogl1de) <= eps12) THEN
-                      CALL errore(routine_name, &
-                        "dlogl1de is close to zero at rmt", 1)
-                    ELSE IF (dloglde * dlogl1de <= 0.0_dp) THEN
-                      WRITE(stdout, '(/5x, &
-                        & "WARNING: dloglde * dlogl1de <= 0 at rmt")')
-                      WRITE(stdout, '(6x, "dloglde = ", F0.16)') dloglde
-                      WRITE(stdout, '(6x, "dlogl1de = ", F0.16)') dlogl1de
-                      CALL errore(routine_name, &
-                        "dloglde * dlogl1de <= 0", 1)
-                    ELSE
-                      CALL errore(routine_name, &
-                        "problem with dloglde or dlogl1de", 1)
-                    END IF
-                    !
-                  END IF
-                  !
-                END IF
-                !
-              ELSE
-                !
-                IF (ir == nin) &
-                  CALL errore(routine_name, "rmtf is close to zero", 1)
-                !
-              END IF
-              !
-              !
-            END DO ! ir
-            !
-            !
-            ! at rmtf
-            !
-            rmtf = mt_rf(mt_nrf, ist_i(iat))
-            !
-            ul = urf(mt_nrf, iorb, ispin, iat)
-            ul1 = urf(mt_nrf, iorb + 1, ispin, iat)
-            rl = ul / rmtf
-            rl1 = ul1 / rmtf
-            logl = loglrf(mt_nrf, iorb, ispin, iat)
-            logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
-            dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
-            dlogl1de = dloglderf(mt_nrf, iorb + 1, ispin, iat)
-            !
-            WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
-              "u_", iorb - 1, "(r_mt) = ", ul
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "R_", iorb - 1, "(r_mt) = ", rl
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "L_", iorb - 1, "(r_mt) = ", logl
-            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
-              "dL_", iorb - 1, "(r_mt) / de = ", dloglde, " (1 / Ry)"
-            !
-            IF (ABS(ul) < eps12) THEN
-              WRITE(stdout, '(5x, "WARNING: u_", I0, & 
-                & "(r) at rmt is close to zero")') & 
-                iorb - 1
-              ! CALL errore(routine_name, "Adjust rmt.", 1)
-            END IF
-            !
-            WRITE(stdout, '(/7x, A, I1, A, F16.8)') &
-              "u_", iorb, "(r_mt) = ", ul1
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "R_", iorb, "(r_mt) = ", rl1
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "L_", iorb, "(r_mt) = ", logl1
-            WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
-              "dL_", iorb, "(r_mt) / de = ", dlogl1de, " (1 / Ry)"
-            !
-            IF (ABS(ul1) < eps12) THEN
-              WRITE(stdout, '(5x, "WARNING: u_", I0, &
-                & "(r) at rmt is close to zero")') & 
-                iorb
-              ! CALL errore(routine_name, "Adjust rmt.", 1)
-            END IF
-            !
-            !
-            !
-            IF (ldebug) THEN
-              mll1_nodloglde_at_rmt = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
-              WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
-                " m_", mll1rf_label(iorb, ispin, iat), &
-                "(",  rmtf, "):", &
-                mll1_nodloglde_at_rmt, &
-                " "
-            END IF ! ldebug
-            !
-            mll1_at_rmt = mll1rf(mt_nrf, iorb, ispin, iat)
-            !
-            WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
-              " M_", mll1rf_label(iorb, ispin, iat), &
-              "(",  rmtf, "):", &
-              mll1_at_rmt, &
-              " (Ry / bohr)"
-            WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
-              " M^2_", mll1rf_label(iorb, ispin, iat), &
-              "(",  rmtf, "):", &
-              mll1_at_rmt * &
-              mll1_at_rmt, &
-              " (Ry / bohr)^2"
-            !
-            WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
-              " M_", mll1rf_label(iorb, ispin, iat), &
-              "(",  rmtf, "):", &
-              mll1_at_rmt * &
-              (rytoev / bohr_to_ang), &
-              " (eV / A)"
-            WRITE(stdout, '(7x, A10, A, A, F16.8, A, F16.8, A)') &
-              " M^2_", mll1rf_label(iorb, ispin, iat), &
-              "(",  rmtf, "):", &
-              mll1_at_rmt * &
-              mll1_at_rmt * &
-              (rytoev / bohr_to_ang)**2, &
-              " (eV / A)^2"
-            !
-            WRITE(stdout, '("")')
-            !
-          END DO ! iorb
-        END DO ! ispin
-      END DO ! iat
-      !
-      IF (lhybrid) THEN
-        WRITE(stdout, &
-        '(/5x, ">>>>>>>>>>>>   HYBRID END   <<<<<<<<<<<<", /5x, /5x, /5x)')
-      ELSE
-        WRITE(stdout, &
-        '(/5x, ">>>>>>>>>>>>  PETTIFOR END  <<<<<<<<<<<<", /5x, /5x, /5x)')
-      END IF
-      !
-      CALL stop_clock(routine_name)
-      !
-    !---------------------------------------------------------------------------
-    END SUBROUTINE set_pet_mll1
-    !---------------------------------------------------------------------------
-    !
-    !
-    !---------------------------------------------------------------------------
-    SUBROUTINE set_pet_mll1_form2()
-    !---------------------------------------------------------------------------
-    !!
     !! Computes matrix elements M_{l, l + 1} through an expanded expression
     !! avoiding divisions by u(r)
     !!
@@ -1672,7 +1353,7 @@
       USE mt_var, ONLY: ldebug, &
         natoms, norbs, orb_label, &
         nspins, fermi_energy, &
-        mll1rf_label, mll1rf, mll1rf_nodloglde, &
+        mll1rf_label, mll1rf, &
         irf_max, &
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
@@ -1738,8 +1419,6 @@
       ! !! d L_{l + 1}(r) / d e
       REAL(DP) :: mll1_at_rmt
       !! Value of M_{l, l+1} at r_mt
-      REAL(DP) :: mll1_nodloglde_at_rmt
-      !! Value of m_{l, l+1} at r_mt
       !
       EXTERNAL :: errore
       !
@@ -1748,11 +1427,10 @@
       !
       EXTERNAL :: start_clock, stop_clock
       !
-      routine_name = "set_pet_mll1_form2"
+      routine_name = "set_pet_mll1"
       CALL start_clock(routine_name)
       !
       mll1rf(:, :, :, :) = zero
-      mll1rf_nodloglde(:, :, :, :) = zero
       mll1rf_label(:, :, :) = "?????"
       v0 = zero
       !
@@ -1838,12 +1516,6 @@
               !
               IF (ABS(r) > eps12) THEN
                 !
-                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
-                  veff * r * r - &
-                  (logl - l) * (logl1 + l + 2)
-                mll1rf_nodloglde(ir, iorb, ispin, iat) = &
-                  mll1rf_nodloglde(ir, iorb, ispin, iat) / r
-                !
                 ul = urf(ir, iorb, ispin, iat)
                 ul1 = urf(ir, iorb + 1, ispin, iat)
                 duldr = dudrrf(ir, iorb, ispin, iat)
@@ -1916,8 +1588,10 @@
               "u_", iorb - 1, "(r_mt) = ", ul
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb - 1, "(r_mt) = ", rl
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "W_", iorb - 1, "(r_mt) = ", wl
+            IF (ldebug) THEN
+              WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+                "W_", iorb - 1, "(r_mt) = ", wl
+            END IF ! ldebug
             ! WRITE(stdout, '(7x, A, I1, A, F16.8)') &
             !   "L_", iorb - 1, "(r_mt) = ", logl
             ! WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
@@ -1934,8 +1608,10 @@
               "u_", iorb, "(r_mt) = ", ul1
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb, "(r_mt) = ", rl1
-            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
-              "W_", iorb, "(r_mt) = ", wl1
+            IF (ldebug) THEN
+              WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+                "W_", iorb, "(r_mt) = ", wl1
+            END IF ! ldebug
             ! WRITE(stdout, '(7x, A, I1, A, F16.8)') &
             !   "L_", iorb, "(r_mt) = ", logl1
             ! WRITE(stdout, '(7x, A, I1, A, F16.8, A)') &
@@ -1949,15 +1625,6 @@
             END IF
             !
             !
-            !
-            IF (ldebug) THEN
-              mll1_nodloglde_at_rmt = mll1rf_nodloglde(mt_nrf, iorb, ispin, iat)
-              WRITE(stdout, '(/7x, A10, A, A, F16.8, A, F16.8, A)') &
-                " m_", mll1rf_label(iorb, ispin, iat), &
-                "(",  rmtf, "):", &
-                mll1_nodloglde_at_rmt, &
-                " "
-            END IF ! ldebug
             !
             mll1_at_rmt = mll1rf(mt_nrf, iorb, ispin, iat)
             !
@@ -1999,7 +1666,7 @@
       CALL stop_clock(routine_name)
       !
     !---------------------------------------------------------------------------
-    END SUBROUTINE set_pet_mll1_form2
+    END SUBROUTINE set_pet_mll1
     !---------------------------------------------------------------------------
     !
     !

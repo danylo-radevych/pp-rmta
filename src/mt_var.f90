@@ -48,12 +48,11 @@
       vlocscrg3d, mt_g, vlocscfg3d, &
       vsemilocr, vsemilocrf, urf, duderf, dudrrf, &
       d2udrderf, &
-      mll1rf_label, mll1rf, mll1rf_nodloglde, &
+      mll1rf_label, mll1rf, &
       vfullrf, rvfullrf, &
       irf_min, irf_max, &
       dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
-      dos_nlmrf_nodloglde, dos_nlrf_nodloglde, &
-      etall1rf, etall1rf_nodloglde, &
+      etall1rf, &
       loglrf, dloglderf, &
       luse_ref_pot, luse_tot_dos, &
       rmta_routine, rmta_code, &
@@ -250,11 +249,6 @@
     !! computed matrix elements M_{l, l + 1},
     !! as defined by Pettifor,
     !! on fine r grid
-    REAL(DP), ALLOCATABLE :: mll1rf_nodloglde(:, :, :, :)
-    !! mll1rf_nodloglde(mt_nrf, norbs, nspins, natoms)
-    !! computed matrix elements M_{l, l + 1},
-    !! not reduced by normalization integrals,
-    !! on fine r grid
     REAL(DP), ALLOCATABLE :: vfullrf(:, :, :, :)
     !! vfullrf(mt_nrf, norbs, nspins, natoms)
     !! total potential V(r) on fine grid
@@ -270,20 +264,10 @@
     REAL(DP), ALLOCATABLE :: dos_nrf(:, :, :)
     !! total partial densities n^i(r, E_F)
     !! dos_nrf(nr, nspins, natoms), per atom, per spin
-    REAL(DP), ALLOCATABLE :: dos_nlmrf_nodloglde(:, :, :, :)
-    !! reduced by dloglde partial densities n^i_{lm}(r, E_F)
-    !! dos_nlmrf(nr, (lmax + 1)**2, norbs, nspins, natoms)
-    REAL(DP), ALLOCATABLE :: dos_nlrf_nodloglde(:, :, :, :)
-    !! reduced by dloglde partial densities n^i_{l}(r, E_F)
-    !! dos_nlrf(nr, norbs, nspins, natoms)
     REAL(DP), ALLOCATABLE :: etall1rf(:, :, :, :)
     !! etall1rf(mt_nrf, norbs, nspins, natoms)
     !! McMillan-Hopfield \eta_l,
     !! on fine r grid
-    REAL(DP), ALLOCATABLE :: etall1rf_nodloglde(:, :, :, :)
-    !! etall1rf_nodloglde(mt_nrf, norbs, nspins, natoms)
-    !! McMillan-Hopfield \eta_l,
-    !! on fine r grid, calculated without normalization integrals
     REAL(DP), ALLOCATABLE :: wrf(:, :, :, :)
     !! wrf(mt_nrf, norbs, nspins, natoms)
     !! Wronskians, or normalization integrals
@@ -1384,12 +1368,6 @@
         CALL errore(routine_name, "Error allocating mll1rf", 1)
       mll1rf(:, :, :, :) = zero
       !
-      ALLOCATE(mll1rf_nodloglde(mt_nrf, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating mll1rf_nodloglde", 1)
-      mll1rf_nodloglde(:, :, :, :) = zero
-      !
       ALLOCATE(mll1rf_label(norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
@@ -1419,29 +1397,12 @@
         CALL errore(routine_name, 'Error allocating dos_n', 1)
       dos_n(:) = zero
       !
-      ALLOCATE(dos_nlmrf_nodloglde(1 : irf_delta + 1, &
-        (rmta_lmax + 1) * (rmta_lmax + 1), nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, 'Error allocating dos_nlmrf_nodloglde', 1)
-      dos_nlmrf_nodloglde(:, :, :, :) = zero
-      !
-      ALLOCATE(dos_nlrf_nodloglde(1 : irf_delta + 1, &
-        norbs, nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, 'Error allocating dos_nlrf_nodloglde', 1)
-      dos_nlrf_nodloglde(:, :, :, :) = zero
-      !
       ALLOCATE(etall1rf(1 : irf_delta + 1, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
         CALL errore(routine_name, "Error allocating etall1rf", 1)
       etall1rf(:, :, :, :) = zero
       !
-      ALLOCATE(etall1rf_nodloglde(1 : irf_delta + 1, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating etall1rf_nodloglde", 1)
-      etall1rf_nodloglde(:, :, :, :) = zero
       !
       ! V_SL
       !
@@ -1619,10 +1580,6 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating mll1rf', 1)
       !
-      DEALLOCATE(mll1rf_nodloglde, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating mll1rf_nodloglde', 1)
-      !
       DEALLOCATE(mll1rf_label, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
           'Error deallocating mll1rf_label', 1)
@@ -1658,21 +1615,9 @@
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating dos_n', 1)
       !
-      DEALLOCATE(dos_nlmrf_nodloglde, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating dos_nlmrf_nodloglde', 1)
-      !
-      DEALLOCATE(dos_nlrf_nodloglde, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating dos_nlrf_nodloglde', 1)
-      !
       DEALLOCATE(etall1rf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating etall1rf', 1)
-      !
-      DEALLOCATE(etall1rf_nodloglde, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating etall1rf_nodloglde', 1)
       !
       DEALLOCATE(wrf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
