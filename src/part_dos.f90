@@ -348,7 +348,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_n(ltetra, nr, imin, imax, stp, nat, norb, &
+    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, dloglde, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n, &
@@ -482,8 +482,6 @@
       !! constant prefactor for partial DOS
       REAL(DP) :: prefactor
       !! common prefactor for given rmt, atom, and l
-      REAL(DP) :: prefactor_tot_dos
-      !! constant prefactor for total DOS
       REAL(DP) :: prefactor_nodloglde
       !! reduced by dloglde common prefactor for given rmt, atom, and l
       REAL(DP) :: rvec_cart(3)
@@ -503,8 +501,6 @@
       !! sum of all k-point and band weights (ltetra = .true.)
       REAL(DP) :: psi_kg_norm
       !! norm of psi(k + G) coefficients
-      REAL(DP) :: avg_dos_per_spin
-      !! average of the total DOS for both spins
       REAL(DP), ALLOCATABLE :: gp_vec(:, :)
       !! unit vectors for Gauss integration
       REAL(DP), ALLOCATABLE :: gp_wt(:)
@@ -551,7 +547,7 @@
       !
       !
       !
-      routine_name = "set_dos_n"
+      routine_name = "set_dos_nlm"
       CALL start_clock(routine_name)
       !
       IF (ltetra) THEN
@@ -686,17 +682,14 @@
       ! spin!
       IF (ltetra) THEN
         prefactor_part_dos = 1._dp / omega
-        prefactor_tot_dos = 1._dp / nat
         !
         If (nspin == 1) THEN
           prefactor_part_dos = prefactor_part_dos / 2._dp
-          prefactor_tot_dos = prefactor_tot_dos / 2._dp
         END IF
         !
       ELSE
         ! times nspin to compensate sum_wk = 2
         prefactor_part_dos = 1._dp / omega / sum_wk * nspin
-        prefactor_tot_dos = 1._dp / sum_wk / nat * nspin
       END IF
       !
       !
@@ -1103,10 +1096,122 @@
       IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_wt', 1)
       !
       !
+      ! total DOS
+      CALL set_dos_n(ltetra, nat, nspin, ngauss, degauss, &
+        sum_wk, efermi, wdk, dos_n)
+      !
+      !
+      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
+        & /5x, /5x, /5x)')
+      !
+      IF (ltetra) THEN
+        !
+        DEALLOCATE(wdk, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
+        !
+      END IF
+      !
+      CALL stop_clock(routine_name)
+      !
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE set_dos_nlm
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE set_dos_n(ltetra, nat, &
+      nspin, ngauss, degauss, sum_wk, efermi, wdk, dos_n)
+    !---------------------------------------------------------------------------
+    !!
+    !! Computes total densities n at Fermi level, normalized per atom per spin
+    !! To be executed inside set_dos_nlm
+    !!
+    !---------------------------------------------------------------------------
+    !
+    !  D. Radevych
+    !
+      USE io_global, ONLY: stdout
+      USE constants, ONLY: tpi, eps32, eps6, eps4
+      USE const, ONLY: zero
+      USE cell_base, ONLY: omega
+      USE parameters, ONLY: npk
+      USE klist, ONLY: xk, nkstot, ngk, wk, igk_k ! two_fermi_energies
+      USE wvfct, ONLY: et, nbnd
+      USE io_files, ONLY: restart_dir
+      USE pw_restart_new, ONLY: read_collected_wfc
+      USE gvect, ONLY: g ! mill, gl, ngl
+      USE symm_base, ONLY: nrot, irt
+      USE lsda_mod, ONLY: isk
+      USE const, ONLY: zero, one, two, half
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore, start_clock, stop_clock, cryst_to_cart
+      REAL(DP), EXTERNAL :: w0gauss
+      ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
+      !
+      LOGICAL, INTENT(in) :: ltetra
+      !! if true, use tetrahedron method
+      INTEGER, INTENT(in) :: nat
+      !! number of atoms
+      INTEGER, INTENT(in) :: nspin
+      !! number of spins
+      INTEGER, INTENT(in) :: ngauss
+      !! type of delta-function
+      REAL(DP), INTENT(in) :: degauss
+      !! smearing value
+      REAL(DP), INTENT(in) :: sum_wk
+      !! sum of all k-point weights
+      REAL(DP), INTENT(in) :: efermi(:)
+      !! Fermi energy
+      !
+      REAL(DP), INTENT(inout) :: wdk(:, :)
+      !! tetrahedron weights for integration with the delta-function
+      REAL(DP), INTENT(inout) :: dos_n(:)
+      !! total DOS at the Fermi level n(E_F), per atom per spin
+      !! dos_n(nspin)
+      !
+      ! local variables
+      !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      LOGICAL :: lspeedup = .TRUE.
+      !! if true, ignore bands far on the tails of the delta-function
+      !! (should be done)
+      LOGICAL :: lselect
+      !! auxiliary flag to include specific bands in integration
+      INTEGER :: ispin, ik, ibnd
+      !! iterators
+      REAL(DP) :: deltaf
+      !! current value of Dirac-delta function
+      REAL(DP) :: prefactor_tot_dos
+      !! constant prefactor for total DOS
+      REAL(DP) :: avg_dos_per_spin
+      !
+      !
+      routine_name = "set_dos_n"
+      CALL start_clock(routine_name)
+      !
+      !
+      ! spin!
+      IF (ltetra) THEN
+        prefactor_tot_dos = one / nat
+        !
+        If (nspin == 1) THEN
+          prefactor_tot_dos = prefactor_tot_dos / two
+        END IF
+        !
+      ELSE
+        ! times nspin to compensate sum_wk = 2
+        prefactor_tot_dos = one / sum_wk / nat * nspin
+      END IF
+      !
+      !
       WRITE(stdout, &
         '(/6x, "Computing total DOS per atom per spin = f(spin, E_F)...")')
       !
-      dos_n(:) = 0._dp
+      dos_n(:) = zero
       !
       DO ispin = 1, nspin
           !
@@ -1152,7 +1257,7 @@
       ! averaging of total DOS per spin
       !
       IF (nspin == 2) THEN
-        avg_dos_per_spin = 0.5_dp * (dos_n(1) + dos_n(2))
+        avg_dos_per_spin = half * (dos_n(1) + dos_n(2))
         dos_n(1) = avg_dos_per_spin
         dos_n(2) = avg_dos_per_spin
       END IF
@@ -1161,15 +1266,6 @@
         '(6x, "Done computing total DOS", &
         & " per atom per spin = f(spin, E_F).", /6x, /6x)')
       !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
-        & /5x, /5x, /5x)')
-      !
-      IF (ltetra) THEN
-        !
-        DEALLOCATE(wdk, STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
-        !
-      END IF
       !
       CALL stop_clock(routine_name)
       !
