@@ -75,7 +75,7 @@ recalculated from `chi` functions and `beta` projectors.
 | `LOGICAL`    | `lrmt`       | `.false.` | if `.true.`, read MT radii for each atom, specified in the `rmt(:)` array, from input; if `.false.`, calculate MT radii automatically with one of the methods specified in `rmt_method`, without reading `rmt(:)` |
 | `LOGICAL`    | `ltetra`     | `.true.`  | if `.true.`, use tetrhedron method for partial DOS integration; if `.false.`, use delta-function smearing set by `ngauss` and `degauss` |
 | `LOGICAL`    | `lwrite_dat` | `.false.` | if `.true.`, write spherical potentials and radial functions in `*.dat` files for subsequent plotting with the `plot_lwrite_dat.py` script (not required) |
-| `LOGICAL`    | `lhybrid`    | `.false.` | if `.true.`, evaulate radial integrals of u^2(r, e) explicitly; if `.false.`, evaluate them through the derivatives of u(r, e) |
+| `LOGICAL`    | `lhybrid`    | `.true.` | if `.true.`, evaulate radial integrals of u^2(r, e) explicitly; if `.false.`, evaluate them through the derivatives of u(r, e) |
 | `INTEGER`    | `ngauss`     | `-99`     | delta-function smearing for partial DOS integration: `-99` Fermi-Dirac; `0` Gauss; `1` MP; see `ltetra`, `degauss` |
 | `REAL`       | `degauss`    | `0.001`   | smearing degauss value in Ry; see `ltetra`, `ngauss` |
 | `REAL`       | `rmt(:)`     | `-1.0`    | MT radii of each atom in bohr; when `lrmt == .false.`, defaults to MT radii calculated with a method in `rmt_method`; if MT radii of any two atoms of the same symmetry type are different or atomic spheres overlap, the code stops |

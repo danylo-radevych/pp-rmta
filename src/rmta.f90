@@ -155,7 +155,7 @@
     !
     ldebug = .FALSE.
     ltetra = .TRUE.
-    lhybrid = .FALSE.
+    lhybrid = .TRUE.
     lnonlocal = .FALSE. ! non-local form is not functional at this point
     lsemiloc = .TRUE.
     luse_ref_pot = .FALSE. ! only for debug with FLAPW potential
