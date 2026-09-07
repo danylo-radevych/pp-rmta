@@ -364,19 +364,15 @@
     !
       USE io_global, ONLY: stdout
       USE constants, ONLY: tpi, eps32, eps6, eps4
-      USE const, ONLY: zero
       USE cell_base, ONLY: tpiba, omega
       USE parameters, ONLY: npk
       USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
       USE wvfct, ONLY: npwx, et, nbnd
-      ! USE wavefunctions, ONLY: evc
       USE io_files, ONLY: restart_dir
       USE pw_restart_new, ONLY: read_collected_wfc
       USE gvect, ONLY: g ! mill, gl, ngl
-      USE symm_base, ONLY: nrot, irt, nosym
+      USE symm_base, ONLY: nosym
       USE lsda_mod, ONLY: isk
-      ! USE lsda_mod, ONLY: nspin, isk, current_spin ! TODO
-      ! USE ener, ONLY : ef
       USE const, ONLY: zero, one, two
       !
       IMPLICIT NONE
@@ -449,15 +445,11 @@
       !! (should be done)
       LOGICAL :: lselect
       !! auxiliary flag to include specific bands in integration
-      LOGICAL :: lfound
-      !! flag, if found
       LOGICAL :: lsymmetrize = .TRUE.
       !! symmatrize partial DOS
-      LOGICAL :: lcheck_sym = .TRUE.
-      !! check symmetry relations
       INTEGER :: ierr
       !! error code
-      INTEGER :: iat, jat, iorb, im, ir, ispin, igp, ik, ig, ibnd, irot
+      INTEGER :: iat, iorb, im, ir, ispin, igp, ik, ig, ibnd
       !! iterators
       INTEGER :: lmax
       !! max angular momentum
@@ -475,8 +467,6 @@
       !! l0
       INTEGER :: m
       !! current m quantum number
-      INTEGER, ALLOCATABLE :: counters(:)
-      !! counters on number of equivalent sites
       REAL(DP) :: deltaf
       !! current value of Dirac-delta function
       REAL(DP) :: prefactor_part_dos
@@ -508,26 +498,6 @@
       !! weights for Gauss integration
       REAL(DP), ALLOCATABLE :: wdk(:, :)
       !! tetrahedron weights for integration with the delta-function
-      REAL(DP), ALLOCATABLE :: dos_nlmr_sym(:, :, :, :)
-      !! symmetrized partial densities n**i_{lm}(r, E_F)
-      !! for a specific atom
-      !! dos_nlmr_sym(nr, 2 * lmax + 1, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), ALLOCATABLE :: dos_nlr_sym(:, :, :, :)
-      !! symmetrized  partial densities n**i_{l}(r, E_F)
-      !! for a specific atom
-      !! dos_nlr_sym(nr, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), ALLOCATABLE :: dos_nlmr_nodloglde_sym(:, :, :, :)
-      !! reduced by dloglde symmetrized partial densities n**i_{lm}(r, E_F)
-      !! for a specific atom
-      !! dos_nlmr_sym(nr, 2 * lmax + 1, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), ALLOCATABLE :: dos_nlr_nodloglde_sym(:, :, :, :)
-      !! reduced by dloglde symmetrized  partial densities n**i_{l}(r, E_F)
-      !! for a specific atom
-      !! dos_nlr_sym(nr, norb, nspin, nat)
-      !! lmax = norb - 1
       COMPLEX(DP) :: cnr_aux
       !! complex version of partial DOS on r grid
       COMPLEX(DP), ALLOCATABLE :: psi_kg(:, :, :)
@@ -570,7 +540,6 @@
         CALL errore(routine_name, "imax > nr", 1)
       !
       lsymmetrize = (.NOT. nosym)
-      lcheck_sym = (.NOT. nosym)
       !
       WRITE(stdout, '(/5x, ">>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<")')
       !
@@ -913,6 +882,166 @@
       END DO ! iat
       !
       !
+      CALL symmetrize_dos_nlm(imin, imax, nat, norb, nspin, &
+        dos_nlmr, dos_nlr, dos_nr, &
+        dos_nlmr_nodloglde, dos_nlr_nodloglde)
+      !
+      !
+      WRITE(stdout, '(6x, "Done computing partial DOS per atom per spin", &
+        & " = f(r, E_F).", /6x, /6x)')
+      !
+      !
+      ! clean-up
+      !
+      DEALLOCATE(psi_krtau_aux, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating psi_krtau_aux', 1)
+      !
+      DEALLOCATE(ylm, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating ylm', 1)
+      !
+      DEALLOCATE(psi_kg, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating psi_kg', 1)
+      !
+      DEALLOCATE(gp_vec, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_vec', 1)
+      !
+      DEALLOCATE(gp_wt, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_wt', 1)
+      !
+      !
+      ! total DOS
+      CALL set_dos_n(ltetra, nat, nspin, ngauss, degauss, &
+        sum_wk, efermi, wdk, dos_n)
+      !
+      !
+      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
+        & /5x, /5x, /5x)')
+      !
+      IF (ltetra) THEN
+        !
+        DEALLOCATE(wdk, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
+        !
+      END IF
+      !
+      CALL stop_clock(routine_name)
+      !
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE set_dos_nlm
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE symmetrize_dos_nlm(imin, imax, nat, norb, &
+      nspin, &
+      dos_nlmr, dos_nlr, dos_nr, &
+      dos_nlmr_nodloglde, dos_nlr_nodloglde)
+    !---------------------------------------------------------------------------
+    !!
+    !! Symmetrize partial densities n at Fermi level for each atom i,
+    !! spin s, and angular L = l, m on a range of r-indices [nmin, nmax].
+    !! To be executed inside set_dos_nlm
+    !!
+    !---------------------------------------------------------------------------
+    !
+    !  D. Radevych
+    !
+      USE io_global, ONLY: stdout
+      USE constants, ONLY: tpi, eps32, eps6, eps4
+      USE symm_base, ONLY: nrot, irt, nosym
+      USE const, ONLY: zero, one, two
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore, start_clock, stop_clock, cryst_to_cart
+      REAL(DP), EXTERNAL :: w0gauss
+      ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
+      !
+      INTEGER, INTENT(in) :: imin
+      !! min index of the radial point for partial DOS
+      !! partial DOS for ir < nmin will be left zero
+      INTEGER, INTENT(in) :: imax
+      !! max index of the radial point for partial DOS
+      !! partial DOS for ir > nmax will be left zero
+      INTEGER, INTENT(in) :: nat
+      !! number of atoms
+      INTEGER, INTENT(in) :: norb
+      !! number of orbitals
+      INTEGER, INTENT(in) :: nspin
+      !! number of spins
+      !
+      REAL(DP), INTENT(inout) :: dos_nlmr(:, :, :, :)
+      !! partial densities n**i_{lm}(r, E_F)
+      !! dos_nlmr(nr, (lmax + 1)**2, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nlr(:, :, :, :)
+      !! partial densities n**i_{l}(r, E_F)
+      !! dos_nlr(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nr(:, :, :)
+      !! partial densities n**i(r, E_F), per atom, per spin
+      !! dos_nr(nr, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nlmr_nodloglde(:, :, :, :)
+      !! reduced by dloglde partial densities n**i_{lm}(r, E_F)
+      !! dos_nlmr(nr, (lmax + 1)**2, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), INTENT(inout) :: dos_nlr_nodloglde(:, :, :, :)
+      !! reduced by dloglde partial densities n**i_{l}(r, E_F)
+      !! dos_nlr(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      !
+      ! local variables
+      !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      LOGICAL :: lfound
+      !! flag, if found
+      LOGICAL :: lsymmetrize = .TRUE.
+      !! symmatrize partial DOS
+      INTEGER :: ierr
+      !! error code
+      INTEGER :: iat, jat, iorb, im, ir, ispin, irot
+      !! iterators
+      INTEGER :: l0, l, m
+      !! orbital quantum numbers
+      INTEGER :: lmax
+      !! max angular momentum
+      INTEGER, ALLOCATABLE :: counters(:)
+      !! counters on number of equivalent sites
+      REAL(DP), ALLOCATABLE :: dos_nlmr_sym(:, :, :, :)
+      !! symmetrized partial densities n**i_{lm}(r, E_F)
+      !! for a specific atom
+      !! dos_nlmr_sym(nr, 2 * lmax + 1, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), ALLOCATABLE :: dos_nlr_sym(:, :, :, :)
+      !! symmetrized  partial densities n**i_{l}(r, E_F)
+      !! for a specific atom
+      !! dos_nlr_sym(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), ALLOCATABLE :: dos_nlmr_nodloglde_sym(:, :, :, :)
+      !! reduced by dloglde symmetrized partial densities n**i_{lm}(r, E_F)
+      !! for a specific atom
+      !! dos_nlmr_sym(nr, 2 * lmax + 1, norb, nspin, nat)
+      !! lmax = norb - 1
+      REAL(DP), ALLOCATABLE :: dos_nlr_nodloglde_sym(:, :, :, :)
+      !! reduced by dloglde symmetrized  partial densities n**i_{l}(r, E_F)
+      !! for a specific atom
+      !! dos_nlr_sym(nr, norb, nspin, nat)
+      !! lmax = norb - 1
+      !
+      !
+      !
+      routine_name = "symmetrize_dos_nlm"
+      CALL start_clock(routine_name)
+      !
+      lsymmetrize = (.NOT. nosym)
+      lmax = norb - 1
+      !
+      !
+      !
       IF (lsymmetrize) THEN
         !
         WRITE(stdout, &
@@ -1071,52 +1200,12 @@
         !
       END IF ! lsymmetrize
       !
-
-      !
-      !
-      WRITE(stdout, '(6x, "Done computing partial DOS per atom per spin", &
-        & " = f(r, E_F).", /6x, /6x)')
-      !
-      !
-      ! clean-up
-      !
-      DEALLOCATE(psi_krtau_aux, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating psi_krtau_aux', 1)
-      !
-      DEALLOCATE(ylm, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating ylm', 1)
-      !
-      DEALLOCATE(psi_kg, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating psi_kg', 1)
-      !
-      DEALLOCATE(gp_vec, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_vec', 1)
-      !
-      DEALLOCATE(gp_wt, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_wt', 1)
-      !
-      !
-      ! total DOS
-      CALL set_dos_n(ltetra, nat, nspin, ngauss, degauss, &
-        sum_wk, efermi, wdk, dos_n)
-      !
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
-        & /5x, /5x, /5x)')
-      !
-      IF (ltetra) THEN
-        !
-        DEALLOCATE(wdk, STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
-        !
-      END IF
       !
       CALL stop_clock(routine_name)
       !
       !
     !---------------------------------------------------------------------------
-    END SUBROUTINE set_dos_nlm
+    END SUBROUTINE symmetrize_dos_nlm
     !---------------------------------------------------------------------------
     !
     !
@@ -1135,14 +1224,11 @@
       USE io_global, ONLY: stdout
       USE constants, ONLY: tpi, eps32, eps6, eps4
       USE const, ONLY: zero
-      USE cell_base, ONLY: omega
       USE parameters, ONLY: npk
-      USE klist, ONLY: xk, nkstot, ngk, wk, igk_k ! two_fermi_energies
+      USE klist, ONLY: nkstot, wk
       USE wvfct, ONLY: et, nbnd
       USE io_files, ONLY: restart_dir
       USE pw_restart_new, ONLY: read_collected_wfc
-      USE gvect, ONLY: g ! mill, gl, ngl
-      USE symm_base, ONLY: nrot, irt
       USE lsda_mod, ONLY: isk
       USE const, ONLY: zero, one, two, half
       !
