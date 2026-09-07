@@ -377,6 +377,7 @@
       USE lsda_mod, ONLY: isk
       ! USE lsda_mod, ONLY: nspin, isk, current_spin ! TODO
       ! USE ener, ONLY : ef
+      USE const, ONLY: zero, one, two
       !
       IMPLICIT NONE
       !
@@ -621,7 +622,7 @@
       ALLOCATE(ylm((lmax + 1) * (lmax + 1), ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ylm', 1)
       !
-      ylm(:, :) = CMPLX(0._dp, 0._dp, KIND=DP)
+      ylm(:, :) = CMPLX(zero, zero, KIND=DP)
       !
       DO igp = 1, ngp
         CALL ylm4(gp_vec(:, igp), ylm(:, igp), lmax)
@@ -651,7 +652,7 @@
       WRITE(stdout, '(6x, "Done reading all stored psi_kg ", &
         & "coefficients of the wavefunctions.", /6x, /6x)')
       !
-      psi_kg_norm = 0._dp
+      psi_kg_norm = zero
       DO ik = 1, nkstot
         DO ibnd = 1, nbnd
           npw = ngk(ik)
@@ -671,30 +672,30 @@
       WRITE(stdout, &
         '(/6x, "Computing partial DOS per atom per spin = f(r, E_F)...")')
       !
-      dos_nlmr(:, :, :, :) = 0._dp
-      dos_nlr(:, :, :, :) = 0._dp
-      dos_nr(:, :, :) = 0._dp
+      dos_nlmr(:, :, :, :) = zero
+      dos_nlr(:, :, :, :) = zero
+      dos_nr(:, :, :) = zero
       !
-      dos_nlmr_nodloglde(:, :, :, :) = 0._dp
-      dos_nlr_nodloglde(:, :, :, :) = 0._dp
+      dos_nlmr_nodloglde(:, :, :, :) = zero
+      dos_nlr_nodloglde(:, :, :, :) = zero
       !
       !
       ! spin!
       IF (ltetra) THEN
-        prefactor_part_dos = 1._dp / omega
+        prefactor_part_dos = one / omega
         !
         If (nspin == 1) THEN
-          prefactor_part_dos = prefactor_part_dos / 2._dp
+          prefactor_part_dos = prefactor_part_dos / two
         END IF
         !
       ELSE
         ! times nspin to compensate sum_wk = 2
-        prefactor_part_dos = 1._dp / omega / sum_wk * nspin
+        prefactor_part_dos = one / omega / sum_wk * nspin
       END IF
       !
       !
-      ! prefactor0 = 1._dp
-      ! prefactor0 = 1.0 / omega / (tpi * tpi * tpi)
+      ! prefactor0 = one
+      ! prefactor0 = one / omega / (tpi * tpi * tpi)
       ! prefactor0 = prefactor0 * prefactor0 * prefactor0
       !
       !
@@ -717,7 +718,7 @@
             !
             ! precompute psi_krtau with delta function for all bands
             !
-            psi_krtau_aux(:, :, :) = CMPLX(0._dp, 0._dp, KIND=DP)
+            psi_krtau_aux(:, :, :) = CMPLX(zero, zero, KIND=DP)
             !
             WRITE(stdout, &
               '(/9x, "Precomputing ", &
@@ -824,7 +825,7 @@
                   !
                   DO ibnd = 1, nbnd
                     !
-                    deltaf = 0.0_dp
+                    deltaf = zero
                     !
                     IF (ltetra) THEN
                       lselect = (ABS(wdk(ibnd, ik)) > eps32)
@@ -839,7 +840,7 @@
                     !
                     IF (lselect) THEN
                       !
-                      cnr_aux = CMPLX(0._dp, 0._dp, KIND=DP)
+                      cnr_aux = CMPLX(zero, zero, KIND=DP)
                       !
                       ! integral over r angle (Gauss points)
                       !
@@ -1026,7 +1027,7 @@
           !
           ! updating total DOS, inside MT sphere(s)
           !
-          dos_nr(:, :, iat) = 0._dp
+          dos_nr(:, :, iat) = zero
           !
           DO ispin = 1, nspin
             DO ir = imin, imax
@@ -1253,6 +1254,7 @@
             '(/7x, "n(E_F, ", I1, ") = ", ES16.8)') ispin, dos_n(ispin)
           !
       END DO ! ispin
+      !
       !
       ! averaging of total DOS per spin
       !
