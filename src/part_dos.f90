@@ -1254,6 +1254,10 @@
                     DO igp = 1, ngp
                       !
                       rvec_cart(:) = r(ir, stp(iat)) * gp_vec(:, igp)
+                      rvec_mod = SQRT(rvec_cart(1) * rvec_cart(1) + &
+                        rvec_cart(2) * rvec_cart(2) + &
+                        rvec_cart(3) * rvec_cart(3))
+                      rvec_unit_vec(:) = rvec_cart(:) / rvec_mod
                       !
                       ! sum over G-vectors
                       !
@@ -1267,10 +1271,6 @@
                           rvec_cart(:) + tau_cart(:, iat))
                         !
                         ! reformulated
-                        rvec_mod = SQRT(rvec_cart(1) * rvec_cart(1) + &
-                          rvec_cart(2) * rvec_cart(2) + &
-                          rvec_cart(3) * rvec_cart(3))
-                        rvec_unit_vec(:) = rvec_cart(:) / rvec_mod
                         !
                         psi_krtau_aux(igp, ibnd, ik) = &
                           psi_krtau_aux(igp, ibnd, ik) + &
