@@ -575,7 +575,7 @@
       ALLOCATE(ylm((lmax + 1) * (lmax + 1), ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ylm', 1)
       !
-      ylm(:, :) = CMPLX(zero, zero, KIND=DP)
+      ylm(:, :) = czero
       !
       DO igp = 1, ngp
         CALL ylm4(gp_vec(:, igp), ylm(:, igp), lmax)
@@ -1123,7 +1123,7 @@
       ALLOCATE(ylm((lmax + 1) * (lmax + 1), ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ylm', 1)
       !
-      ylm(:, :) = CMPLX(zero, zero, KIND=DP)
+      ylm(:, :) = czero
       !
       DO igp = 1, ngp
         CALL ylm4(gp_vec(:, igp), ylm(:, igp), lmax)
