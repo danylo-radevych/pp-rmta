@@ -67,11 +67,13 @@
       !! weights
       INTEGER, INTENT(in) :: lmax
       !! max angular momentum
-      INTEGER, INTENT(in) :: iscale
+      INTEGER, INTENT(in), OPTIONAL :: iscale
       !! integer scaler for the number of integration points
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
+      INTEGER :: iscale_
+      !! local copy of iscale
       INTEGER :: ierr
       !! error code
       INTEGER :: ngpt, nphi, i, j, k
@@ -83,9 +85,16 @@
       !
       routine_name = "gauss_points"
       !
+      iscale_ = 1
+      IF (PRESENT(iscale)) iscale_ = iscale
+      !
+      IF (iscale_ < 1) THEN
+        CALL errore(routine_name, 'iscale must be >= 1', 1)
+      ENDIF
+      !
       ! determine the number of points cos(theta)
       !
-      ngpt = (lmax + 1) * iscale
+      ngpt = (lmax + 1) * iscale_
       !
       ALLOCATE(xx((ngpt + 1) / 2), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating xx', 1)
@@ -97,7 +106,7 @@
       !
       ! in phi, use nyquist frequency, i.e.,  2 * lmax + 1
       !
-      nphi = (2 * lmax + 1) * iscale
+      nphi = (2 * lmax + 1) * iscale_
       delphi = 8._dp * ATAN(1._dp) / nphi
       !
       j = 0
@@ -585,7 +594,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 10
+      igp_scale = 5
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
@@ -1137,7 +1146,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 10
+      igp_scale = 5
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
