@@ -237,7 +237,7 @@
     !! computed energy derivatives of radial functions
     !! d u(r, e) / de on fine r grid
     REAL(DP), ALLOCATABLE :: dudrrf(:, :, :, :)
-    !! dudrrf(mt_nrf, rnorbs, nspins, natoms)
+    !! dudrrf(mt_nrf, norbs, nspins, natoms)
     !! computed r derivatives of radial functions
     !! d u(r, e) / dr on fine r grid
     REAL(DP), ALLOCATABLE :: d2udrderf(:, :, :, :)

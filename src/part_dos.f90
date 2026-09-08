@@ -749,15 +749,14 @@
               !
               ! WRITE(stdout, '(/8x, "orbit #", I0, " out of ", I0)') l, norb - 1
               !
+              prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
+                ABS(dloglde(ir, iorb, ispin, iat))
+              !
               DO im = 1, 2 * l + 1
                 !
                 m = im - l - 1
                 !
                 ! WRITE(stdout, '(/9x, "m #", I)') m
-                !
-                !
-                prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
-                  ABS(dloglde(ir, iorb, ispin, iat))
                 !
                 ! integral over k-points
                 !
@@ -1304,28 +1303,24 @@
               !
               ! WRITE(stdout, '(/8x, "orbit #", I0, " out of ", I0)') l, norb - 1
               !
+              ! reformulated
+              prefactor = zero
+              !
+              tmp = dudrr(ir, iorb, ispin, iat) - &
+                ur(ir, iorb, ispin, iat) / r(ir, stp(iat))
+              !
+              IF (ABS(tmp) > eps12) THEN
+                prefactor = prefactor_part_dos * &
+                  r(ir, stp(iat)) * r(ir, stp(iat)) * &
+                  wr(ir, iorb, ispin, iat) / &
+                  (tmp * tmp)
+              END IF
+              !
+              !
               DO im = 1, 2 * l + 1
                 !
                 m = im - l - 1
                 !
-                ! WRITE(stdout, '(/9x, "m #", I)') m
-                !
-                !
-                ! prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
-                !   ABS(dloglde(ir, iorb, ispin, iat))
-                !
-                ! reformulated
-                prefactor = zero
-                !
-                tmp = dudrr(ir, iorb, ispin, iat) - &
-                  ur(ir, iorb, ispin, iat) / r(ir, stp(iat))
-                !
-                IF (ABS(tmp) > eps12) THEN
-                  prefactor = prefactor_part_dos * &
-                    r(ir, stp(iat)) * r(ir, stp(iat)) * &
-                    wr(ir, iorb, ispin, iat) / &
-                    (tmp * tmp)
-                END IF
                 !
                 ! integral over k-points
                 !

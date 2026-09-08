@@ -347,6 +347,8 @@
       !
       IMPLICIT NONE
       !
+      LOGICAL :: l_old_formulation = .FALSE.
+      !
       ! semilocal potential V^l_{SL}(r)
       !
       CALL set_vsemiloc(lsemilocupf, &
@@ -372,23 +374,25 @@
       !
       ! partial DOS
       !
-      ! CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
-      !   ist_i, &
-      !   natoms, norbs, nspins, mt_ngauss, mt_rf, &
-      !   tau_cart(1 : 3, 1 : natoms), &
-      !   dloglderf(1 : irf_max, &
-      !   1 : norbs, 1 : nspins, 1 : natoms), &
-      !   mt_degauss, fermi_energy, &
-      !   dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
-      !
-      CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, ist_i, &
-        natoms, norbs, nspins, mt_ngauss, mt_rf, &
-        tau_cart(1 : 3, 1 : natoms), &
-        urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-        dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-        wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-        mt_degauss, fermi_energy, &
-        dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      IF (l_old_formulation) THEN
+        CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
+          ist_i, &
+          natoms, norbs, nspins, mt_ngauss, mt_rf, &
+          tau_cart(1 : 3, 1 : natoms), &
+          dloglderf(1 : irf_max, &
+          1 : norbs, 1 : nspins, 1 : natoms), &
+          mt_degauss, fermi_energy, &
+          dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      ELSE
+        CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, ist_i, &
+          natoms, norbs, nspins, mt_ngauss, mt_rf, &
+          tau_cart(1 : 3, 1 : natoms), &
+          urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          mt_degauss, fermi_energy, &
+          dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      END IF
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l
       !
@@ -793,7 +797,7 @@
     !---------------------------------------------------------------------------
     SUBROUTINE set_log_ders(nin, dx, rf, nat, stp, &
       norb, nspins, lhybrid, urf, dudrrf, duderf, d2udrderf, &
-      logl, dloglde, Wl)
+      logl, dloglde, wl)
     !---------------------------------------------------------------------------
     !!
     !! Sets log derivatives of radial functions
