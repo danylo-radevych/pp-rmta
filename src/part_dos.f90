@@ -43,7 +43,7 @@
   !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE gauss_points(vgauss, wt, lmax)
+    SUBROUTINE gauss_points(vgauss, wt, lmax, iscale)
     !---------------------------------------------------------------------------
     !!
     !! Generates Gaussian points (unit vectors corrsponding to specific
@@ -59,25 +59,45 @@
       !
       IMPLICIT NONE
       !
+      EXTERNAL :: errore
+      !
       REAL(DP), INTENT(out) :: vgauss(:, :)
       !! points
       REAL(DP), INTENT(out) :: wt(:)
       !! weights
       INTEGER, INTENT(in) :: lmax
       !! max angular momentum
+      INTEGER, INTENT(in) :: iscale
+      !! integer scaler for the number of integration points
       !
-      REAL(DP) :: xx(lmax / 2 + 1), w(lmax / 2 + 1)
-      REAL(DP) :: delphi, phi, rxy
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: ierr
+      !! error code
       INTEGER :: ngpt, nphi, i, j, k
+      !! integers
+      REAL(DP), ALLOCATABLE :: xx(:), w(:)
+      ! REAL(DP) :: xx((ngpt + 1) / 2), w((ngpt + 1) / 2)
+      REAL(DP) :: delphi, phi, rxy
+      !
+      !
+      routine_name = "gauss_points"
       !
       ! determine the number of points cos(theta)
       !
-      ngpt = lmax + 1
+      ngpt = (lmax + 1) * iscale
+      !
+      ALLOCATE(xx((ngpt + 1) / 2), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating xx', 1)
+      !
+      ALLOCATE(w((ngpt + 1) / 2), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating w', 1)
+      !
       CALL grule(ngpt, xx, w) ! outputs (ngpt + 1) / 2 points
       !
       ! in phi, use nyquist frequency, i.e.,  2 * lmax + 1
       !
-      nphi = 2 * lmax + 1
+      nphi = (2 * lmax + 1) * iscale
       delphi = 8._dp * ATAN(1._dp) / nphi
       !
       j = 0
@@ -107,6 +127,12 @@
         ENDDO
         j = j + nphi
       END IF
+      !
+      DEALLOCATE(xx, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating xx', 1)
+      !
+      DEALLOCATE(w, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating w', 1)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE gauss_points
@@ -441,6 +467,8 @@
       !! iterators
       INTEGER :: lmax
       !! max angular momentum
+      INTEGER :: igp_scale
+      !! scale number of gp integration points
       INTEGER :: gp_ntheta
       !! number of Gauss points for theta
       INTEGER :: gp_nphi
@@ -556,8 +584,10 @@
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      gp_ntheta = lmax + 1
-      gp_nphi = 2 * lmax + 1
+      ! igp_scale = 1
+      igp_scale = 10
+      gp_ntheta = (lmax + 1) * igp_scale
+      gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
       !
       ALLOCATE(gp_vec(3, ngp), STAT = ierr)
@@ -566,7 +596,7 @@
       ALLOCATE(gp_wt(ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
-      CALL gauss_points(gp_vec, gp_wt, lmax)
+      CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
       !
       !
       ! prepare corresponding spherical harmonics for
@@ -987,6 +1017,8 @@
       !! iterators
       INTEGER :: lmax
       !! max angular momentum
+      INTEGER :: igp_scale
+      !! scale number of gp integration points
       INTEGER :: gp_ntheta
       !! number of Gauss points for theta
       INTEGER :: gp_nphi
@@ -1104,8 +1136,10 @@
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      gp_ntheta = lmax + 1
-      gp_nphi = 2 * lmax + 1
+      ! igp_scale = 1
+      igp_scale = 10
+      gp_ntheta = (lmax + 1) * igp_scale
+      gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
       !
       ALLOCATE(gp_vec(3, ngp), STAT = ierr)
@@ -1114,7 +1148,7 @@
       ALLOCATE(gp_wt(ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
-      CALL gauss_points(gp_vec, gp_wt, lmax)
+      CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
       !
       !
       ! prepare corresponding spherical harmonics for
