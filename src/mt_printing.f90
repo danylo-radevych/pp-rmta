@@ -1223,6 +1223,7 @@
       CALL print_clock('set_log_ders')
       CALL print_clock('set_pet_mll1')
       CALL print_clock('tetra_delta_weights')
+      CALL print_clock('set_dos_nlm_form2')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
       CALL print_clock('print_at_rmt')
