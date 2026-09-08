@@ -1009,13 +1009,9 @@
       !! constant prefactor for partial DOS
       REAL(DP) :: prefactor
       !! common prefactor for given rmt, atom, and l
-      REAL(DP) :: rvec_mod
-      !! modulus of rvec_cart
       REAL(DP) :: rvec_cart(3)
       !! temporary MT-sphere vector for Gauss integration
       !! in Cartesian coordinates
-      REAL(DP) :: rvec_unit_vec(3)
-      !! unit vector along rvec_cart
       REAL(DP) :: kvec_cart(3)
       !! temporary k-point vector
       !! in Cartesian coordinates
@@ -1254,10 +1250,6 @@
                     DO igp = 1, ngp
                       !
                       rvec_cart(:) = r(ir, stp(iat)) * gp_vec(:, igp)
-                      rvec_mod = SQRT(rvec_cart(1) * rvec_cart(1) + &
-                        rvec_cart(2) * rvec_cart(2) + &
-                        rvec_cart(3) * rvec_cart(3))
-                      rvec_unit_vec(:) = rvec_cart(:) / rvec_mod
                       !
                       ! sum over G-vectors
                       !
@@ -1276,7 +1268,7 @@
                           psi_krtau_aux(igp, ibnd, ik) + &
                           ci * &
                           DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
-                          rvec_unit_vec(:)) * &
+                          gp_vec(:, igp)) * &
                           CMPLX(COS(arg), SIN(arg), KIND=DP) * &
                           psi_kg(ig, ibnd, ik)
                         !
