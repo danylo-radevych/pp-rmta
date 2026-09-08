@@ -56,6 +56,8 @@
     ! Courtesy of M. Weinert and flair: FLAPW code.
     ! https://sites.uwm.edu/weinert/flair/
     !
+      USE const, ONLY: zero, one
+      USE io_global, ONLY: stdout
       !
       IMPLICIT NONE
       !
@@ -79,9 +81,11 @@
       INTEGER :: ngpt, nphi, i, j, k
       !! integers
       REAL(DP), ALLOCATABLE :: xx(:), w(:)
-      ! REAL(DP) :: xx((ngpt + 1) / 2), w((ngpt + 1) / 2)
+      !! REAL(DP) :: xx((ngpt + 1) / 2), w((ngpt + 1) / 2)
       REAL(DP) :: delphi, phi, rxy
-      !
+      !!
+      REAL :: sum_wt
+      !! sum of all wt weights
       !
       routine_name = "gauss_points"
       !
@@ -107,11 +111,12 @@
       ! in phi, use nyquist frequency, i.e.,  2 * lmax + 1
       !
       nphi = (2 * lmax + 1) * iscale_
-      delphi = 8._dp * ATAN(1._dp) / nphi
+      delphi = 8._dp * ATAN(one) / nphi
       !
+      sum_wt = zero
       j = 0
       DO i = 1, ngpt / 2
-        rxy = SQRT(1._dp - xx(i) * xx(i))
+        rxy = SQRT(one - xx(i) * xx(i))
         DO k=1, nphi
           phi = k * delphi
           j = j + 1
@@ -124,6 +129,7 @@
           vgauss(2, j) = vgauss(2, j - 1)
           vgauss(3, j) = -xx(i)
           wt(j) = w(i) * delphi
+          sum_wt = sum_wt + wt(j)
         ENDDO
       ENDDO
       !
@@ -131,11 +137,14 @@
         DO k = 1, nphi
           vgauss(1, j + k) = COS(k * delphi)
           vgauss(2, j + k) = SIN(k * delphi)
-          vgauss(3, j + k) = 0._dp
+          vgauss(3, j + k) = zero
           wt(j + k) = w((ngpt + 1) / 2) * delphi
+          sum_wt = sum_wt + wt(j + k)
         ENDDO
         j = j + nphi
       END IF
+      !
+      WRITE(stdout, '(/6x, "gauss_points: sum_wt = ", F0.6 )') sum_wt
       !
       DEALLOCATE(xx, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating xx', 1)
@@ -1146,7 +1155,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 5
+      igp_scale = 3
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
