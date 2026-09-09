@@ -1247,7 +1247,6 @@
       USE ions_base, ONLY: ityp
       USE uspp_param, ONLY: upf
       USE constants, ONLY: rytoev, eps6, eps12
-      USE const, ONLY: bohr_to_ang
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
       USE mt_var, ONLY: natoms, norbs, orb_label, &
         nspins, fermi_energy, &
@@ -1257,7 +1256,7 @@
         vlocscr00rf, &
         mll1rf_label, mll1rf, etall1rf, &
         mt_nrf, mt_rf
-      USE const, ONLY: zero
+      USE const, ONLY: zero, bohr_to_ang
       !
       IMPLICIT NONE
       !
@@ -1790,7 +1789,6 @@
       USE uspp_param, ONLY : upf ! see upflib/pseudo_types.f90
       USE io_global, ONLY : stdout
       USE basis, ONLY: natomwfc
-!       USE projections, ONLY: nlmchi
       USE ions_base, ONLY : nat
       USE ener, ONLY : ef
       !
