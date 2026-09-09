@@ -4,25 +4,23 @@
 
 ncpu=8
 # ncpu=$SLURM_NTASKS
-
+export OMP_NUM_THREADS=2
 
 EXEC="mpirun"
 ECHO=echo
 
 lrun_scf=true
-lrun_nscf=true
 lrun_rmta=true
 
-# save temporary folders for  RMTA restart
 lsave_tmp_dir=true
 lsave_tmp_dir_tar=true
 
-PREFIX='v3si-a15'
+PREFIX='nb6rhpd'
 IBRAV=1
-ALAT=8.928766529717567
+ALAT=9.676543371121308
 NAT=8
-NTYP=2
-ECUT=70
+NTYP=3
+ECUT=80
 CHARGE=0
 PRESS=0
 OCCUPATIONS="smearing"
@@ -32,27 +30,27 @@ PSEUDO_DIR='pseudo'
 TMP_DIR='tempdir'
 OUT_DIR='output'
 
-# SCF grid
 k=12
-# NSCF grid
-kf=24
-
+nk1=$k
+nk2=$k
+nk3=$k
 
 # species.in -------------------------------------------------------------------
 cat > species.in << EOF
 ATOMIC_SPECIES
-V    50.942   V.upf
-Si   28.085  Si.upf
+Nb    92.906   Nb.upf
+Rh   102.91    Rh.upf
+Pd   106.42    Pd.upf
 
-ATOMIC_POSITIONS (crystal)
-   V       0.250000000        0.000000000        0.500000000
-   V       0.750000000        0.000000000        0.500000000
-   V       0.500000000        0.250000000        0.000000000
-   V       0.500000000        0.750000000        0.000000000
-   V       0.000000000        0.500000000        0.250000000
-   V       0.000000000        0.500000000        0.750000000
-  Si       0.000000000        0.000000000        0.000000000
-  Si       0.500000000        0.500000000        0.500000000
+ATOMIC_POSITIONS crystal
+  Nb 0.0 0.500000007208889 0.752109515923497
+  Nb 0.500000007208889 0.247890498494282 0.0
+  Nb 0.752109515923497 0.0 0.500000007208889
+  Nb 0.0 0.500000007208889 0.247890498494282
+  Nb 0.500000007208889 0.752109515923497 0.0
+  Nb 0.247890498494282 0.0 0.500000007208889
+  Pd 0.500000007208889 0.500000007208889 0.500000007208889
+  Rh 0.0 0.0 0.0
 
 EOF
 
@@ -115,7 +113,6 @@ $ECHO "smearing = " $SMEARING
 $ECHO "degauss = " $DEGAUSS
 $ECHO "ngauss = " $ngauss
 $ECHO "k = " ${k}
-$ECHO "kf = " ${kf}
 $ECHO "IBRAV = " $IBRAV
 $ECHO "ALAT = " $ALAT
 $ECHO "ECUT = " $ECUT
@@ -138,10 +135,6 @@ $ECHO ""
 $ECHO "$SUFFIX"
 $ECHO "-------------->"
 
-nk1=$k
-nk2=$k
-nk3=$k
-
 NAME=$PREFIX.$TASK
 cat > $NAME.in << EOF
 &control
@@ -158,7 +151,7 @@ cat > $NAME.in << EOF
 
 &system
  ibrav = $IBRAV
- celldm(1) = $ALAT
+ ! celldm(1) = $ALAT
  nat = $NAT
  ntyp = $NTYP
  ecutwfc = $ECUT
@@ -187,7 +180,7 @@ name_check="species.in"
 file_check $name_check
 cat $name_check >> $NAME.in
 
-$ECHO "  running $SUFFIX for $PREFIX..."
+$ECHO "  running the scf calculation for $PREFIX..."
 $EXEC -n $ncpu $QE_ROOT/bin/pw.x < $NAME.in > $OUT_DIR/$NAME.out
 $ECHO "$SUFFIX is done"
 
@@ -207,96 +200,10 @@ fi
 grep "Fermi" output/$NAME.out \
 | sed -e 's/the Fermi energy is//g' \
 | sed -e 's/ev//g' > efermi.in
-cp efermi.in efermi_scf.in
-
-fi
-
-
-
-
-# NSCF =========================================================================
-if [[ "$lrun_nscf" == "true" && "$lfail" != "true" ]]
-then
-TASK='nscf'
-SUFFIX=$TASK
-
-$ECHO ""
-$ECHO "$SUFFIX"
-$ECHO "-------------->"
-
-nk1=$kf
-nk2=$kf
-nk3=$kf
-
-NAME=$PREFIX.$TASK
-cat > $NAME.in << EOF
-&control
- calculation = '$TASK',
- restart_mode = 'from_scratch',
- prefix = '$PREFIX',
- tprnfor = .true.,
- tstress =.true.,
- pseudo_dir = '$PSEUDO_DIR',
- outdir = '$TMP_DIR'
- etot_conv_thr = 1.0d-5
- forc_conv_thr = 1.0d-4
-/
-
-&system
- ibrav = $IBRAV
- celldm(1) = $ALAT
- nat = $NAT
- ntyp = $NTYP
- ecutwfc = $ECUT
- occupations = '$OCCUPATIONS'
- degauss = $DEGAUSS
- smearing = '$SMEARING'
-/
-
-&electrons
- diagonalization = 'cg'
- mixing_mode = 'plain'
- mixing_beta = 0.7
- conv_thr =  1.0d-12
-/
-
-&cell
-  press = $PRESS ! kbar
-/
-
-K_POINTS AUTOMATIC
-$nk1 $nk2 $nk3 0 0 0
-
-EOF
-
-name_check="species.in"
-file_check $name_check
-cat $name_check >> $NAME.in
-
-$ECHO "  running $SUFFIX for $PREFIX..."
-$EXEC -n $ncpu $QE_ROOT/bin/pw.x < $NAME.in > $OUT_DIR/$NAME.out
-$ECHO "$SUFFIX is done"
-
-if [ $? -ne 0 ]; then
-  $ECHO “Error: Failed $SUFFIX.”
-  lfail=true
-fi
-
-mkdir -p tempdir_$SUFFIX
-rsync $ORSYNC tempdir tempdir_$SUFFIX/
-
-if [[ $lsave_tmp_dir_tar == "true" ]]
-then
-  XZ_OPT="-T${ncpu}" tar $OTAR ${SUFFIX}_out.tar.xz $TMP_DIR
-fi
-
-grep "Fermi" output/$NAME.out \
-| sed -e 's/the Fermi energy is//g' \
-| sed -e 's/ev//g' > efermi.in
-cp efermi.in efermi_nscf.in
 
 
 fi
+
 
 
 
@@ -311,29 +218,28 @@ $ECHO ""
 $ECHO "$SUFFIX"
 $ECHO "-------------->"
 
-name_check="${TMP_DIR}_nscf/${TMP_DIR}"
+name_check="${TMP_DIR}_scf/${TMP_DIR}"
 if [[ -d $name_check ]]
 then
 dir_check $name_check
 rsync $ORSYNC $name_check .
 else
-name_check=nscf_out.tar.xz
+name_check=scf_out.tar.xz
 file_check $name_check
 rm $ORM ${TMP_DIR}
 tar -xvf $name_check
-mkdir -p ${TMP_DIR}_nscf
-rsync $ORSYNC ${TMP_DIR} ${TMP_DIR}_nscf/
+mkdir -p ${TMP_DIR}_scf
+rsync $ORSYNC ${TMP_DIR} ${TMP_DIR}_scf/
 fi
 
 
 NAME=$PREFIX.$SUFFIX
-$ECHO "  running $SUFFIX for $PREFIX..."
+$ECHO "  running RMTA for $PREFIX..."
 cat > ${NAME}.in << EOF
 &rmta
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
   lwrite_dat = .true.
-  lrmt = .false.
 /
 EOF
 $EXEC -n 1 $PPRMTA_ROOT/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
@@ -363,7 +269,6 @@ if [[ $lsave_tmp_dir != "true" ]]
 then
   rm $ORM ${TMP_DIR}
   rm $ORM ${TMP_DIR}_scf
-  rm $ORM ${TMP_DIR}_nscf
 fi
 
 $ECHO "DONE"
