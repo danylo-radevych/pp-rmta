@@ -58,6 +58,7 @@
     !
       USE const, ONLY: zero, one
       USE io_global, ONLY: stdout
+      USE mt_var, ONLY: ldebug
       !
       IMPLICIT NONE
       !
@@ -84,7 +85,7 @@
       !! REAL(DP) :: xx((ngpt + 1) / 2), w((ngpt + 1) / 2)
       REAL(DP) :: delphi, phi, rxy
       !!
-      REAL(DP) :: sum_wt
+      REAL(DP) :: sum_gp_wt
       !! sum of all wt weights
       !
       routine_name = "gauss_points"
@@ -113,7 +114,7 @@
       nphi = (2 * lmax + 1) * iscale_
       delphi = 8._dp * ATAN(one) / nphi
       !
-      sum_wt = zero
+      sum_gp_wt = zero
       j = 0
       DO i = 1, ngpt / 2
         rxy = SQRT(one - xx(i) * xx(i))
@@ -124,13 +125,13 @@
           vgauss(2, j) = rxy * SIN(phi)
           vgauss(3, j) = xx(i)
           wt(j) = w(i) * delphi
-          sum_wt = sum_wt + wt(j)
+          sum_gp_wt = sum_gp_wt + wt(j)
           j = j + 1
           vgauss(1, j) = vgauss(1, j - 1)
           vgauss(2, j) = vgauss(2, j - 1)
           vgauss(3, j) = -xx(i)
           wt(j) = w(i) * delphi
-          sum_wt = sum_wt + wt(j)
+          sum_gp_wt = sum_gp_wt + wt(j)
         ENDDO
       ENDDO
       !
@@ -140,12 +141,14 @@
           vgauss(2, j + k) = SIN(k * delphi)
           vgauss(3, j + k) = zero
           wt(j + k) = w((ngpt + 1) / 2) * delphi
-          sum_wt = sum_wt + wt(j + k)
+          sum_gp_wt = sum_gp_wt + wt(j + k)
         ENDDO
         j = j + nphi
       END IF
       !
-      WRITE(stdout, '(/6x, "gauss_points: sum_wt = ", F0.6 )') sum_wt
+      IF (ldebug) THEN
+        WRITE(stdout, '(/6x, "gauss_points: sum_gp_wt = ", F0.6 )') sum_gp_wt
+      END IF
       !
       DEALLOCATE(xx, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating xx', 1)
