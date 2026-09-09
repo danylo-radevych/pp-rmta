@@ -56,9 +56,10 @@
     USE uspp_param, ONLY: upf
     ! custom module
     USE muffin_tin, ONLY: rmta_init, rmta_compute, rmta_quit
-    USE mt_var, ONLY: ldebug, &
+    USE mt_var, ONLY: formulation, ldebug, &
       lmpi_single_rank, &
       luse_ref_pot, luse_tot_dos, &
+      igp_scale, &
       rmta_code, rmta_routine, & ! variables
       atomic_type, lsemiloc, lhybrid, &
       lnonlocal, &
@@ -101,15 +102,17 @@
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
       dnr, lrmt, rmt, ltetra, lhybrid, rmt_method, &
-      ldebug
+      ldebug, igp_scale, formulation
     !
     ! defaults
     !
     program_name = "rmta.x"
     lmpi_single_rank = .TRUE. ! error if multiple ranks
     !
+    formulation = "upstream"
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
+    igp_scale = 3
     rmt_method = "touching"
     rmt(:) = -1.0_dp
     ngauss = -99
@@ -211,6 +214,7 @@
     CALL mp_bcast(ltetra, ionode_id, intra_image_comm)
     CALL mp_bcast(ldense_r_grid, ionode_id, intra_image_comm)
     CALL mp_bcast(ldebug, ionode_id, intra_image_comm)
+    CALL mp_bcast(igp_scale, ionode_id, intra_image_comm)
     !
     ! read xml data file produced by pw.x or cp.x
     CALL read_file_new(needwf)

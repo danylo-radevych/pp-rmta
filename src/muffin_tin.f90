@@ -327,7 +327,7 @@
       USE mt_var, ONLY: norbs, ltetra
       USE part_dos, ONLY: set_dos_nlm, set_dos_nlm_form2
       USE mh_eta, ONLY: set_eta
-      USE mt_var, ONLY: &
+      USE mt_var, ONLY: formulation, igp_scale, &
         mt_nr, mt_r, vsemilocr, &
         vsemilocrf, &
         irf_min, irf_max, &
@@ -347,7 +347,11 @@
       !
       IMPLICIT NONE
       !
-      LOGICAL :: l_old_formulation = .FALSE.
+      EXTERNAL :: errore
+      !
+      CHARACTER(len = 256) :: routine_name
+      !
+      routine_name = "rmta_compute"
       !
       ! semilocal potential V^l_{SL}(r)
       !
@@ -374,8 +378,8 @@
       !
       ! partial DOS
       !
-      IF (l_old_formulation) THEN
-        CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, &
+      IF (TRIM(formulation) == "paper") THEN
+        CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
           tau_cart(1 : 3, 1 : natoms), &
@@ -383,8 +387,9 @@
           1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
           dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
-      ELSE
-        CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, ist_i, &
+      ELSE IF (TRIM(formulation) == "upstream") THEN
+        CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
+          ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
           tau_cart(1 : 3, 1 : natoms), &
           urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
@@ -392,6 +397,9 @@
           wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
           dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      ELSE
+        WRITE(stdout, '(/5x, "Formulation: ", A)') TRIM(formulation)
+        CALL errore(routine_name, "This formulation is not known.", 1)
       END IF
       !
       ! McMillan-Hopfield \eta_l and \eta = \sum_l \eta_l

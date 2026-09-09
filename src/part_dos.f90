@@ -544,7 +544,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, stp, nat, norb, &
+    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, igp_scale, stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, dloglde, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n)
@@ -585,6 +585,8 @@
       INTEGER, INTENT(in) :: imax
       !! max index of the radial point for partial DOS
       !! partial DOS for ir > nmax will be left zero
+      INTEGER, INTENT(in) :: igp_scale
+      !! scale number of gp integration points
       INTEGER, INTENT(in) :: stp(:)
       !! array converting atom indices into symmetry type indices, stp(atom)
       INTEGER, INTENT(in) :: nat
@@ -637,8 +639,6 @@
       !! iterators
       INTEGER :: lmax
       !! max angular momentum
-      INTEGER :: igp_scale
-      !! scale number of gp integration points
       INTEGER :: gp_ntheta
       !! number of Gauss points for theta
       INTEGER :: gp_nphi
@@ -754,8 +754,6 @@
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      ! igp_scale = 1
-      igp_scale = 4
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
@@ -1090,7 +1088,8 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, stp, nat, norb, &
+    SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, igp_scale, &
+      stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, ur, dudrr, wr, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n)
@@ -1132,6 +1131,8 @@
       INTEGER, INTENT(in) :: imax
       !! max index of the radial point for partial DOS
       !! partial DOS for ir > nmax will be left zero
+      INTEGER, INTENT(in) :: igp_scale
+      !! scale number of gp integration points
       INTEGER, INTENT(in) :: stp(:)
       !! array converting atom indices into symmetry type indices, stp(atom)
       INTEGER, INTENT(in) :: nat
@@ -1188,8 +1189,6 @@
       !! iterators
       INTEGER :: lmax
       !! max angular momentum
-      INTEGER :: igp_scale
-      !! scale number of gp integration points
       INTEGER :: gp_ntheta
       !! number of Gauss points for theta
       INTEGER :: gp_nphi
@@ -1307,8 +1306,6 @@
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      ! igp_scale = 1
-      igp_scale = 4
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi

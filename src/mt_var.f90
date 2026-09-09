@@ -34,9 +34,10 @@
     !
     IMPLICIT NONE
     !
-    PUBLIC :: ldebug, &
-      rmta_set_vars, rmta_delete_vars, rmt_default, &
-      lmpi_single_rank, &
+    PUBLIC :: rmta_set_vars, rmta_delete_vars, rmt_default, &
+      formulation, &
+      ldebug, lmpi_single_rank, &
+      igp_scale, &
       mt_prec, natoms, nspins, mt_rmt, norbs, &
       rmta_lmax, orb_label, &
       tau_cart, n_chem_types, natoms_per_chem_type, &
@@ -80,6 +81,8 @@
     !! Name of the code
     CHARACTER(LEN=12), SAVE :: rmta_routine = 'rmta'
     !! Name of the code (short)
+    CHARACTER(LEN=12) :: formulation
+    !! methology used
     CHARACTER(len = 256) :: atomic_type
     !! TODO: obsolete
     CHARACTER(LEN=128) :: rmt_method
@@ -144,6 +147,9 @@
     !! number of points on radial mesh for each type
     INTEGER :: rmta_ng
     !! number of \bm{G} vectors
+    INTEGER :: igp_scale
+    !! integer scaling factor for the number of Gauss points in spherical
+    !! integration
     INTEGER :: irf_min
     !! min irf
     INTEGER :: irf_max
