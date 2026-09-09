@@ -447,7 +447,7 @@
                 rmt_default(st_name(ist_i(jat)))
               !
               !
-              rtmp = nr_dist(jat, iat)  * & ! distance to the neighbor
+              rtmp = nr_dist(jat, iat) * & ! distance to the neighbor
                 rmt_d_iat / & ! this atom
                 (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
               !
@@ -468,7 +468,7 @@
                 & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
-                "First MT radius guess is too small.", 1)
+                "First MT radius guess is below pseudo rc.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
@@ -576,7 +576,7 @@
             WRITE(stdout, '(6x, "MT radius: ", &
               & F10.8, " bohr = ", F10.8, " A")') &
               mt_rmt(ist), mt_rmt(ist) * bohr_to_ang
-            CALL errore(routine_name, "MT radius is too small.", 1)
+            CALL errore(routine_name, "MT radius is below pseudo rc.", 1)
             !
         END IF
         !
