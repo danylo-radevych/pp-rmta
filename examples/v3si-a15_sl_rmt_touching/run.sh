@@ -12,15 +12,15 @@ ECHO=echo
 lrun_scf=true
 lrun_rmta=true
 
-lsave_tmp_dir=false
-lsave_tmp_dir_tar=false
+lsave_tmp_dir=true
+lsave_tmp_dir_tar=true
 
 PREFIX='v3si-a15'
 IBRAV=1
 ALAT=8.928766529717567
 NAT=8
 NTYP=2
-ECUT=100
+ECUT=80
 CHARGE=0
 PRESS=0
 OCCUPATIONS="smearing"
@@ -30,7 +30,7 @@ PSEUDO_DIR='pseudo'
 TMP_DIR='tempdir'
 OUT_DIR='output'
 
-k=24
+k=12
 nk1=$k
 nk2=$k
 nk3=$k
