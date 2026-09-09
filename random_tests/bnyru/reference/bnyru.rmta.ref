@@ -1,0 +1,2128 @@
+
+     ==========================================================
+
+     >>>>>>>>>>>>>>>>>>>>>>>>>> RMTA <<<<<<<<<<<<<<<<<<<<<<<<<<
+
+     ==========================================================
+
+
+     Please cite:
+     D. Radevych, T. Shishidou, M. Weinert, 
+     E. R. Margine, A. N. Kolmogorov, I. I. Mazin, 
+     Rigid muffin-tin approximation in plane wave 
+     codes for fast modeling of phonon-mediated 
+     superconductors, npj Comput Mater (2026) 
+     DOI: https://doi.org/10.1038/s41524-026-02141-7
+
+
+     Program RMTA v.7.5 starts on  9Sep2026 at 14: 3:20 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
+         "P. Giannozzi et al., J. Chem. Phys. 152 154105 (2020);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI), running on     1 processors
+
+     MPI processes distributed on     1 nodes
+     1395 MiB available memory on the printing compute node when the environment starts
+ 
+
+     Check input:
+       prefix = bnyru                                                                                                                                                                                                                                                           
+       outdir = tempdir                                                                                                                                                                                                                                                         
+       tmp_dir = tempdir/                                                                                                                                                                                                                                                        
+
+     Reading xml data from directory:
+
+     tempdir/bnyru.save/
+
+     IMPORTANT: XC functional enforced from input :
+     Exchange-correlation= PBE
+                           (   1   4   3   4   0   0   0)
+     Any further DFT definition will be discarded
+     Please, verify this is what you really want
+
+ 
+     G-vector sticks info
+     --------------------
+     sticks:   dense  smooth     PW     G-vecs:    dense   smooth      PW
+     Sum        1177    1177    341                64659    64659   10185
+ 
+     Using Slab Decomposition
+ 
+
+     Tetrahedra used
+
+
+     Checking irt, whether symmetry operations relate different atoms:
+
+      atom #   1 out of    8:   Y 
+       irt( 3,  1) = 2: Y 
+       irt( 4,  1) = 2: Y 
+       irt( 5,  1) = 2: Y 
+       irt( 6,  1) = 2: Y 
+       irt( 9,  1) = 2: Y 
+       irt(10,  1) = 2: Y 
+       irt(15,  1) = 2: Y 
+       irt(16,  1) = 2: Y 
+      symmetry type:    1
+      # of pairs:    9
+
+      atom #   2 out of    8:   Y 
+       irt( 3,  2) = 1: Y 
+       irt( 4,  2) = 1: Y 
+       irt( 5,  2) = 1: Y 
+       irt( 6,  2) = 1: Y 
+       irt( 9,  2) = 1: Y 
+       irt(10,  2) = 1: Y 
+       irt(15,  2) = 1: Y 
+       irt(16,  2) = 1: Y 
+      symmetry type:    1
+      # of pairs:    9
+
+      atom #   3 out of    8:   B 
+       irt( 3,  3) = 4: B 
+       irt( 4,  3) = 4: B 
+       irt( 5,  3) = 4: B 
+       irt( 6,  3) = 4: B 
+       irt( 9,  3) = 4: B 
+       irt(10,  3) = 4: B 
+       irt(15,  3) = 4: B 
+       irt(16,  3) = 4: B 
+      symmetry type:    2
+      # of pairs:    9
+
+      atom #   4 out of    8:   B 
+       irt( 3,  4) = 3: B 
+       irt( 4,  4) = 3: B 
+       irt( 5,  4) = 3: B 
+       irt( 6,  4) = 3: B 
+       irt( 9,  4) = 3: B 
+       irt(10,  4) = 3: B 
+       irt(15,  4) = 3: B 
+       irt(16,  4) = 3: B 
+      symmetry type:    2
+      # of pairs:    9
+
+      atom #   5 out of    8:   Ru
+       irt( 3,  5) = 6: Ru
+       irt( 4,  5) = 6: Ru
+       irt( 7,  5) = 6: Ru
+       irt( 8,  5) = 6: Ru
+       irt( 9,  5) = 6: Ru
+       irt(10,  5) = 6: Ru
+       irt(13,  5) = 6: Ru
+       irt(14,  5) = 6: Ru
+      symmetry type:    3
+      # of pairs:    9
+
+      atom #   6 out of    8:   Ru
+       irt( 3,  6) = 5: Ru
+       irt( 4,  6) = 5: Ru
+       irt( 7,  6) = 5: Ru
+       irt( 8,  6) = 5: Ru
+       irt( 9,  6) = 5: Ru
+       irt(10,  6) = 5: Ru
+       irt(13,  6) = 5: Ru
+       irt(14,  6) = 5: Ru
+      symmetry type:    3
+      # of pairs:    9
+
+      atom #   7 out of    8:   N 
+       irt( 3,  7) = 8: N 
+       irt( 4,  7) = 8: N 
+       irt( 5,  7) = 8: N 
+       irt( 6,  7) = 8: N 
+       irt( 9,  7) = 8: N 
+       irt(10,  7) = 8: N 
+       irt(15,  7) = 8: N 
+       irt(16,  7) = 8: N 
+      symmetry type:    4
+      # of pairs:    9
+
+      atom #   8 out of    8:   N 
+       irt( 3,  8) = 7: N 
+       irt( 4,  8) = 7: N 
+       irt( 5,  8) = 7: N 
+       irt( 6,  8) = 7: N 
+       irt( 9,  8) = 7: N 
+       irt(10,  8) = 7: N 
+       irt(15,  8) = 7: N 
+       irt(16,  8) = 7: N 
+      symmetry type:    4
+      # of pairs:    9
+
+
+     # of symmetry types:    4
+
+
+     type #:    1: Y  with    2 members:
+          1    2 
+     type #:    2: B  with    2 members:
+          3    4 
+     type #:    3: Ru with    2 members:
+          5    6 
+     type #:    4: N  with    2 members:
+          7    8 
+
+
+
+
+     Nearest neighbors
+
+      atom #   1 out of    8:   Y 
+       neighbor distance: 4.33310830 bohr = 2.29298217 A
+       neighbor types:
+         N  
+       neighbor indices:
+          8 
+       neighbor replicas:
+        6.77801581 6.68761800 7.13060821 5.39023130 5.99462678 5.99462678 4.80419403 4.33310830 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   2 out of    8:   Y 
+       neighbor distance: 4.33310830 bohr = 2.29298217 A
+       neighbor types:
+         N  
+       neighbor indices:
+          7 
+       neighbor replicas:
+        6.68761800 6.77801581 5.39023130 7.13060821 5.99462666 5.99462666 4.33310830 4.80419403 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   3 out of    8:   B 
+       neighbor distance: 2.79749991 bohr = 1.48037320 A
+       neighbor types:
+         N  
+       neighbor indices:
+          8 
+       neighbor replicas:
+        7.13060821 5.39023130 6.77801581 6.89463499 4.19841456 4.19841456 8.31901644 2.79749991 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   4 out of    8:   B 
+       neighbor distance: 2.79749991 bohr = 1.48037320 A
+       neighbor types:
+         N  
+       neighbor indices:
+          7 
+       neighbor replicas:
+        5.39023130 7.13060821 6.89463499 6.77801581 4.19841465 4.19841465 2.79749991 8.31901644 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   5 out of    8:   Ru
+       neighbor distance: 4.19841456 bohr = 2.22170531 A
+       neighbor types:
+         B   B  
+       neighbor indices:
+          3   4 
+       neighbor replicas:
+        5.99462678 5.99462666 4.19841456 4.19841465 6.77801581 4.79278094 6.27040943 6.27040931 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   6 out of    8:   Ru
+       neighbor distance: 4.19841456 bohr = 2.22170531 A
+       neighbor types:
+         B   B  
+       neighbor indices:
+          3   4 
+       neighbor replicas:
+        5.99462678 5.99462666 4.19841456 4.19841465 4.79278094 6.77801581 6.27040943 6.27040931 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   7 out of    8:   N 
+       neighbor distance: 2.79749991 bohr = 1.48037320 A
+       neighbor types:
+         B  
+       neighbor indices:
+          4 
+       neighbor replicas:
+        4.80419403 4.33310830 8.31901644 2.79749991 6.27040943 6.27040943 6.77801581 6.24403565 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+      atom #   8 out of    8:   N 
+       neighbor distance: 2.79749991 bohr = 1.48037320 A
+       neighbor types:
+         B  
+       neighbor indices:
+          3 
+       neighbor replicas:
+        4.33310830 4.80419403 2.79749991 8.31901644 6.27040931 6.27040931 6.24403565 6.77801581 
+         Y   Y   B   B   Ru  Ru  N   N  
+
+
+
+
+     Summary of the MT radii:
+
+     MT radii for symmetry types
+      symmetry type #   1  Y 
+       MT radius: 2.84893850 bohr = 1.50759333 A
+      symmetry type #   2  B 
+       MT radius: 1.31333011 bohr = 0.69498436 A
+      symmetry type #   3  Ru
+       MT radius: 2.39639047 bohr = 1.26811523 A
+      symmetry type #   4  N 
+       MT radius: 1.48416980 bohr = 0.78538883 A
+     MT radii for atoms
+      rmt(1) =  2.8489385040202144
+      rmt(2) =  2.8489385040202144
+      rmt(3) =  1.3133301082320363
+      rmt(4) =  1.3133301082320363
+      rmt(5) =  2.3963904699228862
+      rmt(6) =  2.3963904699228862
+      rmt(7) =  1.4841697971077483
+      rmt(8) =  1.4841697971077483
+
+     Performing safety checks for the MT radii...
+     Done safety checks for the MT radii.
+
+     tau (cartesian, bohr)
+          0.0000      3.3890     12.2215
+          3.3890      0.0000      2.3320
+          0.0000      3.3890      4.7986
+          3.3890      0.0000      9.7549
+          0.0000      0.0000      7.2767
+          3.3890      3.3890      7.2767
+          3.3890      0.0000     12.5524
+          0.0000      3.3890      2.0011
+
+
+
+      n_chem_types: 4
+
+
+     Pseudo for   Y contains explicit SL parts that will be used.
+     Pseudo for   B contains explicit SL parts that will be used.
+     Pseudo for  Ru contains explicit SL parts that will be used.
+     Pseudo for   N contains explicit SL parts that will be used.
+
+       FFT vrs to vgs
+       DONE FFT vrs to vgs
+
+     PP info:
+       SIZE(upf): 4
+
+       element: Y 
+       z_valence:  11.000000
+       type: SL  
+       functional: PBE                      
+       relativistic: scalar
+       is_ultrasoft:  F
+       is_paw:  F
+       is_coulomb:  F
+       has_so:  F
+       has_wfc:  F
+       has_gipaw:  F
+       paw_as_gipaw:  F
+       core_correction:  T
+       with_metagga_info:  F
+       total_psenergy: -76.7654174970000014
+       wfc_cutoff:   0.000000
+       rho_cutoff:  17.650000
+       l_max: 2
+       l_max_rho: 0
+       l_local: -1
+       r_max:   0.000000
+       number_of_wfc: 4
+         rcut(  1):  1.630  rcutus(  1):  0.000  n(  1):   0  l(  1):   0
+         rcut(  2):  1.630  rcutus(  2):  0.000  n(  2):   0  l(  2):   1
+         rcut(  3):  1.630  rcutus(  3):  0.000  n(  3):   0  l(  3):   2
+         rcut(  4):  1.630  rcutus(  4):  0.000  n(  4):   0  l(  4):   0
+
+       nat: 8
+       natomwfc: 56
+
+       number_of_proj: 6
+       mesh_size: 1766
+
+       element: B 
+       z_valence:   3.000000
+       type: SL  
+       functional: PBE                      
+       relativistic: scalar
+       is_ultrasoft:  F
+       is_paw:  F
+       is_coulomb:  F
+       has_so:  F
+       has_wfc:  F
+       has_gipaw:  F
+       paw_as_gipaw:  F
+       core_correction:  T
+       with_metagga_info:  F
+       total_psenergy: -5.1987395843100002
+       wfc_cutoff:   0.000000
+       rho_cutoff:  15.330000
+       l_max: 1
+       l_max_rho: 0
+       l_local: -1
+       r_max:   0.000000
+       number_of_wfc: 2
+         rcut(  1):  1.230  rcutus(  1):  0.000  n(  1):   0  l(  1):   0
+         rcut(  2):  1.230  rcutus(  2):  0.000  n(  2):   0  l(  2):   1
+
+       nat: 8
+       natomwfc: 56
+
+       number_of_proj: 4
+       mesh_size: 1534
+
+       element: Ru
+       z_valence:  16.000000
+       type: SL  
+       functional: PBE                      
+       relativistic: scalar
+       is_ultrasoft:  F
+       is_paw:  F
+       is_coulomb:  F
+       has_so:  F
+       has_wfc:  F
+       has_gipaw:  F
+       paw_as_gipaw:  F
+       core_correction:  T
+       with_metagga_info:  F
+       total_psenergy: -189.8390093030000116
+       wfc_cutoff:   0.000000
+       rho_cutoff:  15.830000
+       l_max: 2
+       l_max_rho: 0
+       l_local: -1
+       r_max:   0.000000
+       number_of_wfc: 4
+         rcut(  1):  1.430  rcutus(  1):  0.000  n(  1):   0  l(  1):   0
+         rcut(  2):  1.430  rcutus(  2):  0.000  n(  2):   0  l(  2):   1
+         rcut(  3):  1.430  rcutus(  3):  0.000  n(  3):   0  l(  3):   2
+         rcut(  4):  1.430  rcutus(  4):  0.000  n(  4):   0  l(  4):   0
+
+       nat: 8
+       natomwfc: 56
+
+       number_of_proj: 6
+       mesh_size: 1584
+
+       element: N 
+       z_valence:   5.000000
+       type: SL  
+       functional: PBE                      
+       relativistic: scalar
+       is_ultrasoft:  F
+       is_paw:  F
+       is_coulomb:  F
+       has_so:  F
+       has_wfc:  F
+       has_gipaw:  F
+       paw_as_gipaw:  F
+       core_correction:  T
+       with_metagga_info:  F
+       total_psenergy: -19.3380605299000017
+       wfc_cutoff:   0.000000
+       rho_cutoff:  10.570000
+       l_max: 1
+       l_max_rho: 0
+       l_local: -1
+       r_max:   0.000000
+       number_of_wfc: 2
+         rcut(  1):  1.390  rcutus(  1):  0.000  n(  1):   0  l(  1):   0
+         rcut(  2):  1.390  rcutus(  2):  0.000  n(  2):   0  l(  2):   1
+
+       nat: 8
+       natomwfc: 56
+
+       number_of_proj: 4
+       mesh_size: 1058
+
+
+     ef:  1.170247
+     nat    8
+     norb    4
+     rf(nin) 2.848939
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 2.848939
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 2.848939
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 2.848939
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 2.848939
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 2.848939
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 2.848939
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 2.848939
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 1.313330
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 1.313330
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 1.313330
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 1.313330
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 1.313330
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 1.313330
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 1.313330
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 1.313330
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 2.396390
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 2.396390
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 2.396390
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 2.396390
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 2.396390
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 2.396390
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 2.396390
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 2.396390
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 1.484170
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 1.484170
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 1.484170
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 1.484170
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+     rf(nin) 1.484170
+     l    0
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  0  1   s
+
+     rf(nin) 1.484170
+     l    1
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  1  1   p
+
+     rf(nin) 1.484170
+     l    2
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  2  1   d
+
+     rf(nin) 1.484170
+     l    3
+
+     
+     Solving radial Schrodinger for
+     n l spin  0  3  1   f
+
+
+
+
+     >>>>>>>>>> PARTIAL E-PH BEGIN <<<<<<<<<<
+
+       Atom # 1  Y  ==============================================================
+
+       Desired r_mt:     2.8489
+
+       Actual r_mt:     2.8489
+
+       atom:   1 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)      0.45427930 (Ry)
+       V(r_mt) - E_F     -0.71596742 (Ry)
+
+       u_0(r_mt) =      -1.16735426
+       R_0(r_mt) =      -0.40975060
+
+       u_1(r_mt) =      -1.23777016
+       R_1(r_mt) =      -0.43446714
+
+               M_sp   (      2.84893850):     -0.90956592 (Ry / bohr)
+             M^2_sp   (      2.84893850):      0.82731016 (Ry / bohr)^2
+               M_sp   (      2.84893850):    -23.38588002 (eV / A)
+             M^2_sp   (      2.84893850):    546.89938418 (eV / A)^2
+
+
+       u_1(r_mt) =      -1.23777016
+       R_1(r_mt) =      -0.43446714
+
+       u_2(r_mt) =       0.81088560
+       R_2(r_mt) =       0.28462727
+
+               M_pd   (      2.84893850):      0.83029685 (Ry / bohr)
+             M^2_pd   (      2.84893850):      0.68939286 (Ry / bohr)^2
+               M_pd   (      2.84893850):     21.34779027 (eV / A)
+             M^2_pd   (      2.84893850):    455.72814932 (eV / A)^2
+
+
+       u_2(r_mt) =       0.81088560
+       R_2(r_mt) =       0.28462727
+
+       u_3(r_mt) =       1.53217970
+       R_3(r_mt) =       0.53780722
+
+               M_df   (      2.84893850):      1.59174571 (Ry / bohr)
+             M^2_df   (      2.84893850):      2.53365442 (Ry / bohr)^2
+               M_df   (      2.84893850):     40.92542775 (eV / A)
+             M^2_df   (      2.84893850):   1674.89063686 (eV / A)^2
+
+
+       Atom # 2  Y  ==============================================================
+
+       Desired r_mt:     2.8489
+
+       Actual r_mt:     2.8489
+
+       atom:   2 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)      0.45427910 (Ry)
+       V(r_mt) - E_F     -0.71596762 (Ry)
+
+       u_0(r_mt) =      -1.16735420
+       R_0(r_mt) =      -0.40975058
+
+       u_1(r_mt) =      -1.23777017
+       R_1(r_mt) =      -0.43446714
+
+               M_sp   (      2.84893850):     -0.90956593 (Ry / bohr)
+             M^2_sp   (      2.84893850):      0.82731018 (Ry / bohr)^2
+               M_sp   (      2.84893850):    -23.38588025 (eV / A)
+             M^2_sp   (      2.84893850):    546.89939493 (eV / A)^2
+
+
+       u_1(r_mt) =      -1.23777017
+       R_1(r_mt) =      -0.43446714
+
+       u_2(r_mt) =       0.81088545
+       R_2(r_mt) =       0.28462722
+
+               M_pd   (      2.84893850):      0.83029675 (Ry / bohr)
+             M^2_pd   (      2.84893850):      0.68939270 (Ry / bohr)^2
+               M_pd   (      2.84893850):     21.34778783 (eV / A)
+             M^2_pd   (      2.84893850):    455.72804505 (eV / A)^2
+
+
+       u_2(r_mt) =       0.81088545
+       R_2(r_mt) =       0.28462722
+
+       u_3(r_mt) =       1.53217966
+       R_3(r_mt) =       0.53780721
+
+               M_df   (      2.84893850):      1.59174582 (Ry / bohr)
+             M^2_df   (      2.84893850):      2.53365476 (Ry / bohr)^2
+               M_df   (      2.84893850):     40.92543053 (eV / A)
+             M^2_df   (      2.84893850):   1674.89086439 (eV / A)^2
+
+
+       Atom # 3  B  ==============================================================
+
+       Desired r_mt:     1.3133
+
+       Actual r_mt:     1.3133
+
+       atom:   3 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)     -0.75892452 (Ry)
+       V(r_mt) - E_F     -1.92917125 (Ry)
+
+       u_0(r_mt) =       1.43822284
+       R_0(r_mt) =       1.09509622
+
+       u_1(r_mt) =       1.34725310
+       R_1(r_mt) =       1.02582975
+
+               M_sp   (      1.31333011):     -2.49012902 (Ry / bohr)
+             M^2_sp   (      1.31333011):      6.20074252 (Ry / bohr)^2
+               M_sp   (      1.31333011):    -64.02379118 (eV / A)
+             M^2_sp   (      1.31333011):   4099.04583740 (eV / A)^2
+
+
+       u_1(r_mt) =       1.34725310
+       R_1(r_mt) =       1.02582975
+
+       u_2(r_mt) =       2.09274759
+       R_2(r_mt) =       1.59346655
+
+               M_pd   (      1.31333011):      5.90214623 (Ry / bohr)
+             M^2_pd   (      1.31333011):     34.83533008 (Ry / bohr)^2
+               M_pd   (      1.31333011):    151.75028076 (eV / A)
+             M^2_pd   (      1.31333011):  23028.14771000 (eV / A)^2
+
+
+       u_2(r_mt) =       2.09274759
+       R_2(r_mt) =       1.59346655
+
+       u_3(r_mt) =       2.48149056
+       R_3(r_mt) =       1.88946446
+
+               M_df   (      1.31333011):      3.60981008 (Ry / bohr)
+             M^2_df   (      1.31333011):     13.03072885 (Ry / bohr)^2
+               M_df   (      1.31333011):     92.81194887 (eV / A)
+             M^2_df   (      1.31333011):   8614.05785395 (eV / A)^2
+
+
+       Atom # 4  B  ==============================================================
+
+       Desired r_mt:     1.3133
+
+       Actual r_mt:     1.3133
+
+       atom:   4 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)     -0.75892420 (Ry)
+       V(r_mt) - E_F     -1.92917093 (Ry)
+
+       u_0(r_mt) =       1.43822289
+       R_0(r_mt) =       1.09509626
+
+       u_1(r_mt) =       1.34725316
+       R_1(r_mt) =       1.02582980
+
+               M_sp   (      1.31333011):     -2.49012870 (Ry / bohr)
+             M^2_sp   (      1.31333011):      6.20074093 (Ry / bohr)^2
+               M_sp   (      1.31333011):    -64.02378298 (eV / A)
+             M^2_sp   (      1.31333011):   4099.04478691 (eV / A)^2
+
+
+       u_1(r_mt) =       1.34725316
+       R_1(r_mt) =       1.02582980
+
+       u_2(r_mt) =       2.09274762
+       R_2(r_mt) =       1.59346657
+
+               M_pd   (      1.31333011):      5.90214609 (Ry / bohr)
+             M^2_pd   (      1.31333011):     34.83532852 (Ry / bohr)^2
+               M_pd   (      1.31333011):    151.75027736 (eV / A)
+             M^2_pd   (      1.31333011):  23028.14668012 (eV / A)^2
+
+
+       u_2(r_mt) =       2.09274762
+       R_2(r_mt) =       1.59346657
+
+       u_3(r_mt) =       2.48149058
+       R_3(r_mt) =       1.88946447
+
+               M_df   (      1.31333011):      3.60981008 (Ry / bohr)
+             M^2_df   (      1.31333011):     13.03072883 (Ry / bohr)^2
+               M_df   (      1.31333011):     92.81194883 (eV / A)
+             M^2_df   (      1.31333011):   8614.05784478 (eV / A)^2
+
+
+       Atom # 5  Ru ==============================================================
+
+       Desired r_mt:     2.3964
+
+       Actual r_mt:     2.3964
+
+       atom:   5 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)      0.16271376 (Ry)
+       V(r_mt) - E_F     -1.00753297 (Ry)
+
+       u_0(r_mt) =      -1.19010550
+       R_0(r_mt) =      -0.49662420
+
+       u_1(r_mt) =      -1.38686855
+       R_1(r_mt) =      -0.57873229
+
+               M_sp   (      2.39639047):     -1.13596601 (Ry / bohr)
+             M^2_sp   (      2.39639047):      1.29041878 (Ry / bohr)^2
+               M_sp   (      2.39639047):    -29.20686042 (eV / A)
+             M^2_sp   (      2.39639047):    853.04069554 (eV / A)^2
+
+
+       u_1(r_mt) =      -1.38686855
+       R_1(r_mt) =      -0.57873229
+
+       u_2(r_mt) =       0.43429552
+       R_2(r_mt) =       0.18122903
+
+               M_pd   (      2.39639047):      0.62169432 (Ry / bohr)
+             M^2_pd   (      2.39639047):      0.38650383 (Ry / bohr)^2
+               M_pd   (      2.39639047):     15.98440364 (eV / A)
+             M^2_pd   (      2.39639047):    255.50115987 (eV / A)^2
+
+
+       u_2(r_mt) =       0.43429552
+       R_2(r_mt) =       0.18122903
+
+       u_3(r_mt) =       1.65585771
+       R_3(r_mt) =       0.69097993
+
+               M_df   (      2.39639047):      3.37784975 (Ry / bohr)
+             M^2_df   (      2.39639047):     11.40986896 (Ry / bohr)^2
+               M_df   (      2.39639047):     86.84800898 (eV / A)
+             M^2_df   (      2.39639047):   7542.57666381 (eV / A)^2
+
+
+       Atom # 6  Ru ==============================================================
+
+       Desired r_mt:     2.3964
+
+       Actual r_mt:     2.3964
+
+       atom:   6 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)      0.16271378 (Ry)
+       V(r_mt) - E_F     -1.00753295 (Ry)
+
+       u_0(r_mt) =      -1.19010550
+       R_0(r_mt) =      -0.49662420
+
+       u_1(r_mt) =      -1.38686855
+       R_1(r_mt) =      -0.57873229
+
+               M_sp   (      2.39639047):     -1.13596598 (Ry / bohr)
+             M^2_sp   (      2.39639047):      1.29041871 (Ry / bohr)^2
+               M_sp   (      2.39639047):    -29.20685970 (eV / A)
+             M^2_sp   (      2.39639047):    853.04065372 (eV / A)^2
+
+
+       u_1(r_mt) =      -1.38686855
+       R_1(r_mt) =      -0.57873229
+
+       u_2(r_mt) =       0.43429551
+       R_2(r_mt) =       0.18122902
+
+               M_pd   (      2.39639047):      0.62169429 (Ry / bohr)
+             M^2_pd   (      2.39639047):      0.38650380 (Ry / bohr)^2
+               M_pd   (      2.39639047):     15.98440299 (eV / A)
+             M^2_pd   (      2.39639047):    255.50113886 (eV / A)^2
+
+
+       u_2(r_mt) =       0.43429551
+       R_2(r_mt) =       0.18122902
+
+       u_3(r_mt) =       1.65585771
+       R_3(r_mt) =       0.69097992
+
+               M_df   (      2.39639047):      3.37784978 (Ry / bohr)
+             M^2_df   (      2.39639047):     11.40986917 (Ry / bohr)^2
+               M_df   (      2.39639047):     86.84800977 (eV / A)
+             M^2_df   (      2.39639047):   7542.57680051 (eV / A)^2
+
+
+       Atom # 7  N  ==============================================================
+
+       Desired r_mt:     1.4842
+
+       Actual r_mt:     1.4842
+
+       atom:   7 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)     -0.29013832 (Ry)
+       V(r_mt) - E_F     -1.46038505 (Ry)
+
+       u_0(r_mt) =       0.63618157
+       R_0(r_mt) =       0.42864474
+
+       u_1(r_mt) =       0.88593991
+       R_1(r_mt) =       0.59692625
+
+               M_sp   (      1.48416980):     -0.53928731 (Ry / bohr)
+             M^2_sp   (      1.48416980):      0.29083080 (Ry / bohr)^2
+               M_sp   (      1.48416980):    -13.86563420 (eV / A)
+             M^2_sp   (      1.48416980):    192.25581189 (eV / A)^2
+
+
+       u_1(r_mt) =       0.88593991
+       R_1(r_mt) =       0.59692625
+
+       u_2(r_mt) =       1.93151411
+       R_2(r_mt) =       1.30141047
+
+               M_pd   (      1.48416980):      6.53591354 (Ry / bohr)
+             M^2_pd   (      1.48416980):     42.71816584 (Ry / bohr)^2
+               M_pd   (      1.48416980):    168.04509361 (eV / A)
+             M^2_pd   (      1.48416980):  28239.15348779 (eV / A)^2
+
+
+       u_2(r_mt) =       1.93151411
+       R_2(r_mt) =       1.30141047
+
+       u_3(r_mt) =       2.32125303
+       R_3(r_mt) =       1.56400772
+
+               M_df   (      1.48416980):      3.42720771 (Ry / bohr)
+             M^2_df   (      1.48416980):     11.74575272 (Ry / bohr)^2
+               M_df   (      1.48416980):     88.11705317 (eV / A)
+             M^2_df   (      1.48416980):   7764.61505917 (eV / A)^2
+
+
+       Atom # 8  N  ==============================================================
+
+       Desired r_mt:     1.4842
+
+       Actual r_mt:     1.4842
+
+       atom:   8 spin:   1
+
+       E_F      1.17024673 (Ry)
+       V(r_mt)     -0.29013848 (Ry)
+       V(r_mt) - E_F     -1.46038521 (Ry)
+
+       u_0(r_mt) =       0.63618152
+       R_0(r_mt) =       0.42864470
+
+       u_1(r_mt) =       0.88593986
+       R_1(r_mt) =       0.59692621
+
+               M_sp   (      1.48416980):     -0.53928759 (Ry / bohr)
+             M^2_sp   (      1.48416980):      0.29083110 (Ry / bohr)^2
+               M_sp   (      1.48416980):    -13.86564131 (eV / A)
+             M^2_sp   (      1.48416980):    192.25600884 (eV / A)^2
+
+
+       u_1(r_mt) =       0.88593986
+       R_1(r_mt) =       0.59692621
+
+       u_2(r_mt) =       1.93151409
+       R_2(r_mt) =       1.30141046
+
+               M_pd   (      1.48416980):      6.53591364 (Ry / bohr)
+             M^2_pd   (      1.48416980):     42.71816705 (Ry / bohr)^2
+               M_pd   (      1.48416980):    168.04509600 (eV / A)
+             M^2_pd   (      1.48416980):  28239.15428883 (eV / A)^2
+
+
+       u_2(r_mt) =       1.93151409
+       R_2(r_mt) =       1.30141046
+
+       u_3(r_mt) =       2.32125302
+       R_3(r_mt) =       1.56400772
+
+               M_df   (      1.48416980):      3.42720770 (Ry / bohr)
+             M^2_df   (      1.48416980):     11.74575260 (Ry / bohr)^2
+               M_df   (      1.48416980):     88.11705275 (eV / A)
+             M^2_df   (      1.48416980):   7764.61498455 (eV / A)^2
+
+
+     >>>>>>>>>>  PARTIAL E-PH END  <<<<<<<<<<
+
+
+
+
+     >>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<
+
+       ltetra =  T
+       two_fermi_energies =  F
+       nspin = 1
+       nkstot = 40
+       nbnd = 42
+       omega =   668.6090
+       isk(     1) = 1
+       isk(    40) = 1
+       sum_wk =     2.0000
+
+       sum_wdk =    64.3746
+
+
+      Reading all stored psi_kg coefficients of the wavefunctions...
+      Done reading all stored psi_kg coefficients of the wavefunctions.
+
+
+       psi_kg_norm =     1.0000
+
+
+      Computing partial DOS per atom per spin = f(r, E_F)...
+
+      atom #1 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #2 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #3 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #4 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #5 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #6 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #7 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+      atom #8 out of 8
+
+       spin #1 out of 1
+        ir #401 on [401, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+       Symmetrizing partial DOS = f(r, E_F)...
+       Done symmetrizing partial DOS = f(r, E_F).
+
+
+      Done computing partial DOS per atom per spin = f(r, E_F).
+
+
+
+      Computing total DOS per atom per spin = f(spin, E_F)...
+
+      spin #1 out of 1
+
+       n(E_F, 1) =   4.02341252E+00
+      Done computing total DOS per atom per spin = f(spin, E_F).
+
+
+
+     >>>>>>>>    PARTIAL DOS END    <<<<<<<<<
+
+
+
+
+
+
+     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OUTPUT BEGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+      ################################### ATOMS #####################################
+
+      Atom #    1  Y  ==============================================================
+
+      r_mt = 2.848939 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   2.84894) =     0.4543 (Ry) =     6.1808    (eV)
+           V(   2.84894) - E_F =    -0.7160 (Ry) =    -9.7412    (eV)
+
+           E_F:    1.1702
+           V:    0.4543
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   2.84894):       -0.9096     (Ry / bohr)
+              M^2_sp(   2.84894):        0.8273   (Ry / bohr)^2
+                M_sp(   2.84894):      -23.3859        (eV / A)
+              M^2_sp(   2.84894):      546.8994      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_s(   2.84894) (1 / Ry):    2.7296E-02
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_s / n :     6.7843E-03
+                n_p / n :     4.1672E-02
+                n_s:    2.7296E-02
+
+           eta_sp(   2.84894):    7.8420E-05 (Ry / bohr^2) =    3.8102E-03 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.84894):        0.8303     (Ry / bohr)
+              M^2_pd(   2.84894):        0.6894   (Ry / bohr)^2
+                M_pd(   2.84894):       21.3478        (eV / A)
+              M^2_pd(   2.84894):      455.7281      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_p / n :     4.1672E-02
+                n_d / n :     2.7945E-01
+                n_p:    1.6766E-01
+
+           eta_pd(   2.84894):    1.0767E-03 (Ry / bohr^2) =    5.2313E-02 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   2.84894):        1.5917     (Ry / bohr)
+              M^2_df(   2.84894):        2.5337   (Ry / bohr)^2
+                M_df(   2.84894):       40.9254        (eV / A)
+              M^2_df(   2.84894):     1674.8906      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_f(   2.84894) (1 / Ry):    6.6352E-02
+                n_d / n :     2.7945E-01
+                n_f / n :     1.6491E-02
+                n_d:    1.1244E+00
+                n_f:    6.6352E-02
+
+           eta_df(   2.84894):    1.0067E-03 (Ry / bohr^2) =    4.8913E-02 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   2.84894):    2.1618E-03 (Ry / bohr^2) =    1.0504E-01 (eV / A^2)
+          ? eta_tot:    1.0504E-01
+
+
+
+      Atom #    2  Y  ==============================================================
+
+      r_mt = 2.848939 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   2.84894) =     0.4543 (Ry) =     6.1808    (eV)
+           V(   2.84894) - E_F =    -0.7160 (Ry) =    -9.7412    (eV)
+
+           E_F:    1.1702
+           V:    0.4543
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   2.84894):       -0.9096     (Ry / bohr)
+              M^2_sp(   2.84894):        0.8273   (Ry / bohr)^2
+                M_sp(   2.84894):      -23.3859        (eV / A)
+              M^2_sp(   2.84894):      546.8994      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_s(   2.84894) (1 / Ry):    2.7296E-02
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_s / n :     6.7843E-03
+                n_p / n :     4.1672E-02
+                n_s:    2.7296E-02
+
+           eta_sp(   2.84894):    7.8420E-05 (Ry / bohr^2) =    3.8102E-03 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.84894):        0.8303     (Ry / bohr)
+              M^2_pd(   2.84894):        0.6894   (Ry / bohr)^2
+                M_pd(   2.84894):       21.3478        (eV / A)
+              M^2_pd(   2.84894):      455.7280      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_p / n :     4.1672E-02
+                n_d / n :     2.7945E-01
+                n_p:    1.6766E-01
+
+           eta_pd(   2.84894):    1.0767E-03 (Ry / bohr^2) =    5.2313E-02 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   2.84894):        1.5917     (Ry / bohr)
+              M^2_df(   2.84894):        2.5337   (Ry / bohr)^2
+                M_df(   2.84894):       40.9254        (eV / A)
+              M^2_df(   2.84894):     1674.8909      (eV / A)^2
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_f(   2.84894) (1 / Ry):    6.6352E-02
+                n_d / n :     2.7945E-01
+                n_f / n :     1.6491E-02
+                n_d:    1.1244E+00
+                n_f:    6.6352E-02
+
+           eta_df(   2.84894):    1.0067E-03 (Ry / bohr^2) =    4.8913E-02 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   2.84894):    2.1618E-03 (Ry / bohr^2) =    1.0504E-01 (eV / A^2)
+          ? eta_tot:    1.0504E-01
+
+
+
+      Atom #    3  B  ==============================================================
+
+      r_mt = 1.313330 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   1.31333) =    -0.7589 (Ry) =   -10.3257    (eV)
+           V(   1.31333) - E_F =    -1.9292 (Ry) =   -26.2477    (eV)
+
+           E_F:    1.1702
+           V:   -0.7589
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   1.31333):       -2.4901     (Ry / bohr)
+              M^2_sp(   1.31333):        6.2007   (Ry / bohr)^2
+                M_sp(   1.31333):      -64.0238        (eV / A)
+              M^2_sp(   1.31333):     4099.0458      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_s(   1.31333) (1 / Ry):    3.9943E-02
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_s / n :     9.9276E-03
+                n_p / n :     1.2761E-01
+                n_s:    3.9943E-02
+
+           eta_sp(   1.31333):    2.6339E-03 (Ry / bohr^2) =    1.2797E-01 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.31333):        5.9021     (Ry / bohr)
+              M^2_pd(   1.31333):       34.8353   (Ry / bohr)^2
+                M_pd(   1.31333):      151.7503        (eV / A)
+              M^2_pd(   1.31333):    23028.1477      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_p / n :     1.2761E-01
+                n_d / n :     4.7396E-03
+                n_p:    5.1344E-01
+
+           eta_pd(   1.31333):    2.8257E-03 (Ry / bohr^2) =    1.3729E-01 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   1.31333):        3.6098     (Ry / bohr)
+              M^2_df(   1.31333):       13.0307   (Ry / bohr)^2
+                M_df(   1.31333):       92.8119        (eV / A)
+              M^2_df(   1.31333):     8614.0579      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_f(   1.31333) (1 / Ry):    1.6370E-03
+                n_d / n :     4.7396E-03
+                n_f / n :     4.0687E-04
+                n_d:    1.9069E-02
+                n_f:    1.6370E-03
+
+           eta_df(   1.31333):    2.1665E-06 (Ry / bohr^2) =    1.0526E-04 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   1.31333):    5.4618E-03 (Ry / bohr^2) =    2.6537E-01 (eV / A^2)
+          ? eta_tot:    2.6537E-01
+
+
+
+      Atom #    4  B  ==============================================================
+
+      r_mt = 1.313330 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   1.31333) =    -0.7589 (Ry) =   -10.3257    (eV)
+           V(   1.31333) - E_F =    -1.9292 (Ry) =   -26.2477    (eV)
+
+           E_F:    1.1702
+           V:   -0.7589
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   1.31333):       -2.4901     (Ry / bohr)
+              M^2_sp(   1.31333):        6.2007   (Ry / bohr)^2
+                M_sp(   1.31333):      -64.0238        (eV / A)
+              M^2_sp(   1.31333):     4099.0448      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_s(   1.31333) (1 / Ry):    3.9943E-02
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_s / n :     9.9276E-03
+                n_p / n :     1.2761E-01
+                n_s:    3.9943E-02
+
+           eta_sp(   1.31333):    2.6339E-03 (Ry / bohr^2) =    1.2797E-01 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.31333):        5.9021     (Ry / bohr)
+              M^2_pd(   1.31333):       34.8353   (Ry / bohr)^2
+                M_pd(   1.31333):      151.7503        (eV / A)
+              M^2_pd(   1.31333):    23028.1467      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_p / n :     1.2761E-01
+                n_d / n :     4.7396E-03
+                n_p:    5.1344E-01
+
+           eta_pd(   1.31333):    2.8257E-03 (Ry / bohr^2) =    1.3729E-01 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   1.31333):        3.6098     (Ry / bohr)
+              M^2_df(   1.31333):       13.0307   (Ry / bohr)^2
+                M_df(   1.31333):       92.8119        (eV / A)
+              M^2_df(   1.31333):     8614.0578      (eV / A)^2
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_f(   1.31333) (1 / Ry):    1.6370E-03
+                n_d / n :     4.7396E-03
+                n_f / n :     4.0687E-04
+                n_d:    1.9069E-02
+                n_f:    1.6370E-03
+
+           eta_df(   1.31333):    2.1665E-06 (Ry / bohr^2) =    1.0526E-04 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   1.31333):    5.4618E-03 (Ry / bohr^2) =    2.6537E-01 (eV / A^2)
+          ? eta_tot:    2.6537E-01
+
+
+
+      Atom #    5  Ru ==============================================================
+
+      r_mt = 2.396390 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   2.39639) =     0.1627 (Ry) =     2.2138    (eV)
+           V(   2.39639) - E_F =    -1.0075 (Ry) =   -13.7082    (eV)
+
+           E_F:    1.1702
+           V:    0.1627
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   2.39639):       -1.1360     (Ry / bohr)
+              M^2_sp(   2.39639):        1.2904   (Ry / bohr)^2
+                M_sp(   2.39639):      -29.2069        (eV / A)
+              M^2_sp(   2.39639):      853.0407      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_s(   2.39639) (1 / Ry):    9.3486E-02
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_s / n :     2.3236E-02
+                n_p / n :     2.2337E-01
+                n_s:    9.3486E-02
+
+           eta_sp(   2.39639):    2.2456E-03 (Ry / bohr^2) =    1.0911E-01 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.39639):        0.6217     (Ry / bohr)
+              M^2_pd(   2.39639):        0.3865   (Ry / bohr)^2
+                M_pd(   2.39639):       15.9844        (eV / A)
+              M^2_pd(   2.39639):      255.5012      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_p / n :     2.2337E-01
+                n_d / n :     2.1679E+00
+                n_p:    8.9873E-01
+
+           eta_pd(   2.39639):    2.5102E-02 (Ry / bohr^2) =    1.2196E+00 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   2.39639):        3.3778     (Ry / bohr)
+              M^2_df(   2.39639):       11.4099   (Ry / bohr)^2
+                M_df(   2.39639):       86.8480        (eV / A)
+              M^2_df(   2.39639):     7542.5767      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_f(   2.39639) (1 / Ry):    7.9426E-02
+                n_d / n :     2.1679E+00
+                n_f / n :     1.9741E-02
+                n_d:    8.7224E+00
+                n_f:    7.9426E-02
+
+           eta_df(   2.39639):    4.2100E-02 (Ry / bohr^2) =    2.0455E+00 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   2.39639):    6.9447E-02 (Ry / bohr^2) =    3.3742E+00 (eV / A^2)
+          ? eta_tot:    3.3742E+00
+
+
+
+      Atom #    6  Ru ==============================================================
+
+      r_mt = 2.396390 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   2.39639) =     0.1627 (Ry) =     2.2138    (eV)
+           V(   2.39639) - E_F =    -1.0075 (Ry) =   -13.7082    (eV)
+
+           E_F:    1.1702
+           V:    0.1627
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   2.39639):       -1.1360     (Ry / bohr)
+              M^2_sp(   2.39639):        1.2904   (Ry / bohr)^2
+                M_sp(   2.39639):      -29.2069        (eV / A)
+              M^2_sp(   2.39639):      853.0407      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_s(   2.39639) (1 / Ry):    9.3486E-02
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_s / n :     2.3236E-02
+                n_p / n :     2.2337E-01
+                n_s:    9.3486E-02
+
+           eta_sp(   2.39639):    2.2456E-03 (Ry / bohr^2) =    1.0911E-01 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.39639):        0.6217     (Ry / bohr)
+              M^2_pd(   2.39639):        0.3865   (Ry / bohr)^2
+                M_pd(   2.39639):       15.9844        (eV / A)
+              M^2_pd(   2.39639):      255.5011      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_p / n :     2.2337E-01
+                n_d / n :     2.1679E+00
+                n_p:    8.9873E-01
+
+           eta_pd(   2.39639):    2.5102E-02 (Ry / bohr^2) =    1.2196E+00 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   2.39639):        3.3778     (Ry / bohr)
+              M^2_df(   2.39639):       11.4099   (Ry / bohr)^2
+                M_df(   2.39639):       86.8480        (eV / A)
+              M^2_df(   2.39639):     7542.5768      (eV / A)^2
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_f(   2.39639) (1 / Ry):    7.9426E-02
+                n_d / n :     2.1679E+00
+                n_f / n :     1.9741E-02
+                n_d:    8.7224E+00
+                n_f:    7.9426E-02
+
+           eta_df(   2.39639):    4.2100E-02 (Ry / bohr^2) =    2.0455E+00 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   2.39639):    6.9447E-02 (Ry / bohr^2) =    3.3742E+00 (eV / A^2)
+          ? eta_tot:    3.3742E+00
+
+
+
+      Atom #    7  N  ==============================================================
+
+      r_mt = 1.484170 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   1.48417) =    -0.2901 (Ry) =    -3.9475    (eV)
+           V(   1.48417) - E_F =    -1.4604 (Ry) =   -19.8696    (eV)
+
+           E_F:    1.1702
+           V:   -0.2901
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   1.48417):       -0.5393     (Ry / bohr)
+              M^2_sp(   1.48417):        0.2908   (Ry / bohr)^2
+                M_sp(   1.48417):      -13.8656        (eV / A)
+              M^2_sp(   1.48417):      192.2558      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_s(   1.48417) (1 / Ry):    1.1218E-02
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_s / n :     2.7882E-03
+                n_p / n :     1.5472E-01
+                n_s:    1.1218E-02
+
+           eta_sp(   1.48417):    4.2065E-05 (Ry / bohr^2) =    2.0438E-03 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.48417):        6.5359     (Ry / bohr)
+              M^2_pd(   1.48417):       42.7182   (Ry / bohr)^2
+                M_pd(   1.48417):      168.0451        (eV / A)
+              M^2_pd(   1.48417):    28239.1535      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_p / n :     1.5472E-01
+                n_d / n :     3.7548E-03
+                n_p:    6.2250E-01
+
+           eta_pd(   1.48417):    3.3283E-03 (Ry / bohr^2) =    1.6171E-01 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   1.48417):        3.4272     (Ry / bohr)
+              M^2_df(   1.48417):       11.7458   (Ry / bohr)^2
+                M_df(   1.48417):       88.1171        (eV / A)
+              M^2_df(   1.48417):     7764.6151      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_f(   1.48417) (1 / Ry):    1.0434E-03
+                n_d / n :     3.7548E-03
+                n_f / n :     2.5933E-04
+                n_d:    1.5107E-02
+                n_f:    1.0434E-03
+
+           eta_df(   1.48417):    9.8609E-07 (Ry / bohr^2) =    4.7911E-05 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   1.48417):    3.3713E-03 (Ry / bohr^2) =    1.6380E-01 (eV / A^2)
+          ? eta_tot:    1.6380E-01
+
+
+
+      Atom #    8  N  ==============================================================
+
+      r_mt = 1.484170 (bohr)
+
+       Spin: 1 ---------------------------------------------------------------------
+
+           E_F =     1.1702 (Ry) =  15.9220  (eV)
+           V(   1.48417) =    -0.2901 (Ry) =    -3.9475    (eV)
+           V(   1.48417) - E_F =    -1.4604 (Ry) =   -19.8696    (eV)
+
+           E_F:    1.1702
+           V:   -0.2901
+           N(E_F):    3.2187E+01
+
+        l:  s ......................................................................
+
+                M_sp(   1.48417):       -0.5393     (Ry / bohr)
+              M^2_sp(   1.48417):        0.2908   (Ry / bohr)^2
+                M_sp(   1.48417):      -13.8656        (eV / A)
+              M^2_sp(   1.48417):      192.2560      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_s(   1.48417) (1 / Ry):    1.1218E-02
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_s / n :     2.7882E-03
+                n_p / n :     1.5472E-01
+                n_s:    1.1218E-02
+
+           eta_sp(   1.48417):    4.2065E-05 (Ry / bohr^2) =    2.0438E-03 (eV / A^2)
+
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.48417):        6.5359     (Ry / bohr)
+              M^2_pd(   1.48417):       42.7182   (Ry / bohr)^2
+                M_pd(   1.48417):      168.0451        (eV / A)
+              M^2_pd(   1.48417):    28239.1543      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_p / n :     1.5472E-01
+                n_d / n :     3.7548E-03
+                n_p:    6.2250E-01
+
+           eta_pd(   1.48417):    3.3283E-03 (Ry / bohr^2) =    1.6171E-01 (eV / A^2)
+
+
+
+        l:  d ......................................................................
+
+                M_df(   1.48417):        3.4272     (Ry / bohr)
+              M^2_df(   1.48417):       11.7458   (Ry / bohr)^2
+                M_df(   1.48417):       88.1171        (eV / A)
+              M^2_df(   1.48417):     7764.6150      (eV / A)^2
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_f(   1.48417) (1 / Ry):    1.0434E-03
+                n_d / n :     3.7548E-03
+                n_f / n :     2.5933E-04
+                n_d:    1.5107E-02
+                n_f:    1.0434E-03
+
+           eta_df(   1.48417):    9.8609E-07 (Ry / bohr^2) =    4.7911E-05 (eV / A^2)
+
+
+        sum_l: total ...............................................................
+
+        eta_tot(   1.48417):    3.3713E-03 (Ry / bohr^2) =    1.6380E-01 (eV / A^2)
+          ? eta_tot:    1.6380E-01
+
+
+
+
+      sum_n_dos:   6.43746004E+01 (1 / Ry)
+
+
+
+
+      ########################## SYMMETRY TYPES ####################################
+
+      Symmetry type #    1  Y  =====================================================
+
+       Spin: 1 ---------------------------------------------------------------------
+
+        l:  s ......................................................................
+
+                M_sp(   2.84894):       -0.9096     (Ry / bohr)
+              M^2_sp(   2.84894):        0.8273   (Ry / bohr)^2
+                M_sp(   2.84894):      -23.3859        (eV / A)
+              M^2_sp(   2.84894):      546.8994      (eV / A)^2
+              M^2_sp:        0.8273
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_s(   2.84894) (1 / Ry):    2.7296E-02
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_s / n :     6.7843E-03
+                n_p / n :     4.1672E-02
+
+           eta_sp(   2.84894):    1.5684E-04 (Ry / bohr^2) =    7.6203E-03 (eV / A^2)
+           eta_sp:    7.6203E-03
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.84894):        0.8303     (Ry / bohr)
+              M^2_pd(   2.84894):        0.6894   (Ry / bohr)^2
+                M_pd(   2.84894):       21.3478        (eV / A)
+              M^2_pd(   2.84894):      455.7281      (eV / A)^2
+              M^2_pd:        0.6894
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_p(   2.84894) (1 / Ry):    1.6766E-01
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_p / n :     4.1672E-02
+                n_d / n :     2.7945E-01
+
+           eta_pd(   2.84894):    2.1534E-03 (Ry / bohr^2) =    1.0463E-01 (eV / A^2)
+           eta_pd:    1.0463E-01
+
+
+        l:  d ......................................................................
+
+                M_df(   2.84894):        1.5917     (Ry / bohr)
+              M^2_df(   2.84894):        2.5337   (Ry / bohr)^2
+                M_df(   2.84894):       40.9254        (eV / A)
+              M^2_df(   2.84894):     1674.8908      (eV / A)^2
+              M^2_df:        2.5337
+
+                  N(   2.84894) (1 / Ry):    3.2187E+01
+                  n(   2.84894) (1 / Ry):    4.0234E+00
+                n_d(   2.84894) (1 / Ry):    1.1244E+00
+                n_f(   2.84894) (1 / Ry):    6.6352E-02
+                n_d / n :     2.7945E-01
+                n_f / n :     1.6491E-02
+
+           eta_df(   2.84894):    2.0134E-03 (Ry / bohr^2) =    9.7826E-02 (eV / A^2)
+           eta_df:    9.7826E-02
+
+        sum_l: total ...............................................................
+        eta_tot(   2.84894):    4.3236E-03 (Ry / bohr^2) =    2.1007E-01 (eV / A^2)
+          ! eta_tot:    2.1007E-01
+
+
+
+      Symmetry type #    2  B  =====================================================
+
+       Spin: 1 ---------------------------------------------------------------------
+
+        l:  s ......................................................................
+
+                M_sp(   1.31333):       -2.4901     (Ry / bohr)
+              M^2_sp(   1.31333):        6.2007   (Ry / bohr)^2
+                M_sp(   1.31333):      -64.0238        (eV / A)
+              M^2_sp(   1.31333):     4099.0453      (eV / A)^2
+              M^2_sp:        6.2007
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_s(   1.31333) (1 / Ry):    3.9943E-02
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_s / n :     9.9276E-03
+                n_p / n :     1.2761E-01
+
+           eta_sp(   1.31333):    5.2677E-03 (Ry / bohr^2) =    2.5594E-01 (eV / A^2)
+           eta_sp:    2.5594E-01
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.31333):        5.9021     (Ry / bohr)
+              M^2_pd(   1.31333):       34.8353   (Ry / bohr)^2
+                M_pd(   1.31333):      151.7503        (eV / A)
+              M^2_pd(   1.31333):    23028.1472      (eV / A)^2
+              M^2_pd:       34.8353
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_p(   1.31333) (1 / Ry):    5.1344E-01
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_p / n :     1.2761E-01
+                n_d / n :     4.7396E-03
+
+           eta_pd(   1.31333):    5.6514E-03 (Ry / bohr^2) =    2.7459E-01 (eV / A^2)
+           eta_pd:    2.7459E-01
+
+
+        l:  d ......................................................................
+
+                M_df(   1.31333):        3.6098     (Ry / bohr)
+              M^2_df(   1.31333):       13.0307   (Ry / bohr)^2
+                M_df(   1.31333):       92.8119        (eV / A)
+              M^2_df(   1.31333):     8614.0578      (eV / A)^2
+              M^2_df:       13.0307
+
+                  N(   1.31333) (1 / Ry):    3.2187E+01
+                  n(   1.31333) (1 / Ry):    4.0234E+00
+                n_d(   1.31333) (1 / Ry):    1.9069E-02
+                n_f(   1.31333) (1 / Ry):    1.6370E-03
+                n_d / n :     4.7396E-03
+                n_f / n :     4.0687E-04
+
+           eta_df(   1.31333):    4.3329E-06 (Ry / bohr^2) =    2.1052E-04 (eV / A^2)
+           eta_df:    2.1052E-04
+
+        sum_l: total ...............................................................
+        eta_tot(   1.31333):    1.0924E-02 (Ry / bohr^2) =    5.3074E-01 (eV / A^2)
+          ! eta_tot:    5.3074E-01
+
+
+
+      Symmetry type #    3  Ru =====================================================
+
+       Spin: 1 ---------------------------------------------------------------------
+
+        l:  s ......................................................................
+
+                M_sp(   2.39639):       -1.1360     (Ry / bohr)
+              M^2_sp(   2.39639):        1.2904   (Ry / bohr)^2
+                M_sp(   2.39639):      -29.2069        (eV / A)
+              M^2_sp(   2.39639):      853.0407      (eV / A)^2
+              M^2_sp:        1.2904
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_s(   2.39639) (1 / Ry):    9.3486E-02
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_s / n :     2.3236E-02
+                n_p / n :     2.2337E-01
+
+           eta_sp(   2.39639):    4.4912E-03 (Ry / bohr^2) =    2.1821E-01 (eV / A^2)
+           eta_sp:    2.1821E-01
+
+
+        l:  p ......................................................................
+
+                M_pd(   2.39639):        0.6217     (Ry / bohr)
+              M^2_pd(   2.39639):        0.3865   (Ry / bohr)^2
+                M_pd(   2.39639):       15.9844        (eV / A)
+              M^2_pd(   2.39639):      255.5011      (eV / A)^2
+              M^2_pd:        0.3865
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_p(   2.39639) (1 / Ry):    8.9873E-01
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_p / n :     2.2337E-01
+                n_d / n :     2.1679E+00
+
+           eta_pd(   2.39639):    5.0203E-02 (Ry / bohr^2) =    2.4392E+00 (eV / A^2)
+           eta_pd:    2.4392E+00
+
+
+        l:  d ......................................................................
+
+                M_df(   2.39639):        3.3778     (Ry / bohr)
+              M^2_df(   2.39639):       11.4099   (Ry / bohr)^2
+                M_df(   2.39639):       86.8480        (eV / A)
+              M^2_df(   2.39639):     7542.5767      (eV / A)^2
+              M^2_df:       11.4099
+
+                  N(   2.39639) (1 / Ry):    3.2187E+01
+                  n(   2.39639) (1 / Ry):    4.0234E+00
+                n_d(   2.39639) (1 / Ry):    8.7224E+00
+                n_f(   2.39639) (1 / Ry):    7.9426E-02
+                n_d / n :     2.1679E+00
+                n_f / n :     1.9741E-02
+
+           eta_df(   2.39639):    8.4199E-02 (Ry / bohr^2) =    4.0910E+00 (eV / A^2)
+           eta_df:    4.0910E+00
+
+        sum_l: total ...............................................................
+        eta_tot(   2.39639):    1.3889E-01 (Ry / bohr^2) =    6.7484E+00 (eV / A^2)
+          ! eta_tot:    6.7484E+00
+
+
+
+      Symmetry type #    4  N  =====================================================
+
+       Spin: 1 ---------------------------------------------------------------------
+
+        l:  s ......................................................................
+
+                M_sp(   1.48417):       -0.5393     (Ry / bohr)
+              M^2_sp(   1.48417):        0.2908   (Ry / bohr)^2
+                M_sp(   1.48417):      -13.8656        (eV / A)
+              M^2_sp(   1.48417):      192.2559      (eV / A)^2
+              M^2_sp:        0.2908
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_s(   1.48417) (1 / Ry):    1.1218E-02
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_s / n :     2.7882E-03
+                n_p / n :     1.5472E-01
+
+           eta_sp(   1.48417):    8.4130E-05 (Ry / bohr^2) =    4.0876E-03 (eV / A^2)
+           eta_sp:    4.0876E-03
+
+
+        l:  p ......................................................................
+
+                M_pd(   1.48417):        6.5359     (Ry / bohr)
+              M^2_pd(   1.48417):       42.7182   (Ry / bohr)^2
+                M_pd(   1.48417):      168.0451        (eV / A)
+              M^2_pd(   1.48417):    28239.1539      (eV / A)^2
+              M^2_pd:       42.7182
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_p(   1.48417) (1 / Ry):    6.2250E-01
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_p / n :     1.5472E-01
+                n_d / n :     3.7548E-03
+
+           eta_pd(   1.48417):    6.6565E-03 (Ry / bohr^2) =    3.2342E-01 (eV / A^2)
+           eta_pd:    3.2342E-01
+
+
+        l:  d ......................................................................
+
+                M_df(   1.48417):        3.4272     (Ry / bohr)
+              M^2_df(   1.48417):       11.7458   (Ry / bohr)^2
+                M_df(   1.48417):       88.1171        (eV / A)
+              M^2_df(   1.48417):     7764.6150      (eV / A)^2
+              M^2_df:       11.7458
+
+                  N(   1.48417) (1 / Ry):    3.2187E+01
+                  n(   1.48417) (1 / Ry):    4.0234E+00
+                n_d(   1.48417) (1 / Ry):    1.5107E-02
+                n_f(   1.48417) (1 / Ry):    1.0434E-03
+                n_d / n :     3.7548E-03
+                n_f / n :     2.5933E-04
+
+           eta_df(   1.48417):    1.9722E-06 (Ry / bohr^2) =    9.5822E-05 (eV / A^2)
+           eta_df:    9.5822E-05
+
+        sum_l: total ...............................................................
+        eta_tot(   1.48417):    6.7426E-03 (Ry / bohr^2) =    3.2760E-01 (eV / A^2)
+          ! eta_tot:    3.2760E-01
+
+
+
+     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  OUTPUT END  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+     Writing dat files...
+     writing chir
+     writing betar
+     writing vlocionr
+     writing vsemilocr
+     writing vsemilocr
+     writing vlocscr00rf
+     writing vlocscf00rf
+     writing vsemilocrf
+     writing urf
+     writing duderf
+     writing dudrrf
+     writing d2udrderf
+     writing mll1rf
+     writing vfullrf
+     writing rvfullrf
+     writing rvfullrf
+     writing dos_nlmrf
+     writing dos_nlrf
+     writing dos_nrf
+     writing etall1rf
+     Done writing dat files.
+
+     rmta        : module-specific arrays are deallocated.
+ 
+     rmta_init    :      2.68s CPU      2.69s WALL (       1 calls)
+     set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
+     set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
+     set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
+     tetra_delta_ :      0.00s CPU      0.00s WALL (       1 calls)
+     set_dos_nlm_ :      8.56s CPU      8.70s WALL (       1 calls)
+     set_dos_n    :      0.00s CPU      0.00s WALL (       1 calls)
+     set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
+     print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
+     rmta_write   :      0.08s CPU      0.08s WALL (       1 calls)
+     rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
+ 
+     RMTA         :     11.54s CPU     11.74s WALL
+
+ 
+   This run was terminated on:  14: 3:32   9Sep2026            
+
+=------------------------------------------------------------------------------=
+   JOB DONE.
+=------------------------------------------------------------------------------=
