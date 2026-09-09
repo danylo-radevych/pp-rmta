@@ -681,7 +681,7 @@
     SUBROUTINE check_rmt()
     !---------------------------------------------------------------------------
     !!
-    !! Safety checks for the rmt radii
+    !! Safety checks for the MT radii
     !!
       USE io_global, ONLY: stdout
       USE sym_type, ONLY: nst, ist_i, ist_ityp
@@ -721,6 +721,7 @@
         !
       END DO
       !
+      ! check neighbors
       !
       DO iat = 1, natoms
         !
@@ -743,6 +744,7 @@
         !
       END DO ! iat
       !
+      ! check replicas
       !
       DO iat = 1, natoms
         !
@@ -753,7 +755,7 @@
             !
             WRITE(stdout, '(/5x, "Replica spheres ", I0, " and ", &
               & I0, " overlap:")') &
-              iat, inn_i(inn, iat)
+              iat, inn_i(jat, iat)
             WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", &
               & F0.16)') &
               mt_rmt(ist_i(iat)), mt_rmt(ist_i(jat)), nr_dist(jat, iat)
