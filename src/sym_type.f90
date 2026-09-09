@@ -69,6 +69,7 @@
       USE ions_base, ONLY: nat, ityp
       USE symm_base, ONLY: nrot, irt
       USE uspp_param, ONLY: upf
+      USE const, ONLY: zero, one
       !
       IMPLICIT NONE
       !
@@ -79,6 +80,8 @@
       INTEGER :: irot
       !! symmatry index
       INTEGER :: iat
+      !! atomic index
+      INTEGER :: jat
       !! atomic index
       INTEGER :: counter
       !! counts number of symmetry partners
@@ -101,9 +104,9 @@
         IF (ierr /= 0) CALL errore(routine_name, &
           'Error allocating st_wt', 1)
       END IF
-      st_wt(:) = 1.0_dp
+      st_wt(:) = one
       nst = 0
-      sum_st_wt = 0.0_dp
+      sum_st_wt = zero
       !
       ALLOCATE(ist_i(nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ist_i', 1)
@@ -117,6 +120,8 @@
           iat, nat, upf(ityp(iat))%psd
         counter = 1
         !
+        ! assign a sym. type index
+        !
         IF (ist_i(iat) == 0) THEN
           IF (iat == 1) THEN
             ist_i(iat) = 1
@@ -125,24 +130,39 @@
           END IF
         END IF
         !
+        ! loop over symmetry rotation identified by QE
+        !
         DO irot = 1, nrot
-          IF ((irt(irot, iat) > 0) .AND. (irt(irot, iat) /= iat) .AND. &
-            (irt(irot, iat) <= nat)) THEN
-            WRITE(stdout, '(7x, "irt(", I2, ", ", I2, ") = ", I0, ": ", A)') &
-              irot, iat, irt(irot, iat), upf(ityp(irt(irot, iat)))%psd
-            counter = counter + 1
+          !
+          jat = irt(irot, iat)
+          !IF ( (irt(irot, iat) > 0) .AND. (irt(irot, iat) /= iat) .AND. &
+          !  (irt(irot, iat) <= nat) ) THEN
+          IF ( (jat > 0) .AND. (jat /= iat) .AND. &
+            (jat <= nat) ) THEN
             !
-            IF (ist_i(irt(irot, iat)) == 0) THEN
-              ist_i(irt(irot, iat)) = ist_i(iat)
-            END IF
+            IF (upf(ityp(iat))%psd == upf(ityp(jat))%psd) THEN
+              !
+              WRITE(stdout, '(7x, "irt(", I2, ", ", I2, ") = ", I0, ": ", A)') &
+                irot, iat, jat, upf(ityp(jat))%psd
+              counter = counter + 1
+              !
+              IF (ist_i(jat) == 0) THEN
+                ist_i(jat) = ist_i(iat)
+              END IF
+              !
+            END IF ! same chem element
             !
-          END IF
+          END IF ! sym. type criteria
+          !
         END DO ! irot
+        !
         WRITE(stdout, '(6x, "symmetry type: ", I4)') ist_i(iat)
         WRITE(stdout, '(6x, "# of pairs: ", I4)') counter
+        !
         ! st_wt(iat) = st_wt(iat) / counter
         ! sum_st_wt = sum_st_wt + st_wt(iat)
         ! WRITE(stdout, '(6x, "symmetry weight: ", F10.8)') st_wt(iat)
+        !
       END DO ! iat
       WRITE(stdout, '(/5x)')
       !
