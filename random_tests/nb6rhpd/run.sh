@@ -4,7 +4,6 @@
 
 ncpu=8
 # ncpu=$SLURM_NTASKS
-export OMP_NUM_THREADS=2
 
 EXEC="mpirun"
 ECHO=echo
@@ -151,7 +150,7 @@ cat > $NAME.in << EOF
 
 &system
  ibrav = $IBRAV
- ! celldm(1) = $ALAT
+ celldm(1) = $ALAT
  nat = $NAT
  ntyp = $NTYP
  ecutwfc = $ECUT
