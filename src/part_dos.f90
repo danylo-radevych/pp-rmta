@@ -1156,7 +1156,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 3
+      igp_scale = 5
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
