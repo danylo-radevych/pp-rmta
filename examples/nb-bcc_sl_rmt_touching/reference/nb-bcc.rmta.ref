@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on  8Sep2026 at 10:21:40 
+     Program RMTA v.7.5 starts on  9Sep2026 at 11:23:30 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     2966 MiB available memory on the printing compute node when the environment starts
+     1062 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -90,19 +90,16 @@
 
 
 
+     Summary of the MT radii:
+
      MT radii for symmetry types
-
       symmetry type #   1  Nb
-      MT radius: 2.70129925 bohr = 1.42946600 A
-
-
-
-
+       MT radius: 2.70129925 bohr = 1.42946600 A
      MT radii for atoms
       rmt(1) =  2.7012992514735696
 
-
-
+     Performing safety checks for the MT radii...
+     Done safety checks for the MT radii.
 
      tau (cartesian, bohr)
           0.0000      0.0000      0.0000
@@ -326,13 +323,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_s(   2.70130) (1 / Ry):    1.6375E-01
-                n_p(   2.70130) (1 / Ry):    1.1103E+00
-                n_s / n :     1.6030E-02
-                n_p / n :     1.0869E-01
-                n_s:    1.6375E-01
+                n_s(   2.70130) (1 / Ry):    1.5947E-01
+                n_p(   2.70130) (1 / Ry):    1.1188E+00
+                n_s / n :     1.5611E-02
+                n_p / n :     1.0952E-01
+                n_s:    1.5947E-01
 
-           eta_sp(   2.70130):    9.0558E-03 (Ry / bohr^2) =    4.3999E-01 (eV / A^2)
+           eta_sp(   2.70130):    8.8866E-03 (Ry / bohr^2) =    4.3177E-01 (eV / A^2)
 
 
 
@@ -345,13 +342,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_p(   2.70130) (1 / Ry):    1.1103E+00
-                n_d(   2.70130) (1 / Ry):    7.2178E+00
-                n_p / n :     1.0869E-01
-                n_d / n :     7.0658E-01
-                n_p:    1.1103E+00
+                n_p(   2.70130) (1 / Ry):    1.1188E+00
+                n_d(   2.70130) (1 / Ry):    6.8531E+00
+                n_p / n :     1.0952E-01
+                n_d / n :     6.7088E-01
+                n_p:    1.1188E+00
 
-           eta_pd(   2.70130):    9.6049E-02 (Ry / bohr^2) =    4.6667E+00 (eV / A^2)
+           eta_pd(   2.70130):    9.1893E-02 (Ry / bohr^2) =    4.4648E+00 (eV / A^2)
 
 
 
@@ -364,20 +361,20 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_d(   2.70130) (1 / Ry):    7.2178E+00
-                n_f(   2.70130) (1 / Ry):    2.1431E-01
-                n_d / n :     7.0658E-01
-                n_f / n :     2.0980E-02
-                n_d:    7.2178E+00
-                n_f:    2.1431E-01
+                n_d(   2.70130) (1 / Ry):    6.8531E+00
+                n_f(   2.70130) (1 / Ry):    1.7493E-01
+                n_d / n :     6.7088E-01
+                n_f / n :     1.7125E-02
+                n_d:    6.8531E+00
+                n_f:    1.7493E-01
 
-           eta_df(   2.70130):    1.1324E-01 (Ry / bohr^2) =    5.5018E+00 (eV / A^2)
+           eta_df(   2.70130):    8.7761E-02 (Ry / bohr^2) =    4.2640E+00 (eV / A^2)
 
 
         sum_l: total ...............................................................
 
-        eta_tot(   2.70130):    2.1834E-01 (Ry / bohr^2) =    1.0608E+01 (eV / A^2)
-          ? eta_tot:    1.0608E+01
+        eta_tot(   2.70130):    1.8854E-01 (Ry / bohr^2) =    9.1606E+00 (eV / A^2)
+          ? eta_tot:    9.1606E+00
 
 
 
@@ -403,13 +400,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_s(   2.70130) (1 / Ry):    1.6375E-01
-                n_p(   2.70130) (1 / Ry):    1.1103E+00
-                n_s / n :     1.6030E-02
-                n_p / n :     1.0869E-01
+                n_s(   2.70130) (1 / Ry):    1.5947E-01
+                n_p(   2.70130) (1 / Ry):    1.1188E+00
+                n_s / n :     1.5611E-02
+                n_p / n :     1.0952E-01
 
-           eta_sp(   2.70130):    9.0558E-03 (Ry / bohr^2) =    4.3999E-01 (eV / A^2)
-           eta_sp:    4.3999E-01
+           eta_sp(   2.70130):    8.8866E-03 (Ry / bohr^2) =    4.3177E-01 (eV / A^2)
+           eta_sp:    4.3177E-01
 
 
         l:  p ......................................................................
@@ -422,13 +419,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_p(   2.70130) (1 / Ry):    1.1103E+00
-                n_d(   2.70130) (1 / Ry):    7.2178E+00
-                n_p / n :     1.0869E-01
-                n_d / n :     7.0658E-01
+                n_p(   2.70130) (1 / Ry):    1.1188E+00
+                n_d(   2.70130) (1 / Ry):    6.8531E+00
+                n_p / n :     1.0952E-01
+                n_d / n :     6.7088E-01
 
-           eta_pd(   2.70130):    9.6049E-02 (Ry / bohr^2) =    4.6667E+00 (eV / A^2)
-           eta_pd:    4.6667E+00
+           eta_pd(   2.70130):    9.1893E-02 (Ry / bohr^2) =    4.4648E+00 (eV / A^2)
+           eta_pd:    4.4648E+00
 
 
         l:  d ......................................................................
@@ -441,17 +438,17 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_d(   2.70130) (1 / Ry):    7.2178E+00
-                n_f(   2.70130) (1 / Ry):    2.1431E-01
-                n_d / n :     7.0658E-01
-                n_f / n :     2.0980E-02
+                n_d(   2.70130) (1 / Ry):    6.8531E+00
+                n_f(   2.70130) (1 / Ry):    1.7493E-01
+                n_d / n :     6.7088E-01
+                n_f / n :     1.7125E-02
 
-           eta_df(   2.70130):    1.1324E-01 (Ry / bohr^2) =    5.5018E+00 (eV / A^2)
-           eta_df:    5.5018E+00
+           eta_df(   2.70130):    8.7761E-02 (Ry / bohr^2) =    4.2640E+00 (eV / A^2)
+           eta_df:    4.2640E+00
 
         sum_l: total ...............................................................
-        eta_tot(   2.70130):    2.1834E-01 (Ry / bohr^2) =    1.0608E+01 (eV / A^2)
-          ! eta_tot:    1.0608E+01
+        eta_tot(   2.70130):    1.8854E-01 (Ry / bohr^2) =    9.1606E+00 (eV / A^2)
+          ! eta_tot:    9.1606E+00
 
 
 
@@ -484,21 +481,22 @@
 
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      0.09s CPU      0.09s WALL (       1 calls)
+     rmta_init    :      0.08s CPU      0.09s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
      tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
+     set_dos_nlm_ :      1.11s CPU      1.20s WALL (       1 calls)
      set_dos_n    :      0.00s CPU      0.00s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.02s CPU      0.13s WALL (       1 calls)
+     rmta_write   :      0.01s CPU      0.02s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      3.37s CPU     13.44s WALL
+     RMTA         :      3.94s CPU      4.06s WALL
 
  
-   This run was terminated on:  10:21:53   8Sep2026            
+   This run was terminated on:  11:23:34   9Sep2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
