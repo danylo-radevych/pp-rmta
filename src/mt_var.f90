@@ -494,12 +494,14 @@
             !
             !
             IF (mt_rmt(ist_i(iat)) < MAXVAL(upf(ityp(iat))%rcut(:))) THEN
-              WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
+              WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A)') &
+                ist_i(iat), TRIM(st_name(ist_i(iat)))
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
-                "Starting MT radius is below pseudo rc.", 1)
+                "Starting MT radius is below pseudo rc. " //&
+                "Try one of rmt_method = 'pseudo*' options.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
@@ -1801,6 +1803,7 @@
     !  courtesy of M. Weinert and flair: FLAPW code.
     !  https://sites.uwm.edu/weinert/flair/
     !
+      USE const, ONLY: zero
       !
       !
       IMPLICIT NONE
@@ -1814,7 +1817,7 @@
       !
       routine_name = "rmt_default"
       !
-      rmt_d = 0.0_dp
+      rmt_d = zero
       !
       SELECT CASE(element_label)
         !
