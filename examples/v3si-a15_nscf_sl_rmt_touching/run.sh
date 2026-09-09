@@ -13,7 +13,7 @@ lrun_scf=true
 lrun_nscf=true
 lrun_rmta=true
 
-# save temporary folders for  RMTA restart
+# save temporary folders for RMTA restart
 lsave_tmp_dir=true
 lsave_tmp_dir_tar=true
 
@@ -33,9 +33,9 @@ TMP_DIR='tempdir'
 OUT_DIR='output'
 
 # SCF grid
-k=12
+k=6
 # NSCF grid
-kf=24
+kf=12
 
 
 # species.in -------------------------------------------------------------------
@@ -224,6 +224,20 @@ $ECHO ""
 $ECHO "$SUFFIX"
 $ECHO "-------------->"
 
+name_check="${TMP_DIR}_scf/${TMP_DIR}"
+if [[ -d $name_check ]]
+then
+dir_check $name_check
+rsync $ORSYNC $name_check .
+else
+name_check=scf_out.tar.xz
+file_check $name_check
+rm $ORM ${TMP_DIR}
+tar -xvf $name_check
+mkdir -p ${TMP_DIR}_scf
+rsync $ORSYNC ${TMP_DIR} ${TMP_DIR}_scf/
+fi
+
 nk1=$kf
 nk2=$kf
 nk3=$kf
@@ -248,9 +262,10 @@ cat > $NAME.in << EOF
  nat = $NAT
  ntyp = $NTYP
  ecutwfc = $ECUT
- occupations = '$OCCUPATIONS'
- degauss = $DEGAUSS
- smearing = '$SMEARING'
+ occupations = 'tetrahedra'
+ ! occupations = '$OCCUPATIONS'
+ ! degauss = $DEGAUSS
+ ! smearing = '$SMEARING'
 /
 
 &electrons
