@@ -65,7 +65,7 @@
         WRITE(stdout,'(/5x, "Please cite:")')
         WRITE(stdout,'(5x, "D. Radevych, T. Shishidou, M. Weinert, ")')
         WRITE(stdout,'(5x, "E. R. Margine, A. N. Kolmogorov, I. I. Mazin, ")')
-        WRITE(stdout,'(5x, "Rigid muffin-tin approximation in plane wave ")')
+        WRITE(stdout,'(5x, "Rigid muffin-tin approximation in plane-wave ")')
         WRITE(stdout,'(5x, "codes for fast modeling of phonon-mediated ")')
         WRITE(stdout,'(5x, "superconductors, npj Comput Mater (2026) ")')
         WRITE(stdout,'(5x, "DOI: https://doi.org/10.1038/s41524-026-02141-7")')
