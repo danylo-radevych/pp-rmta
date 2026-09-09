@@ -1275,7 +1275,6 @@
       IF (imax > nr) &
         CALL errore(routine_name, "imax > nr", 1)
       !
-      ! WRITE(stdout, '(/5x, ">>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<")')
       WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
       !
       WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
@@ -1634,8 +1633,6 @@
         sum_wk, efermi, wdk, dos_n)
       !
       !
-      ! WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
-      !   & /5x, /5x, /5x)')
       WRITE(stdout, '(/5x, ">>>>>>>>    PARTIAL DOS END    <<<<<<<<<", &
         & /5x, /5x, /5x)')
       !
