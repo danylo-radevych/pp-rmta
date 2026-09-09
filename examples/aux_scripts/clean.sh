@@ -13,5 +13,5 @@ rm $ORM *.csv *.out *.freq *.modes *.edos *.dyn*
 rm $ORM *.gp *.gnu *.ifc *.dos
 rm $ORM *.tar.gz *.tar.xz
 rm $ORM tempdir*
-rm $ORM save*
+rm $ORM save
 rm $ORM dyna2F

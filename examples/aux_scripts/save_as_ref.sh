@@ -3,7 +3,8 @@
 OUTDIR="output"
 REFDIR="reference"
 
-for name in ${OUTDIR}/*.out
+#for name in ${OUTDIR}/*.out
+for name in ${OUTDIR}/*.rmta.out
 do
 
 name=${name%.out}
