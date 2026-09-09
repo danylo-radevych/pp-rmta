@@ -381,24 +381,22 @@
     !
       !
       USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
-      USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
+      USE sym_type, ONLY: nst, ist_i, st_name
+      USE neighbor, ONLY: nn_dist, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
       USE ions_base, ONLY: ityp
+      USE const, ONLY: zero, one, half
       !
       IMPLICIT NONE
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
-      LOGICAL :: ltouch
-      !! if true, make additional pass to ensure touching spheres
-      !! only if lrmt = .false.
       LOGICAL, ALLOCATABLE :: lrmt_fixed(:)
       !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
       !! error code
-      INTEGER :: ist, iat, jat, inn
+      INTEGER :: ist, iat, jat
       !! iterators
       REAL(DP) :: rtmp, rtmp2
       !! real temporary vars
@@ -409,14 +407,12 @@
       !
       routine_name = "set_rmt"
       !
-      ltouch = .FALSE.
-      !
       ALLOCATE(mt_rmt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
       ALLOCATE(lrmt_fixed(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating lrmt_fixed', 1)
       !
-      mt_rmt(:) = -1.0_dp
+      mt_rmt(:) = - one
       lrmt_fixed(:) = .FALSE.
       !
       IF (.NOT. lrmt) THEN
@@ -451,7 +447,7 @@
                 rmt_d_iat / & ! this atom
                 (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
               !
-              IF ((mt_rmt(ist_i(iat)) < 0.0_dp) .OR. &
+              IF ((mt_rmt(ist_i(iat)) < zero) .OR. &
                 (mt_rmt(ist_i(iat)) > rtmp)) THEN
                 !
                 mt_rmt(ist_i(iat)) = rtmp
@@ -476,7 +472,7 @@
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
                 "First MT radius guess is too high.", 1)
-            ELSE IF (mt_rmt(ist_i(iat)) < 0.0_dp) THEN
+            ELSE IF (mt_rmt(ist_i(iat)) < zero) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
@@ -488,11 +484,19 @@
             !
           END DO ! iat
           !
-          IF (TRIM(rmt_method) == "touching") THEN
-            ltouch = .TRUE.
-          END IF
           !
-          IF (ltouch) THEN
+          ! make touching spheres
+          !
+          IF (TRIM(rmt_method) == "touching") THEN
+            !
+            ! print
+            !
+            WRITE(stdout, '(/5x, "Current MT radii before touching is ", &
+              & "enforced:")')
+            CALL print_rmt()
+            !
+            ! check if some spheres touch already
+            ! if they do, fix their sym-type radii
             !
             DO iat = 1, natoms
               !
@@ -508,24 +512,33 @@
                 !
               END DO ! jat
               !
-              !
+            END DO ! iat
+            !
+            ! if sym types of some atoms are not fixed,
+            ! try to increase them
+            !
+            DO iat = 1, natoms
               !
               IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
                 !
-                rtmp = -1.0_dp
+                rtmp = - one
                 !
                 DO jat = 1, natoms
                   !
-                  rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
+                  IF (ist_i(jat) == ist_i(iat)) THEN
+                    rtmp2 = half * nr_dist(jat, iat)
+                  ELSE
+                    rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
+                  END IF
                   !
-                  IF (((rtmp > 0.0_dp) .AND. (rtmp2 < rtmp)) .OR. &
-                    (rtmp < 0.0_dp)) THEN
+                  IF ( (((rtmp > zero) .AND. (rtmp2 < rtmp)) .OR. &
+                    (rtmp < zero)) .AND. (rtmp2 > zero) ) THEN
                     rtmp = rtmp2
                   END IF
                   !
                 END DO ! jat
                 !
-                IF ((rtmp > 0.0_dp) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
+                IF ((rtmp > zero) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
                   mt_rmt(ist_i(iat)) = rtmp
                 END IF
                 !
@@ -536,7 +549,7 @@
               !
             END DO ! iat
             !
-          END IF ! ltouch
+          END IF ! touching
           !
         END IF ! rmt_method
         !
@@ -560,7 +573,95 @@
       END IF ! lrmt
       !
       !
+      ! print
+      !
+      WRITE(stdout, '(/5x, "Current MT radii before the final check:")')
+        CALL print_rmt()
+      !
       ! check
+      !
+      WRITE(stdout, '(/5x, "Safety checks for MT radii...")')
+      CALL check_rmt()
+      WRITE(stdout, '(/5x, "Done safety checks for MT radii.")')
+      !
+      !
+      ! print
+      !
+      WRITE(stdout, '(/5x, "Final MT radii:")')
+      CALL print_rmt()
+      !
+      DEALLOCATE(lrmt_fixed, STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, 'Error deallocating lrmt_fixed', 1)
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE set_rmt
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE print_rmt()
+    !---------------------------------------------------------------------------
+    !!
+    !! Print current rmt values
+    !!
+      USE io_global, ONLY: stdout
+      USE sym_type, ONLY: nst, ist_i, st_name
+      !
+      IMPLICIT NONE
+      !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: ist, iat
+      !! iterators
+      !
+      routine_name = "print_rmt"
+      !
+      WRITE(stdout, '(/5x, "MT radii for symmetry types")')
+      DO ist = 1, nst
+        ! WRITE(stdout, '(5x)')
+        WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
+        WRITE(stdout, '(7x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
+          mt_rmt(ist), mt_rmt(ist) * bohr_to_ang
+      END DO ! ist
+      ! WRITE(stdout, '(/5x)')
+      !
+      WRITE(stdout, '(5x, "MT radii for atoms")')
+      DO iat = 1, natoms
+        WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
+          iat, mt_rmt(ist_i(iat))
+      END DO ! iat
+      WRITE(stdout, '(/5x)')
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE print_rmt
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE check_rmt()
+    !---------------------------------------------------------------------------
+    !!
+    !! Safety checks for the rmt radii
+    !!
+      USE io_global, ONLY: stdout
+      USE sym_type, ONLY: nst, ist_i, ist_ityp
+      USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
+      USE constants, ONLY: eps6
+      USE uspp_param, ONLY: upf
+      USE ions_base, ONLY: ityp
+      USE const, ONLY: zero, one
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore
+      !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: ist, iat, jat, inn
+      !! iterators
+      !
+      routine_name = "check_rmt"
       !
       DO ist = 1, nst
         !
@@ -626,33 +727,9 @@
         !
       END DO ! iat
       !
-      !
-      ! printing
-      !
-      WRITE(stdout, '(/5x, "MT radii for symmetry types")')
-      DO ist = 1, nst
-        WRITE(stdout, '(5x)')
-        WRITE(stdout, '(6x, "symmetry type #", I4, "  ", A2)') ist, st_name(ist)
-        WRITE(stdout, '(6x, "MT radius: ", F10.8, " bohr = ", F10.8, " A")') &
-          mt_rmt(ist), mt_rmt(ist) * bohr_to_ang
-      END DO ! ist
-      WRITE(stdout, '(/5x, /5x)')
-      !
-      WRITE(stdout, '(/5x, "MT radii for atoms")')
-      DO iat = 1, natoms
-        WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
-          iat, mt_rmt(ist_i(iat))
-      END DO ! iat
-      WRITE(stdout, '(/5x, /5x)')
-      !
-      DEALLOCATE(lrmt_fixed, STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, 'Error deallocating lrmt_fixed', 1)
-      !
     !---------------------------------------------------------------------------
-    END SUBROUTINE set_rmt
+    END SUBROUTINE check_rmt
     !---------------------------------------------------------------------------
-    !
     !
     !
     !---------------------------------------------------------------------------
