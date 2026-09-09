@@ -1275,7 +1275,8 @@
       IF (imax > nr) &
         CALL errore(routine_name, "imax > nr", 1)
       !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<")')
+      ! WRITE(stdout, '(/5x, ">>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<")')
+      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
       !
       WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
       WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
@@ -1633,7 +1634,9 @@
         sum_wk, efermi, wdk, dos_n)
       !
       !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
+      ! WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
+      !   & /5x, /5x, /5x)')
+      WRITE(stdout, '(/5x, ">>>>>>>>    PARTIAL DOS END    <<<<<<<<<", &
         & /5x, /5x, /5x)')
       !
       IF (ltetra) THEN
