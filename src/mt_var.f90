@@ -381,7 +381,7 @@
     !
       !
       USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i, st_name
+      USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
       USE neighbor, ONLY: nn_dist, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
@@ -427,8 +427,18 @@
             mt_rmt(ist) = rmt_default(st_name(ist))
           END DO ! ist
           !
+        ELSE IF (TRIM(rmt_method) == "pseudo") THEN
+          !
+          ! from radial pseudo cutoffs
+          !
+          DO ist = 1, nst
+            mt_rmt(ist) = MAXVAL(upf(ist_ityp(ist))%rcut(:))
+          END DO ! ist
+          !
         ELSE IF (TRIM(rmt_method) == "neighbor" .OR. &
-          TRIM(rmt_method) == "touching") THEN
+          TRIM(rmt_method) == "pseudoneighbor" .OR. &
+          TRIM(rmt_method) == "touching" .OR. &
+          TRIM(rmt_method) == "pseudotouching") THEN
           !
           ! based on the nearest-neighbor distances
           !
@@ -436,11 +446,30 @@
             !
             DO jat = 1, natoms
               !
-              ! this symmetry type
-              rmt_d_iat = rmt_default(st_name(ist_i(iat)))
-              ! its nearest neighbor symmetry type
-              rmt_d_iat_nn = &
-                rmt_default(st_name(ist_i(jat)))
+              rmt_d_iat = zero
+              rmt_d_iat_nn = zero
+              !
+              IF (TRIM(rmt_method) == "neighbor" .OR. &
+                TRIM(rmt_method) == "touching") THEN
+                !
+                ! this symmetry type
+                rmt_d_iat = rmt_default(st_name(ist_i(iat)))
+                ! its nearest neighbor symmetry type
+                rmt_d_iat_nn = &
+                  rmt_default(st_name(ist_i(jat)))
+                !
+              ELSE IF (TRIM(rmt_method) == "pseudoneighbor" .OR. &
+                TRIM(rmt_method) == "pseudotouching") THEN
+                !
+                ! this atom
+                rmt_d_iat = MAXVAL(upf(ityp(iat))%rcut(:))
+                ! another atom
+                rmt_d_iat_nn = MAXVAL(upf(ityp(jat))%rcut(:))
+                !
+              ELSE
+                WRITE(stdout, '(/5x, "rmt_method: ", A)') TRIM(rmt_method)
+                CALL errore(routine_name, "This rmt_method is not known.", 1)
+              END IF
               !
               !
               rtmp = nr_dist(jat, iat) * & ! distance to the neighbor
@@ -464,21 +493,22 @@
                 & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
-                "First MT radius guess is below pseudo rc.", 1)
+                "Starting MT radius is below pseudo rc.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) > nn_dist(iat)) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
-                "First MT radius guess is too high.", 1)
+                "Starting MT radius is higher " // &
+                & "than the nearest-neighbor distance.", 1)
             ELSE IF (mt_rmt(ist_i(iat)) < zero) THEN
               WRITE(stdout, '(6x, "symmetry type #", I4)') ist_i(iat)
               WRITE(stdout, '(6x, "MT radius: ", &
                 & F10.8, " bohr = ", F10.8, " A")') &
                 mt_rmt(ist_i(iat)), mt_rmt(ist_i(iat)) * bohr_to_ang
               CALL errore(routine_name, &
-                "First MT radius guess not assigned.", 1)
+                "Starting MT radius is not assigned.", 1)
             END IF
             !
             !
@@ -487,7 +517,8 @@
           !
           ! make touching spheres
           !
-          IF (TRIM(rmt_method) == "touching") THEN
+          IF (TRIM(rmt_method) == "touching" .OR. &
+            TRIM(rmt_method) == "pseudotouching") THEN
             !
             ! print
             !
@@ -651,7 +682,6 @@
       USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: ityp
       USE const, ONLY: zero, one
       !
       IMPLICIT NONE
