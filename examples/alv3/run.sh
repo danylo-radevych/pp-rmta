@@ -9,11 +9,11 @@ export OMP_NUM_THREADS=2
 EXEC="mpirun"
 ECHO=echo
 
-lrun_scf=false
+lrun_scf=true
 lrun_rmta=true
 
-lsave_tmp_dir=true
-lsave_tmp_dir_tar=true
+lsave_tmp_dir=false
+lsave_tmp_dir_tar=false
 
 PREFIX='alv3'
 IBRAV=0
