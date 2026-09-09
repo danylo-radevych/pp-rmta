@@ -89,29 +89,11 @@ recalculated from `chi` functions and `beta` projectors.
 ## Examples
 
 
-**`$PPRMTA_ROOT/examples/nb-bcc_sl_rmt_touching`**: bcc Nb simple metal with automatically calculated MT radii and a pseudopotential explicitly containing the `PP_SEMILOCAL` block
+**`examples/nb-bcc_sl_rmt_touching`**: bcc Nb simple metal with automatically calculated MT radii and a pseudopotential explicitly containing the `PP_SEMILOCAL` block
 
-**`$PPRMTA_ROOT/examples/v3si-a15_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
+**`examples/v3si-a15_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
 
-**`$PPRMTA_ROOT/examples/v3si-a15_nscf_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks. SCF is performed on a coarse *k*-point grid, and optional NSCF step is used to get a finer *k*-point grid for the subsequent RMTA calculation.
-
-... *also*...
-
-**`$PPRMTA_ROOT/examples/nb-bcc`**: bcc Nb simple metal with manually specified MT radii and standard pseudopotential from PseudoDojo
-
-**`$PPRMTA_ROOT/examples/nb-bcc_sl`**: bcc Nb simple metal with manually specified MT radii and a pseudopotential explicitly containing the `PP_SEMILOCAL` block
-
-**`$PPRMTA_ROOT/examples/mo-bcc_sl`**: bcc Mo simple metal with manually specified MT radii and pseudopotential explicitly containing the `PP_SEMILOCAL` block
-
-**`$PPRMTA_ROOT/examples/pd-fcc_sl`**: fcc Pd simple metal with manually specified MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
-
-**`$PPRMTA_ROOT/examples/v-bcc_sl`**: bcc V simple metal with manually specified MT radii and pseudopotential explicitly containing the `PP_SEMILOCAL` block
-
-**`$PPRMTA_ROOT/examples/nbn-b1_sl`**: *B*1 NbN compound with manually specified MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
-
-**`$PPRMTA_ROOT/examples/nbn-b1_sl_rmt_touching`**: *B*1 NbN compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
-
-**`$PPRMTA_ROOT/examples/v3sn-a15_sl`**: *A*15 V<sub>3</sub>Sn compound with manually specified MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks
+**`examples/v3si-a15_nscf_sl_rmt_touching`**: *A*15 V<sub>3</sub>Si compound with automatically calculated MT radii and pseudopotentials explicitly containing the `PP_SEMILOCAL` blocks. SCF is performed on a coarse *k*-point grid, and optional NSCF step is used to get a finer *k*-point grid for the subsequent RMTA calculation.
 
 
 
