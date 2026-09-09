@@ -70,7 +70,7 @@
       INTEGER, INTENT(in) :: lmax
       !! max angular momentum
       INTEGER, INTENT(in), OPTIONAL :: iscale
-      !! integer scaler for the number of integration points
+      !! integer scalar for the number of integration points
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
@@ -84,7 +84,7 @@
       !! REAL(DP) :: xx((ngpt + 1) / 2), w((ngpt + 1) / 2)
       REAL(DP) :: delphi, phi, rxy
       !!
-      REAL :: sum_wt
+      REAL(DP) :: sum_wt
       !! sum of all wt weights
       !
       routine_name = "gauss_points"
@@ -155,6 +155,154 @@
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE gauss_points
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE gauss_points_omp(vgauss, wt, lmax, iscale)
+    !---------------------------------------------------------------------------
+    !!
+    !! gauss_points with openmp
+    !!
+      USE const, ONLY: zero, one, two
+      USE io_global, ONLY: stdout
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore
+      !
+      REAL(DP), INTENT(out) :: vgauss(:, :)
+      !! points
+      REAL(DP), INTENT(out) :: wt(:)
+      !! weights
+      INTEGER, INTENT(in) :: lmax
+      !! max angular momentum
+      INTEGER, INTENT(in), OPTIONAL :: iscale
+      !! integer scalar for the number of integration points
+      !
+      CHARACTER(len=256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: iscale_
+      !! local copy of iscale, defaults to 1 if not present
+      INTEGER :: ierr
+      !! error code
+      INTEGER :: ngpt
+      !! number of Gauss-Legendre points in cos(theta)
+      INTEGER :: nphi
+      !! number of azimuthal points (Nyquist: 2 * lmax + 1, scaled)
+      INTEGER :: nhalf
+      !! (ngpt + 1) / 2, number of nodes returned by grule
+      INTEGER :: nfull
+      !! ngpt / 2, number of nodes with a distinct -xx(i) mirror
+      INTEGER :: joff
+      !! points written by the main loop; base index of the equator ring
+      INTEGER :: i
+      !! counter on polar nodes xx(i)
+      INTEGER :: j
+      !! index of the current point in vgauss and wt
+      INTEGER :: k
+      !! counter on azimuthal angles phi = k * delphi
+      REAL(DP), ALLOCATABLE :: xx(:)
+      !! Gauss-Legendre nodes in cos(theta), non-negative half only
+      REAL(DP), ALLOCATABLE :: w(:)
+      !! Gauss-Legendre weights matching xx
+      REAL(DP), ALLOCATABLE :: cphi(:)
+      !! precomputed COS(k * delphi), k = 1, nphi
+      REAL(DP), ALLOCATABLE :: sphi(:)
+      !! precomputed SIN(k * delphi), k = 1, nphi
+      REAL(DP) :: delphi
+      !! azimuthal spacing, 2 * pi / nphi
+      REAL(DP) :: twopi
+      !! 2 * pi
+      REAL(DP) :: rxy
+      !! sin(theta) = SQRT(1 - xx(i)^2), the xy-plane radius
+      REAL(DP) :: wk
+      !! weight of the current point pair, w(i) * delphi
+      REAL(DP) :: sum_wt
+      !! sum of all wt weights, analytically 4 * pi
+      !
+      routine_name = "gauss_points_omp"
+      !
+      iscale_ = 1
+      IF (PRESENT(iscale)) iscale_ = iscale
+      !
+      IF (iscale_ < 1) THEN
+        CALL errore(routine_name, 'iscale must be >= 1', 1)
+      ENDIF
+      !
+      ngpt  = (lmax + 1) * iscale_
+      nphi  = (2 * lmax + 1) * iscale_
+      nhalf = (ngpt + 1) / 2
+      nfull = ngpt / 2
+      !
+      twopi  = 8._dp * ATAN(one)
+      delphi = twopi / nphi
+      !
+      ALLOCATE(xx(nhalf), w(nhalf), cphi(nphi), sphi(nphi), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating', 1)
+      !
+      CALL grule(ngpt, xx, w)
+      !
+      !
+      DO k = 1, nphi
+        cphi(k) = COS(k * delphi)
+        sphi(k) = SIN(k * delphi)
+      ENDDO
+      !
+      ! total weight in closed form -> no reduction in the main loop
+      !
+      sum_wt = two * twopi * SUM(w(1 : nfull))
+      IF (MODULO(ngpt, 2) == 1) sum_wt = sum_wt + twopi * w(nhalf)
+      !
+      joff = 2 * nfull * nphi
+      !
+      !$OMP PARALLEL DEFAULT(none) &
+      !$OMP SHARED(nfull, nphi, ngpt, nhalf, joff, xx, w, cphi, sphi, &
+      !$OMP   delphi, vgauss, wt) &
+      !$OMP PRIVATE(i, k, j, rxy, wk)
+      !
+      !$OMP DO COLLAPSE(2) SCHEDULE(static)
+      !
+      DO i = 1, nfull
+        DO k = 1, nphi
+          rxy = SQRT(one - xx(i) * xx(i))
+          wk  = w(i) * delphi
+          j   = 2 * ((i - 1) * nphi + k) - 1
+          !
+          vgauss(1, j) = rxy * cphi(k)
+          vgauss(2, j) = rxy * sphi(k)
+          vgauss(3, j) = xx(i)
+          wt(j) = wk
+          !
+          vgauss(1, j + 1) = vgauss(1, j)
+          vgauss(2, j + 1) = vgauss(2, j)
+          vgauss(3, j + 1) = -xx(i)
+          wt(j + 1) = wk
+        ENDDO
+      ENDDO
+      !$OMP END DO NOWAIT
+      !
+      IF (MODULO(ngpt, 2) == 1) THEN
+      !$OMP DO SCHEDULE(static)
+        DO k = 1, nphi
+          vgauss(1, joff + k) = cphi(k)
+          vgauss(2, joff + k) = sphi(k)
+          vgauss(3, joff + k) = zero
+          wt(joff + k) = w(nhalf) * delphi
+        ENDDO
+      !$OMP END DO NOWAIT
+      ENDIF
+      !
+      !$OMP END PARALLEL
+      !
+      WRITE(stdout, '(/6x, "gauss_points: sum_wt = ", F0.6, &
+        &"  (4 * pi = ", F0.6, ")")') sum_wt, two * twopi
+      !
+      DEALLOCATE(xx, w, cphi, sphi, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating', 1)
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE gauss_points_omp
     !---------------------------------------------------------------------------
     !
     !
@@ -604,7 +752,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 5
+      igp_scale = 4
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
@@ -616,6 +764,7 @@
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
       CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
+      ! CALL gauss_points_omp(gp_vec, gp_wt, lmax, igp_scale)
       !
       !
       ! prepare corresponding spherical harmonics for
@@ -1156,7 +1305,7 @@
       ! spherical harmonics
       !
       ! igp_scale = 1
-      igp_scale = 5
+      igp_scale = 4
       gp_ntheta = (lmax + 1) * igp_scale
       gp_nphi = (2 * lmax + 1) * igp_scale
       ngp = gp_ntheta * gp_nphi
@@ -1168,6 +1317,7 @@
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
       CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
+      ! CALL gauss_points_omp(gp_vec, gp_wt, lmax, igp_scale)
       !
       !
       ! prepare corresponding spherical harmonics for
