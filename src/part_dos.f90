@@ -124,6 +124,7 @@
           vgauss(2, j) = rxy * SIN(phi)
           vgauss(3, j) = xx(i)
           wt(j) = w(i) * delphi
+          sum_wt = sum_wt + wt(j)
           j = j + 1
           vgauss(1, j) = vgauss(1, j - 1)
           vgauss(2, j) = vgauss(2, j - 1)
