@@ -491,9 +491,11 @@
             !
             ! print
             !
-            WRITE(stdout, '(/5x, "Current MT radii before touching is ", &
-              & "enforced:")')
-            CALL print_rmt()
+            IF (ldebug) THEN
+              WRITE(stdout, '(/5x, "Current MT radii before touching is ", &
+                & "enforced:")')
+              CALL print_rmt()
+            END IF
             !
             ! check if some spheres touch already
             ! if they do, fix their sym-type radii
@@ -575,20 +577,20 @@
       !
       ! print
       !
-      WRITE(stdout, '(/5x, "Current MT radii before the final check:")')
+      WRITE(stdout, '(/5x, "Summary of the MT radii:")')
         CALL print_rmt()
       !
       ! check
       !
-      WRITE(stdout, '(/5x, "Safety checks for MT radii...")')
+      WRITE(stdout, '(/5x, "Performing safety checks for the MT radii...")')
       CALL check_rmt()
-      WRITE(stdout, '(/5x, "Done safety checks for MT radii.")')
+      WRITE(stdout, '(5x, "Done safety checks for the MT radii.")')
       !
       !
       ! print
       !
-      WRITE(stdout, '(/5x, "Final MT radii:")')
-      CALL print_rmt()
+      ! WRITE(stdout, '(/5x, "Final MT radii:")')
+      ! CALL print_rmt()
       !
       DEALLOCATE(lrmt_fixed, STAT = ierr)
       IF (ierr /= 0) &
@@ -631,7 +633,7 @@
         WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
           iat, mt_rmt(ist_i(iat))
       END DO ! iat
-      WRITE(stdout, '(/5x)')
+      !WRITE(stdout, '(/5x)')
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE print_rmt
