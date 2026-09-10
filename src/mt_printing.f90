@@ -111,7 +111,7 @@
         vfullrf, rvfullrf, &
         irf_min, &
         dos_nlmrf, dos_nlrf, dos_nrf, &
-        etall1rf, loglrf, dloglderf
+        etall1rf, loglrf, dloglderf, dudrmuorrf
       USE sym_type, ONLY: ist_i
       !
       !
@@ -178,6 +178,8 @@
       !! unit for dos_nlrf / dos_nrf
       INTEGER :: if_etall1rf = 1336
       !! unit for etall1rf
+      INTEGER :: if_dudrmuorrf = 1337
+      !! unit for dudrmuorrf
       REAl(DP) :: r3d(3)
       !! current r3d vector
       REAl(DP) :: g3d(3)
@@ -591,6 +593,43 @@
         WRITE(if_d2udrderf, '()')
       END DO ! ir
       CLOSE(if_d2udrderf)
+      !
+      !
+      ! dudrmuorrf
+      !
+      WRITE(stdout, '(5x, A)') "writing dudrmuorrf"
+      OPEN(UNIT = if_dudrmuorrf, FILE = TRIM('dudrmuorrf.dat'), &
+        FORM = 'formatted', STATUS = 'unknown')
+      WRITE(if_dudrmuorrf, '(1x, &
+        & "dudrmuor_l(r, e_f) for each atom, spin, and l")')
+      DO iat = 1, natoms
+        DO ispin = 1, nspins
+          DO iorb = 1, norbs
+            WRITE(if_dudrmuorrf, '(1x, A13)', advance='no') "r"
+            WRITE(stra, '(I0)') iat
+            WRITE(strs, '(I0)') ispin
+            WRITE(if_dudrmuorrf, '(A14)', advance='no') &
+              TRIM(upf(ityp(iat))%psd) // TRIM(stra) // &
+              "s" // TRIM(strs) // &
+              TRIM(orb_label(iorb))
+          END DO ! iorb
+        END DO ! ispin
+      END DO ! iat
+      WRITE(if_dudrmuorrf, '()')
+      DO ir = 1, mt_nrf
+        DO iat = 1, natoms
+          DO ispin = 1, nspins
+            DO iorb = 1, norbs
+              r = mt_rf(ir, ist_i(iat))
+              WRITE(if_dudrmuorrf, '(1x, es13.4)', advance='no') r
+              WRITE(if_dudrmuorrf, '(1x, es13.4)', advance='no') &
+                dudrmuorrf(ir, iorb, ispin, iat)
+            END DO ! iorb
+          END DO ! ispin
+        END DO ! iat
+        WRITE(if_dudrmuorrf, '()')
+      END DO ! ir
+      CLOSE(if_dudrmuorrf)
       !
       !
       ! IF (.NOT. lskip_nonessential) THEN
@@ -1211,6 +1250,7 @@
     !! Prints RMTA clocks.
     !!
       USE io_global, ONLY: stdout
+      USE mt_var, ONLY: formulation
       !
       IMPLICIT NONE
       !
@@ -1223,7 +1263,10 @@
       CALL print_clock('set_log_ders')
       CALL print_clock('set_pet_mll1')
       CALL print_clock('tetra_delta_weights')
-      CALL print_clock('set_dos_nlm_form2')
+      IF (TRIM(formulation) == "paper") &
+        CALL print_clock('set_dos_nlm')
+      IF (TRIM(formulation) == "upstream") &
+        CALL print_clock('set_dos_nlm_form2')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
       CALL print_clock('print_at_rmt')
@@ -1248,7 +1291,7 @@
       USE uspp_param, ONLY: upf
       USE constants, ONLY: rytoev, eps6, eps12
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
-      USE mt_var, ONLY: natoms, norbs, orb_label, &
+      USE mt_var, ONLY: formulation, natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         luse_tot_dos, &
         irf_min, irf_max, &
@@ -1494,6 +1537,34 @@
                   ":", nl1
               END IF
               !
+              ! warnings
+              !
+              IF (TRIM(formulation) == "paper" .AND. &
+                (nl > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''upstream''")') &
+                  TRIM(orb_label(iorb))
+              END IF
+              IF (TRIM(formulation) == "upstream" .AND. &
+                (nl > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''paper''")') &
+                  TRIM(orb_label(iorb))
+              END IF
+              !
+              IF (TRIM(formulation) == "paper" .AND. &
+                (nl1 > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''upstream''")') &
+                  TRIM(orb_label(iorb + 1))
+              END IF
+              IF (TRIM(formulation) == "upstream" .AND. &
+                (nl1 > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''paper''")') &
+                  TRIM(orb_label(iorb + 1))
+              END IF
+              !
               WRITE(stdout, '("")')
               !
               !
@@ -1657,6 +1728,34 @@
                 "n_", TRIM(orb_label(iorb + 1)), &
                 " / n : ", &
                 nl1 / ntot
+              !
+              ! warnings
+              !
+              IF (TRIM(formulation) == "paper" .AND. &
+                (nl > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''upstream''")') &
+                  TRIM(orb_label(iorb))
+              END IF
+              IF (TRIM(formulation) == "upstream" .AND. &
+                (nl > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''paper''")') &
+                  TRIM(orb_label(iorb))
+              END IF
+              !
+              IF (TRIM(formulation) == "paper" .AND. &
+                (nl1 > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''upstream''")') &
+                  TRIM(orb_label(iorb + 1))
+              END IF
+              IF (TRIM(formulation) == "upstream" .AND. &
+                (nl1 > ntot * natoms)) THEN
+                WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
+                  "Try setting formulation = ''paper''")') &
+                  TRIM(orb_label(iorb + 1))
+              END IF
               !
               WRITE(stdout, '("")')
               !

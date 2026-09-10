@@ -51,6 +51,8 @@
     !! complex one
     COMPLEX(DP), PARAMETER :: ci = CMPLX(0.0_DP, 1.0_DP, KIND = DP)
     !! complex i
+    REAL(DP), PARAMETER :: precm2 = 0.01_DP
+    !! 10^-2
     !
   !=============================================================================
   END MODULE const

@@ -62,7 +62,7 @@
       USE ions_base, ONLY: nat, tau, ityp
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, alat ! bg, omega
-      USE const, ONLY: bohr_to_ang
+      USE const, ONLY: bohr_to_ang, one, zero
       USE constants, ONLY: eps6, eps12
       !
       IMPLICIT NONE
@@ -102,11 +102,11 @@
       !
       ALLOCATE(nn_dist(nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nn_dist', 1)
-      nn_dist(:) = -1.0_dp
+      nn_dist(:) = - one
       !
       ALLOCATE(nr_dist(nat, nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nr_dist', 1)
-      nr_dist(:, :) = -1.0_dp
+      nr_dist(:, :) = - one
       !
       !
       ! minimize distance
@@ -115,7 +115,7 @@
         DO jat = 1, nat
           !
           !
-          jat_dist = -1.0_dp
+          jat_dist = - one
           !
           !
           DO nc3 = - nc_max, nc_max
@@ -136,25 +136,25 @@
                 !
                 tmp_dist = SQRT(tmp_dist)
                 !
-                IF (((jat_dist < 0._dp) .OR. &
+                IF (((jat_dist < zero) .OR. &
                   (tmp_dist < jat_dist)) .AND. (tmp_dist > eps12)) THEN
                   jat_dist = tmp_dist
                 END IF
                 !
                 IF (((tmp_dist < nr_dist(jat, iat)) .OR. &
-                  (nr_dist(jat, iat) < 0.0_dp)) .AND. (tmp_dist > eps6)) &
+                  (nr_dist(jat, iat) < zero)) .AND. (tmp_dist > eps6)) &
                   nr_dist(jat, iat) = tmp_dist
                 !
               END DO ! nc1
             END DO ! nc2
           END DO ! nc3
           !
-          IF ((nn_dist(iat) < 0.0_dp) .OR. &
+          IF ((nn_dist(iat) < zero) .OR. &
             (jat_dist < nn_dist(iat))) THEN
             nn_dist(iat) = jat_dist
           END IF
           !
-          IF (nr_dist(jat, iat) < 0.0_dp) THEN
+          IF (nr_dist(jat, iat) < zero) THEN
             WRITE(stdout, '(5x, "Nearest replica of atom ", I0, &
               & "w.r.t. atom ", I0, " not found")') jat, iat
             CALL errore(routine_name, "Cannot find nearest replica", 1)
@@ -162,7 +162,7 @@
           !
         END DO ! jat
         !
-        IF (nn_dist(iat) < 0.0_dp) THEN
+        IF (nn_dist(iat) < zero) THEN
           WRITE(stdout, '(/5x, "Distance to nearest-neighbor of atom ", I0, &
             & " not found")')
           CALL errore(routine_name, "Error in nn_dist", 1)
@@ -206,7 +206,7 @@
             END DO ! nc2
           END DO ! nc3
           !
-          IF ((nn_dist(iat) >= 0.0_dp) .AND. &
+          IF ((nn_dist(iat) >= zero) .AND. &
             (ABS(jat_dist - nn_dist(iat)) < eps6)) THEN
             nneighbors(iat) = nneighbors(iat) + 1
             inn_i(nneighbors(iat), iat) = jat
@@ -214,7 +214,7 @@
           !
         END DO ! jat
         !
-        IF (ALL(inn_i(:, iat) < 0.0_dp)) THEN
+        IF (ALL(inn_i(:, iat) < zero)) THEN
           WRITE(stdout, '("Nearest-neighbor indices of atom ", I0, &
             & " not found")')
           CALL errore(routine_name, "Error in inn_i", 1)

@@ -48,7 +48,7 @@
       vlociong, vlocscrr3d, vlocscfr3d, &
       vlocscrg3d, mt_g, vlocscfg3d, &
       vsemilocr, vsemilocrf, urf, duderf, dudrrf, &
-      d2udrderf, &
+      d2udrderf, dudrmuorrf, &
       mll1rf_label, mll1rf, &
       vfullrf, rvfullrf, &
       irf_min, irf_max, &
@@ -250,6 +250,8 @@
     !! d2udrderf(mt_nrf, norbs, nspins, natoms)
     !! computed second derivatives of radial functions
     !! d2 u(r, e) / (dr de) on fine r grid
+    REAL(DP), ALLOCATABLE :: dudrmuorrf(:, :, :, :)
+    !! d u(r, e) / dr - u(r, e) / r, on fine r grid
     REAL(DP), ALLOCATABLE :: mll1rf(:, :, :, :)
     !! mll1rf(mt_nrf, norbs, nspins, natoms)
     !! computed matrix elements M_{l, l + 1},
@@ -1469,6 +1471,12 @@
          CALL errore(routine_name, "Error allocating wrf", 1)
       wrf(:, :, :, :) = zero
       !
+      ALLOCATE(dudrmuorrf(mt_nrf, norbs, nspins, natoms), &
+        STAT = ierr)
+      IF (ierr /= 0) &
+         CALL errore(routine_name, "Error allocating wrf", 1)
+      dudrmuorrf(:, :, :, :) = zero
+      !
       ALLOCATE(loglrf(mt_nrf, norbs, nspins, natoms), &
         STAT = ierr)
       IF (ierr /= 0) &
@@ -1692,6 +1700,10 @@
       DEALLOCATE(d2udrderf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating d2udrderf', 1)
+      !
+      DEALLOCATE(dudrmuorrf, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating dudrmuorrf', 1)
       !
       ! computed RMTA quantities
       !

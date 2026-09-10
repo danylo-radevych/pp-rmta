@@ -331,7 +331,7 @@
         mt_nr, mt_r, vsemilocr, &
         vsemilocrf, &
         irf_min, irf_max, &
-        urf, dudrrf, duderf, d2udrderf, wrf, &
+        urf, dudrrf, duderf, d2udrderf, wrf, dudrmuorrf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
         luse_tot_dos, &
@@ -370,7 +370,7 @@
       CALL set_log_ders(irf_max, mt_dx, mt_rf, &
         natoms, ist_i, norbs, nspins, lhybrid, &
         urf, dudrrf, duderf, d2udrderf, &
-        loglrf, dloglderf, wrf)
+        loglrf, dloglderf, wrf, dudrmuorrf)
       !
       ! Pettifor's M_{l, l+1}
       !
@@ -392,9 +392,8 @@
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
           tau_cart(1 : 3, 1 : natoms), &
-          urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
-          dudrrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          dudrmuorrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
           dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
       ELSE
@@ -805,7 +804,7 @@
     !---------------------------------------------------------------------------
     SUBROUTINE set_log_ders(nin, dx, rf, nat, stp, &
       norb, nspins, lhybrid, urf, dudrrf, duderf, d2udrderf, &
-      logl, dloglde, wl)
+      logl, dloglde, wrf, dudrmuorrf)
     !---------------------------------------------------------------------------
     !!
     !! Sets log derivatives of radial functions
@@ -849,8 +848,10 @@
        !! L_l(r, E_F)
        REAL(DP), INTENT(inout) :: dloglde(:, :, :, :)
        !! d L_l(r, E_F) / d e
-       REAL(DP), INTENT(inout) :: wl(:, :, :, :)
+       REAL(DP), INTENT(inout) :: wrf(:, :, :, :)
        !! Wronskian, or normalization integral \int dr u^2(r, e)
+       REAL(DP), INTENT(inout) :: dudrmuorrf(:, :, :, :)
+       !! d u(r, e) / dr - u(r, e) / r
        !
        REAL(DP) :: rmtf
        !! current MT radius, on fine grid
@@ -867,7 +868,8 @@
        !
        logl(:, :, :, :) = zero
        dloglde(:, :, :, :) = zero
-       wl(:, :, :, :) = zero
+       wrf(:, :, :, :) = zero
+       dudrmuorrf(:, :, :, :) = zero
        !
        DO iat = 1, nat
          DO iorb = 1, norb
@@ -884,7 +886,7 @@
                !
                IF (.NOT. lhybrid) THEN
                  !
-                 wl(ir, iorb, ispin, iat) = &
+                 wrf(ir, iorb, ispin, iat) = &
                    (dudrrf(ir, iorb, ispin, iat) * &
                    duderf(ir, iorb, ispin, iat) - &
                    urf(ir, iorb, ispin, iat) * &
@@ -892,7 +894,7 @@
                  !
                ELSE
                  !
-                 wl(ir, iorb, ispin, iat) = &
+                 wrf(ir, iorb, ispin, iat) = &
                    rmta_integrate_u2(ir, dx(stp(iat)), rf(:, stp(iat)), &
                    urf(:, iorb, ispin, iat), iorb - 1)
                  !
@@ -903,9 +905,15 @@
                  dloglde(ir, iorb, ispin, iat) = rmtf / &
                    (urf(ir, iorb, ispin, iat) * &
                    urf(ir, iorb, ispin, iat)) * &
-                   (- wl(ir, iorb, ispin, iat))
+                   (- wrf(ir, iorb, ispin, iat))
                  !
                END IF ! urf
+               !
+               IF (ABS(rmtf) > eps12) THEN
+                 dudrmuorrf(ir, iorb, ispin, iat) = &
+                   dudrrf(ir, iorb, ispin, iat) - &
+                   urf(ir, iorb, ispin, iat) / rmtf
+               END IF
                !
              END DO ! ir
            END DO ! ispin
@@ -1054,8 +1062,6 @@
         CALL errore(routine_name, "Error allocating d2udrderf", 1)
       d2udrderf(:, :, :, :) = zero
       !
-      !
-      !
       ALLOCATE(vfullrf(mt_nrf, norbs, &
         nspins, natoms), STAT = ierr)
       IF (ierr /= 0) &
@@ -1173,6 +1179,7 @@
                 urf(:, iorb, ispin, iat), &
                 dudrrf(:, iorb, ispin, iat), mt_nrf, nin)
             END IF
+            !
             !
             ! at e + de
             !
@@ -1360,7 +1367,7 @@
       USE constants, ONLY : rytoev
       USE const, ONLY : bohr_to_ang
       USE ions_base, ONLY: ityp
-      USE mt_var, ONLY: ldebug, &
+      USE mt_var, ONLY: formulation, ldebug, &
         natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         mll1rf_label, mll1rf, &
@@ -1368,10 +1375,10 @@
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
         urf, dudrrf, &
-        wrf, loglrf
+        wrf, dudrmuorrf, loglrf
       USE sym_type, ONLY: ist_i
       USE constants, ONLY: eps6, eps12
-      USE const, ONLY: zero, half
+      USE const, ONLY: zero, half, precm2
       !
       IMPLICIT NONE
       !
@@ -1403,6 +1410,11 @@
       !! du_l(r, e) / dr
       REAL(DP) :: dul1dr
       !! du_l+1(r, e) / dr
+      REAL(DP) :: duldrmulor
+      !! du_l(r, e) / dr - u_l(r, e) / r
+      REAL(DP) :: dul1drmul1or
+      !! du_l+1(r, e) / dr - u_l+1(r, e) / r
+      !! u_l(r, e)
       ! REAL(DP) :: dulde
       ! !! du_l(r, e) / de
       ! REAL(DP) :: dul1de
@@ -1589,6 +1601,8 @@
             rl1 = ul1 / rmtf
             wl = wrf(mt_nrf, iorb, ispin, iat)
             wl1 = wrf(mt_nrf, iorb + 1, ispin, iat)
+            duldrmulor = dudrmuorrf(mt_nrf, iorb, ispin, iat)
+            dul1drmul1or = dudrmuorrf(mt_nrf, iorb + 1, ispin, iat)
             ! logl = loglrf(mt_nrf, iorb, ispin, iat)
             ! logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
             ! dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
@@ -1598,6 +1612,20 @@
               "u_", iorb - 1, "(r_mt) = ", ul
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb - 1, "(r_mt) = ", rl
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+              "[du / dr - u / r]_", iorb - 1, "(r_mt) = ", duldrmulor
+            !
+            IF (TRIM(formulation) == "paper" .AND. ABS(ul) < precm2) THEN
+              WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
+                & "Try setting formulation = ''upstream''")') iorb - 1
+            END IF
+            IF (TRIM(formulation) == "upstream" .AND. &
+              ABS(duldrmulor) < precm2) THEN
+              WRITE(stdout, &
+                '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
+                & "Try setting formulation = ''paper''")') iorb - 1
+            END IF
+            !
             IF (ldebug) THEN
               WRITE(stdout, '(7x, A, I1, A, F16.8)') &
                 "W_", iorb - 1, "(r_mt) = ", wl
@@ -1618,6 +1646,20 @@
               "u_", iorb, "(r_mt) = ", ul1
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "R_", iorb, "(r_mt) = ", rl1
+            WRITE(stdout, '(7x, A, I1, A, F16.8)') &
+              "[du / dr - u / r]_", iorb, "(r_mt) = ", dul1drmul1or
+            !
+            IF (TRIM(formulation) == "paper" .AND. ABS(ul1) < precm2) THEN
+              WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
+                & "Try setting formulation = ''upstream''")') iorb
+            END IF
+            IF (TRIM(formulation) == "upstream" .AND. &
+              ABS(dul1drmul1or) < precm2) THEN
+              WRITE(stdout, &
+                '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
+                & "Try setting formulation = ''paper''")') iorb
+            END IF
+            !
             IF (ldebug) THEN
               WRITE(stdout, '(7x, A, I1, A, F16.8)') &
                 "W_", iorb, "(r_mt) = ", wl1

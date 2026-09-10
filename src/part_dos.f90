@@ -723,7 +723,7 @@
       IF (imax > nr) &
         CALL errore(routine_name, "imax > nr", 1)
       !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<")')
+      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
       !
       WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
       WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
@@ -1069,7 +1069,7 @@
         sum_wk, efermi, wdk, dos_n)
       !
       !
-      WRITE(stdout, '(/5x, ">>>>>>>>>>    PartDOS END    <<<<<<<<<<<", &
+      WRITE(stdout, '(/5x, ">>>>>>>>    PARTIAL DOS END    <<<<<<<<<", &
         & /5x, /5x, /5x)')
       !
       IF (ltetra) THEN
@@ -1091,7 +1091,7 @@
     SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, igp_scale, &
       stp, nat, norb, &
       nspin, ngauss, r, &
-      tau_cart, ur, dudrr, wr, degauss, efermi, &
+      tau_cart, wr, dudrmuorr, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n)
     !---------------------------------------------------------------------------
     !!
@@ -1147,12 +1147,14 @@
       !! radial grid for each symmetry type, r(sym_type)
       REAL(DP), INTENT(in) :: tau_cart(:, :)
       !! atomic Cartesian coordinates
-      REAL(DP), INTENT(in) :: ur(:, :, :, :)
-      !! u_l(r, e)
-      REAL(DP), INTENT(in) :: dudrr(:, :, :, :)
-      !! d u_l(r, e) / d r
+      ! REAL(DP), INTENT(in) :: ur(:, :, :, :)
+      ! !! u_l(r, e)
+      ! REAL(DP), INTENT(in) :: dudrr(:, :, :, :)
+      ! !! d u_l(r, e) / d r
       REAL(DP), INTENT(in) :: wr(:, :, :, :)
       !! \int d r u^2_l(r, e)
+      REAL(DP), INTENT(in) :: dudrmuorr(:, :, :, :)
+      !! d u(r, e) / dr - u(r, e) / r
       REAL(DP), INTENT(in) :: degauss
       !! smearing value
       REAL(DP), INTENT(in) :: efermi(:)
@@ -1501,8 +1503,7 @@
               ! reformulated
               prefactor = zero
               !
-              tmp = dudrr(ir, iorb, ispin, iat) - &
-                ur(ir, iorb, ispin, iat) / r(ir, stp(iat))
+              tmp = dudrmuorr(ir, iorb, ispin, iat)
               !
               IF (ABS(tmp) > eps12) THEN
                 prefactor = prefactor_part_dos * &
