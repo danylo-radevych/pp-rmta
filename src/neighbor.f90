@@ -90,7 +90,7 @@
       !
       ! checking only translational vectors going to neighboring cells
       !
-      nc_max = 1
+      nc_max = 3
       !
       ALLOCATE(nneighbors(nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nneighbors', 1)
