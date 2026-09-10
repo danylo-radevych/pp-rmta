@@ -236,7 +236,8 @@ NAME=$PREFIX.$SUFFIX
 $ECHO "  running RMTA for $PREFIX..."
 cat > ${NAME}.in << EOF
 &rmta
-  ! formulation = 'paper'
+  ! formulation = 'nodeless'
+  ! formulation = 'derivative'
   ! igp_scale = 3
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
