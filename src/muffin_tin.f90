@@ -325,7 +325,7 @@
     !  D. Radevych
     !
       USE mt_var, ONLY: norbs, ltetra
-      USE part_dos, ONLY: set_dos_nlm, set_dos_nlm_form2
+      USE part_dos, ONLY: set_dos_nlm, set_dos_nlm_form2, set_dos_nlm_form3
       USE mh_eta, ONLY: set_eta
       USE mt_var, ONLY: formulation, igp_scale, &
         mt_nr, mt_r, vsemilocr, &
@@ -392,6 +392,18 @@
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
           tau_cart(1 : 3, 1 : natoms), &
+          wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          dudrmuorrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
+          mt_degauss, fermi_energy, &
+          dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
+      ELSE IF (TRIM(formulation) == "default") THEN
+        CALL set_dos_nlm_form3(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
+          ist_i, &
+          natoms, norbs, nspins, mt_ngauss, mt_rf, &
+          tau_cart(1 : 3, 1 : natoms), &
+          dloglderf(1 : irf_max, &
+          1 : norbs, 1 : nspins, 1 : natoms), &
+          urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           dudrmuorrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
