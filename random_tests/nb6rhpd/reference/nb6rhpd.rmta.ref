@@ -9,13 +9,13 @@
      Please cite:
      D. Radevych, T. Shishidou, M. Weinert, 
      E. R. Margine, A. N. Kolmogorov, I. I. Mazin, 
-     Rigid muffin-tin approximation in plane wave 
+     Rigid muffin-tin approximation in plane-wave 
      codes for fast modeling of phonon-mediated 
      superconductors, npj Comput Mater (2026) 
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on  9Sep2026 at 12:57:41 
+     Program RMTA v.7.5 starts on 10Sep2026 at 12:46:15 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     711 MiB available memory on the printing compute node when the environment starts
+     2366 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -704,9 +704,11 @@
 
        u_0(r_mt) =      -1.30339861
        R_0(r_mt) =      -0.54337185
+       [du / dr - u / r]_0(r_mt) =      -0.02759407
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202453 (Ry / bohr)^2
@@ -716,9 +718,11 @@
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
                M_pd   (      2.39872309):      1.11432590 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172221 (Ry / bohr)^2
@@ -728,9 +732,11 @@
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
        u_3(r_mt) =       1.62107253
        R_3(r_mt) =       0.67580645
+       [du / dr - u / r]_3(r_mt) =       1.24005344
 
                M_df   (      2.39872309):      3.07691656 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741549 (Ry / bohr)^2
@@ -752,9 +758,11 @@
 
        u_0(r_mt) =      -1.30339864
        R_0(r_mt) =      -0.54337186
+       [du / dr - u / r]_0(r_mt) =      -0.02759420
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202452 (Ry / bohr)^2
@@ -764,9 +772,11 @@
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
                M_pd   (      2.39872309):      1.11432603 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172249 (Ry / bohr)^2
@@ -776,9 +786,11 @@
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
        u_3(r_mt) =       1.62107256
        R_3(r_mt) =       0.67580646
+       [du / dr - u / r]_3(r_mt) =       1.24005356
 
                M_df   (      2.39872309):      3.07691647 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741498 (Ry / bohr)^2
@@ -800,9 +812,11 @@
 
        u_0(r_mt) =      -1.30339861
        R_0(r_mt) =      -0.54337185
+       [du / dr - u / r]_0(r_mt) =      -0.02759407
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202453 (Ry / bohr)^2
@@ -812,9 +826,11 @@
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
                M_pd   (      2.39872309):      1.11432590 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172221 (Ry / bohr)^2
@@ -824,9 +840,11 @@
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
        u_3(r_mt) =       1.62107253
        R_3(r_mt) =       0.67580645
+       [du / dr - u / r]_3(r_mt) =       1.24005344
 
                M_df   (      2.39872309):      3.07691656 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741549 (Ry / bohr)^2
@@ -848,9 +866,11 @@
 
        u_0(r_mt) =      -1.30339864
        R_0(r_mt) =      -0.54337186
+       [du / dr - u / r]_0(r_mt) =      -0.02759420
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202452 (Ry / bohr)^2
@@ -860,9 +880,11 @@
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
                M_pd   (      2.39872309):      1.11432603 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172249 (Ry / bohr)^2
@@ -872,9 +894,11 @@
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
        u_3(r_mt) =       1.62107256
        R_3(r_mt) =       0.67580646
+       [du / dr - u / r]_3(r_mt) =       1.24005356
 
                M_df   (      2.39872309):      3.07691647 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741498 (Ry / bohr)^2
@@ -896,9 +920,11 @@
 
        u_0(r_mt) =      -1.30339861
        R_0(r_mt) =      -0.54337185
+       [du / dr - u / r]_0(r_mt) =      -0.02759407
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202453 (Ry / bohr)^2
@@ -908,9 +934,11 @@
 
        u_1(r_mt) =      -1.30602126
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613249
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
                M_pd   (      2.39872309):      1.11432590 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172221 (Ry / bohr)^2
@@ -920,9 +948,11 @@
 
        u_2(r_mt) =       0.71963362
        R_2(r_mt) =       0.30000696
+       [du / dr - u / r]_2(r_mt) =      -0.48363504
 
        u_3(r_mt) =       1.62107253
        R_3(r_mt) =       0.67580645
+       [du / dr - u / r]_3(r_mt) =       1.24005344
 
                M_df   (      2.39872309):      3.07691656 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741549 (Ry / bohr)^2
@@ -944,9 +974,11 @@
 
        u_0(r_mt) =      -1.30339864
        R_0(r_mt) =      -0.54337186
+       [du / dr - u / r]_0(r_mt) =      -0.02759420
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
                M_sp   (      2.39872309):     -1.80056228 (Ry / bohr)
              M^2_sp   (      2.39872309):      3.24202452 (Ry / bohr)^2
@@ -956,9 +988,11 @@
 
        u_1(r_mt) =      -1.30602124
        R_1(r_mt) =      -0.54446520
+       [du / dr - u / r]_1(r_mt) =      -0.90613260
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
                M_pd   (      2.39872309):      1.11432603 (Ry / bohr)
              M^2_pd   (      2.39872309):      1.24172249 (Ry / bohr)^2
@@ -968,9 +1002,11 @@
 
        u_2(r_mt) =       0.71963372
        R_2(r_mt) =       0.30000700
+       [du / dr - u / r]_2(r_mt) =      -0.48363488
 
        u_3(r_mt) =       1.62107256
        R_3(r_mt) =       0.67580646
+       [du / dr - u / r]_3(r_mt) =       1.24005356
 
                M_df   (      2.39872309):      3.07691647 (Ry / bohr)
              M^2_df   (      2.39872309):      9.46741498 (Ry / bohr)^2
@@ -992,9 +1028,11 @@
 
        u_0(r_mt) =      -0.69589390
        R_0(r_mt) =      -0.23044457
+       [du / dr - u / r]_0(r_mt) =       0.63603101
 
        u_1(r_mt) =      -1.08544198
        R_1(r_mt) =      -0.35944303
+       [du / dr - u / r]_1(r_mt) =       0.14183016
 
                M_sp   (      3.01978866):     -0.19763966 (Ry / bohr)
              M^2_sp   (      3.01978866):      0.03906143 (Ry / bohr)^2
@@ -1004,9 +1042,11 @@
 
        u_1(r_mt) =      -1.08544198
        R_1(r_mt) =      -0.35944303
+       [du / dr - u / r]_1(r_mt) =       0.14183016
 
        u_2(r_mt) =      -0.21681196
        R_2(r_mt) =      -0.07179706
+       [du / dr - u / r]_2(r_mt) =      -0.57407717
 
                M_pd   (      3.01978866):      0.21981286 (Ry / bohr)
              M^2_pd   (      3.01978866):      0.04831770 (Ry / bohr)^2
@@ -1016,9 +1056,11 @@
 
        u_2(r_mt) =      -0.21681196
        R_2(r_mt) =      -0.07179706
+       [du / dr - u / r]_2(r_mt) =      -0.57407717
 
        u_3(r_mt) =       1.53874347
        R_3(r_mt) =       0.50955336
+       [du / dr - u / r]_3(r_mt) =       1.05388254
 
                M_df   (      3.01978866):      1.58049162 (Ry / bohr)
              M^2_df   (      3.01978866):      2.49795377 (Ry / bohr)^2
@@ -1040,9 +1082,11 @@
 
        u_0(r_mt) =      -0.77987391
        R_0(r_mt) =      -0.25982537
+       [du / dr - u / r]_0(r_mt) =       0.59010163
 
        u_1(r_mt) =      -1.12059429
        R_1(r_mt) =      -0.37334090
+       [du / dr - u / r]_1(r_mt) =       0.10163688
 
                M_sp   (      3.00153101):     -0.28387195 (Ry / bohr)
              M^2_sp   (      3.00153101):      0.08058329 (Ry / bohr)^2
@@ -1052,9 +1096,11 @@
 
        u_1(r_mt) =      -1.12059429
        R_1(r_mt) =      -0.37334090
+       [du / dr - u / r]_1(r_mt) =       0.10163688
 
        u_2(r_mt) =      -0.00207505
        R_2(r_mt) =      -0.00069133
+       [du / dr - u / r]_2(r_mt) =      -0.52359320
 
                M_pd   (      3.00153101):      0.24791213 (Ry / bohr)
              M^2_pd   (      3.00153101):      0.06146043 (Ry / bohr)^2
@@ -1064,9 +1110,11 @@
 
        u_2(r_mt) =      -0.00207505
        R_2(r_mt) =      -0.00069133
+       [du / dr - u / r]_2(r_mt) =      -0.52359320
 
        u_3(r_mt) =       1.53352607
        R_3(r_mt) =       0.51091462
+       [du / dr - u / r]_3(r_mt) =       1.04213988
 
                M_df   (      3.00153101):      1.61385606 (Ry / bohr)
              M^2_df   (      3.00153101):      2.60453139 (Ry / bohr)^2
@@ -1079,7 +1127,7 @@
 
 
 
-     >>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<
+     >>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<
 
        ltetra =  T
        two_fermi_energies =  F
@@ -1191,7 +1239,7 @@
 
 
 
-     >>>>>>>>>>    PartDOS END    <<<<<<<<<<<
+     >>>>>>>>    PARTIAL DOS END    <<<<<<<<<
 
 
 
@@ -2049,6 +2097,7 @@
      writing duderf
      writing dudrrf
      writing d2udrderf
+     writing dudrmuorrf
      writing mll1rf
      writing vfullrf
      writing rvfullrf
@@ -2061,22 +2110,22 @@
 
      rmta        : module-specific arrays are deallocated.
  
-     rmta_init    :      3.63s CPU      3.65s WALL (       1 calls)
+     rmta_init    :      3.59s CPU      3.66s WALL (       1 calls)
      set_vsemiloc :      0.00s CPU      0.00s WALL (       1 calls)
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
      tetra_delta_ :      0.02s CPU      0.02s WALL (       1 calls)
-     set_dos_nlm_ :     15.98s CPU     17.24s WALL (       1 calls)
+     set_dos_nlm_ :     16.19s CPU     17.34s WALL (       1 calls)
      set_dos_n    :      0.00s CPU      0.00s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.06s CPU      0.08s WALL (       1 calls)
+     rmta_write   :      0.07s CPU      0.09s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :     20.02s CPU     21.35s WALL
+     RMTA         :     20.22s CPU     21.49s WALL
 
  
-   This run was terminated on:  12:58: 2   9Sep2026            
+   This run was terminated on:  12:46:37  10Sep2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.

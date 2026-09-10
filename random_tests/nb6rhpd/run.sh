@@ -8,7 +8,7 @@ ncpu=8
 EXEC="mpirun"
 ECHO=echo
 
-lrun_scf=true
+lrun_scf=false
 lrun_rmta=true
 
 lsave_tmp_dir=true
@@ -236,6 +236,8 @@ NAME=$PREFIX.$SUFFIX
 $ECHO "  running RMTA for $PREFIX..."
 cat > ${NAME}.in << EOF
 &rmta
+  ! formulation = 'paper'
+  ! igp_scale = 3
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
   lwrite_dat = .true.
