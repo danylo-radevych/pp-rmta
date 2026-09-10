@@ -69,7 +69,7 @@ recalculated from `chi` functions and `beta` projectors.
 ## RMTA input
 | Type         | Variable     | Default   | Description                        |
 | :---         | :---         | :---:     | :---                               |
-| `CHARACTER`  | `formulation`| `'upstream'` | if `'upstream'`, calculate partial DOS based on continuous derivatives of the wavefunctions; if `'paper'`, calculate partial DOS based on continuous wavefunctions |
+| `CHARACTER`  | `formulation`| `'default'` | if `'nodeless'`, calculate partial DOS based on continuous wavefunctions; if `'derivative'`, calculate partial DOS based on continuous derivatives of the wavefunctions; if `'default'`, automatically activate `'derivative'` when `'nodeless'` is close to radial nodes (recommended) |
 | `CHARACTER`  | `prefix`     | `'pwscf'` | prefix used in the SCF calculation |
 | `CHARACTER`  | `outdir`     | `'./'`    | folder where SCF wavefunctions and charge density are stored |
 | `CHARACTER`  | `rmt_method` | `'touching'`| see `lrmt`: if `'default'`, set default MT radii from the table; if `'pseudo'`, set default MT radii as pseudopotential cutoff radii; if `'neighbor'`, divide nearest-neighbor distances into ratios of the default MT radii; if `'touching'`, starting from `'neighbor'`, enforce touching spheres (recommended); if `'pseudoneighbor'`, divide nearest-neighbor distances into ratios of the pseudopotential cutoff radii; if `'pseudotouching'`, starting from `'pseudoneighbor'`, enforce touching spheres|

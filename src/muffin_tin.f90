@@ -378,7 +378,7 @@
       !
       ! partial DOS
       !
-      IF (TRIM(formulation) == "paper") THEN
+      IF (TRIM(formulation) == "nodeless") THEN
         CALL set_dos_nlm(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
@@ -387,7 +387,7 @@
           1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
           dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
-      ELSE IF (TRIM(formulation) == "upstream") THEN
+      ELSE IF (TRIM(formulation) == "derivative") THEN
         CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
@@ -1627,16 +1627,16 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "[du / dr - u / r]_", iorb - 1, "(r_mt) = ", duldrmulor
             !
-            IF (TRIM(formulation) == "paper" .AND. ABS(ul) < precm2) THEN
+            IF (TRIM(formulation) == "nodeless" .AND. ABS(ul) < precm2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''upstream''")') &
+                & "Try setting formulation = ''default'' or ''derivative''")') &
                 iorb - 1
             END IF
-            IF (TRIM(formulation) == "upstream" .AND. &
+            IF (TRIM(formulation) == "derivative" .AND. &
               ABS(duldrmulor) < precm2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''paper''")') &
+                & "Try setting formulation = ''default'' or ''nodeless''")') &
                 iorb - 1
             END IF
             !
@@ -1663,16 +1663,16 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "[du / dr - u / r]_", iorb, "(r_mt) = ", dul1drmul1or
             !
-            IF (TRIM(formulation) == "paper" .AND. ABS(ul1) < precm2) THEN
+            IF (TRIM(formulation) == "nodeless" .AND. ABS(ul1) < precm2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''upstream''")') &
+                & "Try setting formulation = ''default'' or ''derivative''")') &
                 iorb
             END IF
-            IF (TRIM(formulation) == "upstream" .AND. &
+            IF (TRIM(formulation) == "derivative" .AND. &
               ABS(dul1drmul1or) < precm2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''paper''")') &
+                & "Try setting formulation = ''default'' or ''nodeless''")') &
                 iorb
             END IF
             !

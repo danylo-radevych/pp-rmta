@@ -1263,9 +1263,9 @@
       CALL print_clock('set_log_ders')
       CALL print_clock('set_pet_mll1')
       CALL print_clock('tetra_delta_weights')
-      IF (TRIM(formulation) == "paper") &
+      IF (TRIM(formulation) == "nodeless") &
         CALL print_clock('set_dos_nlm')
-      IF (TRIM(formulation) == "upstream") &
+      IF (TRIM(formulation) == "derivative") &
         CALL print_clock('set_dos_nlm_form2')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
@@ -1539,29 +1539,29 @@
               !
               ! warnings
               !
-              IF (TRIM(formulation) == "paper" .AND. &
+              IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''derivative''")') &
                   TRIM(orb_label(iorb))
               END IF
-              IF (TRIM(formulation) == "upstream" .AND. &
+              IF (TRIM(formulation) == "derivative" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''paper''")') &
+                  "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
-              IF (TRIM(formulation) == "paper" .AND. &
+              IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''derivative''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
-              IF (TRIM(formulation) == "upstream" .AND. &
+              IF (TRIM(formulation) == "derivative" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''paper''")') &
+                  "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !
@@ -1731,29 +1731,29 @@
               !
               ! warnings
               !
-              IF (TRIM(formulation) == "paper" .AND. &
+              IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''derivative''")') &
                   TRIM(orb_label(iorb))
               END IF
-              IF (TRIM(formulation) == "upstream" .AND. &
+              IF (TRIM(formulation) == "derivative" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''paper''")') &
+                  "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
-              IF (TRIM(formulation) == "paper" .AND. &
+              IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''derivative''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
-              IF (TRIM(formulation) == "upstream" .AND. &
+              IF (TRIM(formulation) == "derivative" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''paper''")') &
+                  "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !
