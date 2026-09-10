@@ -1402,6 +1402,7 @@
       ALLOCATE(psi_krtau_aux(ngp, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating psi_krtau_aux', 1)
+      psi_krtau_aux(:, :, :) = czero
       !
       DO iat = 1, nat
         !
@@ -1652,10 +1653,12 @@
     !---------------------------------------------------------------------------
     !
     !
-!---------------------------------------------------------------------------
+    !---------------------------------------------------------------------------
     SUBROUTINE set_dos_nlm_form3(ltetra, nr, imin, imax, igp_scale, stp, &
       nat, norb, nspin, ngauss, r, &
-      tau_cart, dloglde, ur, wr, dudrmuorr, degauss, efermi, &
+      tau_cart, dloglde, &
+      urmax, dudrmuorrmax, &
+      ur, wr, dudrmuorr, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n)
     !---------------------------------------------------------------------------
     !!
@@ -1677,7 +1680,7 @@
       USE pw_restart_new, ONLY: read_collected_wfc
       USE gvect, ONLY: g ! mill, gl, ngl
       USE lsda_mod, ONLY: isk
-      USE const, ONLY: zero, one, two, czero, ci, precm2
+      USE const, ONLY: zero, one, two, czero, ci, eps2
       !
       IMPLICIT NONE
       !
@@ -1713,6 +1716,10 @@
       !! atomic Cartesian coordinates
       REAL(DP), INTENT(in) :: dloglde(:, :, :, :)
       !! d L_l(r, e) / d e
+      REAL(DP), INTENT(in) :: urmax(:, :, :)
+      !! max of u(r)
+      REAL(DP), INTENT(in) :: dudrmuorrmax(:, :, :)
+      !! max values of [du(r) / dr - u(r) / r] on fine grid
       REAL(DP), INTENT(in) :: ur(:, :, :, :)
       !! u_l(r, e)
       REAL(DP), INTENT(in) :: wr(:, :, :, :)
@@ -1976,9 +1983,11 @@
       ALLOCATE(psi_krtau_aux(ngp, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating psi_krtau_aux', 1)
+      psi_krtau_aux(:, :, :) = czero
       ALLOCATE(psi_krtau_form2_aux(ngp, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating psi_krtau_form2_aux', 1)
+      psi_krtau_form2_aux(:, :, :) = czero
       !
       DO iat = 1, nat
         !
@@ -1996,6 +2005,7 @@
             ! precompute psi_krtau with delta function for all bands
             !
             psi_krtau_aux(:, :, :) = czero
+            psi_krtau_form2_aux(:, :, :) = czero
             !
             WRITE(stdout, &
               '(/9x, "Precomputing ", &
@@ -2086,18 +2096,19 @@
               lorigform = .TRUE.
               tmp = dudrmuorr(ir, iorb, ispin, iat)
               !
-              IF (ABS(ur(ir, iorb, ispin, iat)) > precm2) THEN
+              IF (ABS(ur(ir, iorb, ispin, iat) / &
+                urmax(iorb, ispin, iat)) > eps2) THEN
                 lorigform = .TRUE.
                 prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
                   ABS(dloglde(ir, iorb, ispin, iat))
-                WRITE(stdout, '(/8x, "formulation ''paper'' is used")')
-              ELSE IF (ABS(tmp) > precm2) THEN
+                WRITE(stdout, '(/8x, "formulation ''nodeless'' is used")')
+              ELSE IF (ABS(tmp / dudrmuorrmax(iorb, ispin, iat)) > eps2) THEN
                 lorigform = .FALSE.
                 prefactor = prefactor_part_dos * &
                   r(ir, stp(iat)) * r(ir, stp(iat)) * &
                   wr(ir, iorb, ispin, iat) / &
                   (tmp * tmp)
-                WRITE(stdout, '(/8x, "formulation ''upstream'' is used")')
+                WRITE(stdout, '(/8x, "formulation ''derivative'' is used")')
               ELSE
                 CALL errore(routine_name, &
                   "No reliable partial DOS formulation for given MT radius.", 1)
@@ -2271,6 +2282,8 @@
       USE io_global, ONLY: stdout
       USE constants, ONLY: tpi, eps32, eps6, eps4
       USE symm_base, ONLY: nrot, irt, nosym
+      USE ions_base, ONLY: ityp
+      USE uspp_param, ONLY: upf
       USE const, ONLY: zero, one, two
       !
       IMPLICIT NONE
@@ -2347,7 +2360,7 @@
       IF (lsymmetrize) THEN
         !
         WRITE(stdout, &
-          '(7x, "Symmetrizing partial DOS = f(r, E_F)...")')
+          '(/7x, "Symmetrizing partial DOS = f(r, E_F)...")')
         !
         !
         ALLOCATE(dos_nlmr_sym(imax - imin + 1, (lmax + 1) * (lmax + 1), &
@@ -2376,9 +2389,11 @@
             !
             irot_loop: DO irot = 1, nrot
               IF ((irt(irot, iat) == jat) .AND. (iat /= jat)) THEN
-                lfound = .TRUE.
-                counters(iat) = counters(iat) + 1
-                EXIT irot_loop
+                IF (upf(ityp(iat))%psd == upf(ityp(jat))%psd) THEN
+                  lfound = .TRUE.
+                  counters(iat) = counters(iat) + 1
+                  EXIT irot_loop
+                END IF
               END IF
             END DO irot_loop ! irot
             !

@@ -47,7 +47,9 @@
       vlocscr00rf, vlocscf00rf, &
       vlociong, vlocscrr3d, vlocscfr3d, &
       vlocscrg3d, mt_g, vlocscfg3d, &
-      vsemilocr, vsemilocrf, urf, duderf, dudrrf, &
+      vsemilocr, vsemilocrf, &
+      urmax, dudrmuorrmax, &
+      urf, duderf, dudrrf, &
       d2udrderf, dudrmuorrf, &
       mll1rf_label, mll1rf, &
       vfullrf, rvfullrf, &
@@ -235,6 +237,12 @@
     REAL(DP), ALLOCATABLE :: vsemilocrf(:, :, :)
     !! vsemilocrf(mt_nrf, norbs, natoms)
     !! semilocal V_SL(rf) interpolated from V_SL(r)
+    REAL(DP), ALLOCATABLE :: urmax(:, :, :)
+    !! urmax(norbs, nspins, natoms)
+    !! max values of u(r) on fine grid
+    REAL(DP), ALLOCATABLE :: dudrmuorrmax(:, :, :)
+    !! dudrmuorrmax(norbs, nspins, natoms)
+    !! max values of [du(r) / dr - u(r) / r] on fine grid
     REAL(DP), ALLOCATABLE :: urf(:, :, :, :)
     !! urf(mt_nrf, norbs, nspins, natoms)
     !! computed radial functions u(r) on fine grid
@@ -1465,6 +1473,18 @@
       !
       ! allocate other arrays
       !
+      ALLOCATE(urmax(norbs, nspins, natoms), &
+        STAT = ierr)
+      IF (ierr /= 0) &
+         CALL errore(routine_name, "Error allocating urmax", 1)
+      urmax(:, :, :) = zero
+      !
+      ALLOCATE(dudrmuorrmax(norbs, nspins, natoms), &
+        STAT = ierr)
+      IF (ierr /= 0) &
+         CALL errore(routine_name, "Error allocating dudrmuorrmax", 1)
+      dudrmuorrmax(:, :, :) = zero
+      !
       ALLOCATE(wrf(mt_nrf, norbs, nspins, natoms), &
         STAT = ierr)
       IF (ierr /= 0) &
@@ -1704,6 +1724,14 @@
       DEALLOCATE(dudrmuorrf, STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error deallocating dudrmuorrf', 1)
+      !
+      DEALLOCATE(urmax, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating urmax', 1)
+      !
+      DEALLOCATE(dudrmuorrmax, STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, &
+        'Error deallocating dudrmuorrmax', 1)
       !
       ! computed RMTA quantities
       !

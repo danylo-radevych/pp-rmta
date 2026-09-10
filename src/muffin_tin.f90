@@ -331,6 +331,7 @@
         mt_nr, mt_r, vsemilocr, &
         vsemilocrf, &
         irf_min, irf_max, &
+        urmax, dudrmuorrmax, &
         urf, dudrrf, duderf, d2udrderf, wrf, dudrmuorrf, &
         loglrf, dloglderf, &
         dos_nlmrf, dos_nlrf, dos_nrf, dos_n, &
@@ -370,6 +371,7 @@
       CALL set_log_ders(irf_max, mt_dx, mt_rf, &
         natoms, ist_i, norbs, nspins, lhybrid, &
         urf, dudrrf, duderf, d2udrderf, &
+        urmax, dudrmuorrmax, &
         loglrf, dloglderf, wrf, dudrmuorrf)
       !
       ! Pettifor's M_{l, l+1}
@@ -403,6 +405,8 @@
           tau_cart(1 : 3, 1 : natoms), &
           dloglderf(1 : irf_max, &
           1 : norbs, 1 : nspins, 1 : natoms), &
+          urmax(1 : norbs, 1 : nspins, 1 : natoms), &
+          dudrmuorrmax(1 : norbs, 1 : nspins, 1 : natoms), &
           urf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           wrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
           dudrmuorrf(1 : irf_max, 1 : norbs, 1 : nspins, 1 : natoms), &
@@ -816,6 +820,7 @@
     !---------------------------------------------------------------------------
     SUBROUTINE set_log_ders(nin, dx, rf, nat, stp, &
       norb, nspins, lhybrid, urf, dudrrf, duderf, d2udrderf, &
+      urmax, dudrmuorrmax, &
       logl, dloglde, wrf, dudrmuorrf)
     !---------------------------------------------------------------------------
     !!
@@ -856,6 +861,10 @@
        REAL(DP), INTENT(in) :: d2udrderf(:, :, :, :)
        !! d2 u(r, e) / d r / d e on fine radial grid
        !
+       REAL(DP), INTENT(inout) :: urmax(:, :, :)
+       !! max value of u(r)
+       REAL(DP), INTENT(inout) :: dudrmuorrmax(:, :, :)
+       !! max value of [d u(r) / dr - u(r) / r]
        REAL(DP), INTENT(inout) :: logl(:, :, :, :)
        !! L_l(r, E_F)
        REAL(DP), INTENT(inout) :: dloglde(:, :, :, :)
@@ -886,6 +895,7 @@
        DO iat = 1, nat
          DO iorb = 1, norb
            DO ispin = 1, nspins
+             !
              DO ir = 1, nin
                !
                rmtf = rf(ir, stp(iat))
@@ -928,6 +938,12 @@
                END IF
                !
              END DO ! ir
+             !
+             urmax(iorb, ispin, iat) = &
+               MAXVAL(ABS(urf(:, iorb, ispin, iat)))
+             dudrmuorrmax(iorb, ispin, iat) = &
+               MAXVAL(ABS(dudrmuorrf(:, iorb, ispin, iat)))
+             !
            END DO ! ispin
          END DO ! iorb
        END DO ! iat
@@ -1386,11 +1402,12 @@
         irf_max, &
         mt_nrf, mt_rf, mt_rmt, &
         vlocscr00rf, vsemilocrf, &
+        urmax, dudrmuorrmax, &
         urf, dudrrf, &
         wrf, dudrmuorrf, loglrf
       USE sym_type, ONLY: ist_i
       USE constants, ONLY: eps6, eps12
-      USE const, ONLY: zero, half, precm2
+      USE const, ONLY: zero, half, eps2
       !
       IMPLICIT NONE
       !
@@ -1418,6 +1435,10 @@
       !! u_l(r, e)
       REAL(DP) :: ul1
       !! u_l+1(r, e)
+      REAL(DP) :: ulmax
+      !! max of u_l(r, e)
+      REAL(DP) :: ul1max
+      !! max of u_l+1(r, e)
       REAL(DP) :: duldr
       !! du_l(r, e) / dr
       REAL(DP) :: dul1dr
@@ -1426,6 +1447,10 @@
       !! du_l(r, e) / dr - u_l(r, e) / r
       REAL(DP) :: dul1drmul1or
       !! du_l+1(r, e) / dr - u_l+1(r, e) / r
+      REAL(DP) :: duldrmulormax
+      !! max of du_l(r, e) / dr - u_l(r, e) / r
+      REAL(DP) :: dul1drmul1ormax
+      !! max of du_l+1(r, e) / dr - u_l+1(r, e) / r
       !! u_l(r, e)
       ! REAL(DP) :: dulde
       ! !! du_l(r, e) / de
@@ -1609,12 +1634,16 @@
             !
             ul = urf(mt_nrf, iorb, ispin, iat)
             ul1 = urf(mt_nrf, iorb + 1, ispin, iat)
+            ulmax = urmax(iorb, ispin, iat)
+            ul1max = urmax(iorb + 1, ispin, iat)
             rl = ul / rmtf
             rl1 = ul1 / rmtf
             wl = wrf(mt_nrf, iorb, ispin, iat)
             wl1 = wrf(mt_nrf, iorb + 1, ispin, iat)
             duldrmulor = dudrmuorrf(mt_nrf, iorb, ispin, iat)
             dul1drmul1or = dudrmuorrf(mt_nrf, iorb + 1, ispin, iat)
+            duldrmulormax = dudrmuorrmax(iorb, ispin, iat)
+            dul1drmul1ormax = dudrmuorrmax(iorb + 1, ispin, iat)
             ! logl = loglrf(mt_nrf, iorb, ispin, iat)
             ! logl1 = loglrf(mt_nrf, iorb + 1, ispin, iat)
             ! dloglde = dloglderf(mt_nrf, iorb, ispin, iat)
@@ -1627,13 +1656,14 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "[du / dr - u / r]_", iorb - 1, "(r_mt) = ", duldrmulor
             !
-            IF (TRIM(formulation) == "nodeless" .AND. ABS(ul) < precm2) THEN
+            IF (TRIM(formulation) == "nodeless" .AND. &
+              ABS(ul / ulmax) < eps2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
                 & "Try setting formulation = ''default'' or ''derivative''")') &
                 iorb - 1
             END IF
             IF (TRIM(formulation) == "derivative" .AND. &
-              ABS(duldrmulor) < precm2) THEN
+              ABS(duldrmulor / duldrmulormax) < eps2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
                 & "Try setting formulation = ''default'' or ''nodeless''")') &
@@ -1663,13 +1693,14 @@
             WRITE(stdout, '(7x, A, I1, A, F16.8)') &
               "[du / dr - u / r]_", iorb, "(r_mt) = ", dul1drmul1or
             !
-            IF (TRIM(formulation) == "nodeless" .AND. ABS(ul1) < precm2) THEN
+            IF (TRIM(formulation) == "nodeless" .AND. &
+              ABS(ul1 / ul1max) < eps2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
                 & "Try setting formulation = ''default'' or ''derivative''")') &
                 iorb
             END IF
             IF (TRIM(formulation) == "derivative" .AND. &
-              ABS(dul1drmul1or) < precm2) THEN
+              ABS(dul1drmul1or / dul1drmul1ormax) < eps2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
                 & "Try setting formulation = ''default'' or ''nodeless''")') &
