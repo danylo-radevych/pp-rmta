@@ -63,6 +63,7 @@ file_name_dos_nlrf = "dos_nlrf.dat"
 file_name_dos_nrf = "dos_nrf.dat"
 file_name_duderf = "duderf.dat"
 file_name_dudrrf = "dudrrf.dat"
+file_name_dudrmuorrf = "dudrmuorrf.dat"
 file_name_etall1rf = "etall1rf.dat"
 file_name_loglrf = "loglrf.dat"
 file_name_mll1rf = "mll1rf.dat"
@@ -612,6 +613,51 @@ for i in range(num_lines):
 plt.title("$\\frac{d u(r, \\varepsilon)}{d r}$", fontsize=fntsz)
 plt.xlabel('$r$ (bohr)', fontsize=fntsz)
 plt.ylabel('$\\frac{d u(r, \\varepsilon)}{d r}$', fontsize=fntsz)
+ax.tick_params(axis='both', which='major', labelsize=fntsz)
+plt.subplots_adjust(wspace=0, hspace=0)
+plt.legend(loc="upper right", fontsize='large', prop={'size': fntsz/2.})
+plt.xlim([0., rmt])
+fig.set_size_inches(8.5, 11)
+plt.savefig(plot_name + "_portrait.pdf", format='pdf', bbox_inches='tight')
+plt.savefig(plot_name + "_portrait.png", format='png', bbox_inches='tight')
+plt.savefig(plot_name + "_portrait.svg", format='svg', bbox_inches='tight')
+fig.set_size_inches(11, 8.5)
+plt.savefig(plot_name + "_landscape.pdf", format='pdf', bbox_inches='tight')
+plt.savefig(plot_name + "_landscape.png", format='png', bbox_inches='tight')
+plt.savefig(plot_name + "_landscape.svg", format='svg', bbox_inches='tight')
+fig.set_size_inches(20, 12)
+plt.savefig(plot_name + "_hd.pdf", format='pdf', bbox_inches='tight')
+plt.savefig(plot_name + "_hd.png", format='png', bbox_inches='tight')
+plt.savefig(plot_name + "_hd.svg", format='svg', bbox_inches='tight')
+plt.show()
+
+
+# dudrmuorrf -----------------------------------------------------------------------
+nlines = get_nlines(file_name_dudrmuorrf)
+dudrmuorrf_name, dudrmuorrf = get_table(file_name_dudrmuorrf, nlines)
+
+plot_name="dudrmuorrf"
+fig, ax = plt.subplots()
+# plt.axvline(rc[0], color='brown', linestyle='--', label='$r_c$')
+# plt.axvline(rmt, color='violet', linestyle='--', label='$r_{MT}$')
+plt.axhline(0, color='gray', linestyle='--')
+
+num_lines = int(len(dudrmuorrf_name) / 2)
+cmap = plt.get_cmap(cmap1)
+colors = cmap(np.linspace(0, 1.0, num_lines))
+
+
+for i in range(num_lines):
+  if (True):
+    ax.plot(dudrmuorrf[:, 2 * i], dudrmuorrf[:, 2 * i + 1], \
+     marker='o', markersize=5, \
+     color=colors[i], linestyle='', label="$u^{" + \
+       dudrrf_name[2 * i + 1] + "}(r)$", linewidth=1)
+
+#
+plt.title("$\\frac{d u(r, \\varepsilon)}{d r} - \\frac{u(r, \\varepsilon)}{r}$", fontsize=fntsz)
+plt.xlabel('$r$ (bohr)', fontsize=fntsz)
+plt.ylabel('$\\frac{d u(r, \\varepsilon)}{d r} - \\frac{u(r, \\varepsilon)}{r}$', fontsize=fntsz)
 ax.tick_params(axis='both', which='major', labelsize=fntsz)
 plt.subplots_adjust(wspace=0, hspace=0)
 plt.legend(loc="upper right", fontsize='large', prop={'size': fntsz/2.})
