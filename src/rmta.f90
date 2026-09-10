@@ -109,7 +109,7 @@
     program_name = "rmta.x"
     lmpi_single_rank = .TRUE. ! error if multiple ranks
     !
-    formulation = "upstream"
+    formulation = "default"
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
     igp_scale = 3

@@ -1542,26 +1542,26 @@
               IF (TRIM(formulation) == "paper" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''upstream''")') &
                   TRIM(orb_label(iorb))
               END IF
               IF (TRIM(formulation) == "upstream" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''paper''")') &
+                  "Try setting formulation = ''default'' or ''paper''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
               IF (TRIM(formulation) == "paper" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''upstream''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               IF (TRIM(formulation) == "upstream" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''paper''")') &
+                  "Try setting formulation = ''default'' or ''paper''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !
@@ -1734,26 +1734,26 @@
               IF (TRIM(formulation) == "paper" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''upstream''")') &
                   TRIM(orb_label(iorb))
               END IF
               IF (TRIM(formulation) == "upstream" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''paper''")') &
+                  "Try setting formulation = ''default'' or ''paper''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
               IF (TRIM(formulation) == "paper" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''upstream''")') &
+                  "Try setting formulation = ''default'' or ''upstream''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               IF (TRIM(formulation) == "upstream" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''paper''")') &
+                  "Try setting formulation = ''default'' or ''paper''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !

@@ -1629,13 +1629,15 @@
             !
             IF (TRIM(formulation) == "paper" .AND. ABS(ul) < precm2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''upstream''")') iorb - 1
+                & "Try setting formulation = ''default'' or ''upstream''")') &
+                iorb - 1
             END IF
             IF (TRIM(formulation) == "upstream" .AND. &
               ABS(duldrmulor) < precm2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
-                & "Try setting formulation = ''paper''")') iorb - 1
+                & "Try setting formulation = ''default'' or ''paper''")') &
+                iorb - 1
             END IF
             !
             IF (ldebug) THEN
@@ -1663,13 +1665,15 @@
             !
             IF (TRIM(formulation) == "paper" .AND. ABS(ul1) < precm2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''upstream''")') iorb
+                & "Try setting formulation = ''default'' or ''upstream''")') &
+                iorb
             END IF
             IF (TRIM(formulation) == "upstream" .AND. &
               ABS(dul1drmul1or) < precm2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
-                & "Try setting formulation = ''paper''")') iorb
+                & "Try setting formulation = ''default'' or ''paper''")') &
+                iorb
             END IF
             !
             IF (ldebug) THEN
