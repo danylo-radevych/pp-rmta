@@ -69,7 +69,7 @@ recalculated from `chi` functions and `beta` projectors.
 ## RMTA input
 | Type         | Variable     | Default   | Description                        |
 | :---         | :---         | :---:     | :---                               |
-| `CHARACTER`  | `formulation`| `'default'` | if `'nodeless'`, calculate partial DOS based on continuous wavefunctions; if `'monotonic'`, calculate partial DOS based on continuous derivatives of the wavefunctions; if `'default'`, automatically activate `'monotonic'` when `'nodeless'` is close to radial nodes (recommended) |
+| `CHARACTER`  | `formulation`| `'default'` | if `'nodeless'`, calculate the partial DOS by matching the wavefunctions at the MT radii; if `'monotonic'`, calculate the partial DOS by matching the derivatives of the wavefunctions at the MT radii; if `'default'`, automatically activate `'monotonic'` when `'nodeless'` is close to the radial nodes (recommended) |
 | `CHARACTER`  | `prefix`     | `'pwscf'` | prefix used in the SCF calculation |
 | `CHARACTER`  | `outdir`     | `'./'`    | folder where SCF wavefunctions and charge density are stored |
 | `CHARACTER`  | `rmt_method` | `'touching'`| see `lrmt`: if `'default'`, set default MT radii from the table; if `'pseudo'`, set default MT radii as pseudopotential cutoff radii; if `'neighbor'`, divide nearest-neighbor distances into ratios of the default MT radii; if `'touching'`, starting from `'neighbor'`, enforce touching spheres (recommended); if `'pseudoneighbor'`, divide nearest-neighbor distances into ratios of the pseudopotential cutoff radii; if `'pseudotouching'`, starting from `'pseudoneighbor'`, enforce touching spheres|
