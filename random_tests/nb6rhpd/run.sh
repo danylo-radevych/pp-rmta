@@ -8,7 +8,7 @@ ncpu=8
 EXEC="mpirun"
 ECHO=echo
 
-lrun_scf=true
+lrun_scf=false
 lrun_rmta=true
 
 lsave_tmp_dir=true
@@ -238,6 +238,7 @@ cat > ${NAME}.in << EOF
 &rmta
   ! formulation = 'nodeless'
   ! formulation = 'monotonic'
+  ! igp_lmax = 10
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
   lwrite_dat = .true.

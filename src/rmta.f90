@@ -112,7 +112,7 @@
     formulation = "default"
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
-    igp_lmax = 8 ! if 0, use automatic norb - 1
+    igp_lmax = 10 ! if 0, use automatic norb - 1
     rmt_method = "touching"
     rmt(:) = -1.0_dp
     ngauss = -99
