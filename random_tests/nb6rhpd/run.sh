@@ -237,8 +237,7 @@ $ECHO "  running RMTA for $PREFIX..."
 cat > ${NAME}.in << EOF
 &rmta
   ! formulation = 'nodeless'
-  ! formulation = 'derivative'
-  ! igp_scale = 3
+  ! formulation = 'monotonic'
   prefix = '$PREFIX'
   outdir = '$TMP_DIR'
   lwrite_dat = .true.

@@ -544,7 +544,8 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, igp_scale, stp, nat, norb, &
+    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, igp_lmax, &
+      stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, dloglde, degauss, efermi, &
       dos_nlmr, dos_nlr, dos_nr, dos_n)
@@ -585,8 +586,8 @@
       INTEGER, INTENT(in) :: imax
       !! max index of the radial point for partial DOS
       !! partial DOS for ir > nmax will be left zero
-      INTEGER, INTENT(in) :: igp_scale
-      !! scale number of gp integration points
+      INTEGER, INTENT(in) :: igp_lmax
+      !! lmax used in gp integration
       INTEGER, INTENT(in) :: stp(:)
       !! array converting atom indices into symmetry type indices, stp(atom)
       INTEGER, INTENT(in) :: nat
@@ -748,14 +749,14 @@
         WRITE(stdout, '(7x, "sum_wdk = ", F10.4, /7x)') sum_wdk
       END IF
       !
-      lmax = norb - 1
+      lmax = MAX(norb - 1, igp_lmax)
       !
       !
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      gp_ntheta = (lmax + 1) * igp_scale
-      gp_nphi = (2 * lmax + 1) * igp_scale
+      gp_ntheta = (lmax + 1)
+      gp_nphi = (2 * lmax + 1)
       ngp = gp_ntheta * gp_nphi
       !
       ALLOCATE(gp_vec(3, ngp), STAT = ierr)
@@ -764,8 +765,7 @@
       ALLOCATE(gp_wt(ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
-      CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
-      ! CALL gauss_points_omp(gp_vec, gp_wt, lmax, igp_scale)
+      CALL gauss_points(gp_vec, gp_wt, lmax)
       !
       !
       ! prepare corresponding spherical harmonics for
@@ -1088,7 +1088,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, igp_scale, &
+    SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, igp_lmax, &
       stp, nat, norb, &
       nspin, ngauss, r, &
       tau_cart, wr, dudrmuorr, degauss, efermi, &
@@ -1131,8 +1131,8 @@
       INTEGER, INTENT(in) :: imax
       !! max index of the radial point for partial DOS
       !! partial DOS for ir > nmax will be left zero
-      INTEGER, INTENT(in) :: igp_scale
-      !! scale number of gp integration points
+      INTEGER, INTENT(in) :: igp_lmax
+      !! lmax for gp integration
       INTEGER, INTENT(in) :: stp(:)
       !! array converting atom indices into symmetry type indices, stp(atom)
       INTEGER, INTENT(in) :: nat
@@ -1302,14 +1302,14 @@
         WRITE(stdout, '(7x, "sum_wdk = ", F10.4, /7x)') sum_wdk
       END IF
       !
-      lmax = norb - 1
+      lmax = MAX(norb - 1, igp_lmax)
       !
       !
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      gp_ntheta = (lmax + 1) * igp_scale
-      gp_nphi = (2 * lmax + 1) * igp_scale
+      gp_ntheta = (lmax + 1)
+      gp_nphi = (2 * lmax + 1)
       ngp = gp_ntheta * gp_nphi
       !
       ALLOCATE(gp_vec(3, ngp), STAT = ierr)
@@ -1318,8 +1318,7 @@
       ALLOCATE(gp_wt(ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
-      CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
-      ! CALL gauss_points_omp(gp_vec, gp_wt, lmax, igp_scale)
+      CALL gauss_points(gp_vec, gp_wt, lmax)
       !
       !
       ! prepare corresponding spherical harmonics for
@@ -1654,7 +1653,7 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm_form3(ltetra, nr, imin, imax, igp_scale, stp, &
+    SUBROUTINE set_dos_nlm_form3(ltetra, nr, imin, imax, igp_lmax, stp, &
       nat, norb, nspin, ngauss, r, &
       tau_cart, dloglde, &
       urmax, dudrmuorrmax, &
@@ -1698,8 +1697,8 @@
       INTEGER, INTENT(in) :: imax
       !! max index of the radial point for partial DOS
       !! partial DOS for ir > nmax will be left zero
-      INTEGER, INTENT(in) :: igp_scale
-      !! scale number of gp integration points
+      INTEGER, INTENT(in) :: igp_lmax
+      !! lmax used in gp integration
       INTEGER, INTENT(in) :: stp(:)
       !! array converting atom indices into symmetry type indices, stp(atom)
       INTEGER, INTENT(in) :: nat
@@ -1883,14 +1882,14 @@
         WRITE(stdout, '(7x, "sum_wdk = ", F10.4, /7x)') sum_wdk
       END IF
       !
-      lmax = norb - 1
+      lmax = MAX(norb - 1, igp_lmax)
       !
       !
       ! generate Gauss-integration points for integration with
       ! spherical harmonics
       !
-      gp_ntheta = (lmax + 1) * igp_scale
-      gp_nphi = (2 * lmax + 1) * igp_scale
+      gp_ntheta = (lmax + 1)
+      gp_nphi = (2 * lmax + 1)
       ngp = gp_ntheta * gp_nphi
       !
       ALLOCATE(gp_vec(3, ngp), STAT = ierr)
@@ -1899,8 +1898,7 @@
       ALLOCATE(gp_wt(ngp), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
       !
-      CALL gauss_points(gp_vec, gp_wt, lmax, igp_scale)
-      ! CALL gauss_points_omp(gp_vec, gp_wt, lmax, igp_scale)
+      CALL gauss_points(gp_vec, gp_wt, lmax)
       !
       !
       ! prepare corresponding spherical harmonics for

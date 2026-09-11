@@ -59,7 +59,7 @@
     USE mt_var, ONLY: formulation, ldebug, &
       lmpi_single_rank, &
       luse_ref_pot, luse_tot_dos, &
-      igp_scale, &
+      igp_lmax, &
       rmta_code, rmta_routine, & ! variables
       atomic_type, lsemiloc, lhybrid, &
       lnonlocal, &
@@ -102,7 +102,7 @@
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
       dnr, lrmt, rmt, ltetra, lhybrid, rmt_method, &
-      ldebug, igp_scale, formulation
+      ldebug, igp_lmax, formulation
     !
     ! defaults
     !
@@ -112,7 +112,7 @@
     formulation = "default"
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
-    igp_scale = 3
+    igp_lmax = 8 ! if 0, use automatic norb - 1
     rmt_method = "touching"
     rmt(:) = -1.0_dp
     ngauss = -99
@@ -214,7 +214,7 @@
     CALL mp_bcast(ltetra, ionode_id, intra_image_comm)
     CALL mp_bcast(ldense_r_grid, ionode_id, intra_image_comm)
     CALL mp_bcast(ldebug, ionode_id, intra_image_comm)
-    CALL mp_bcast(igp_scale, ionode_id, intra_image_comm)
+    CALL mp_bcast(igp_lmax, ionode_id, intra_image_comm)
     !
     ! read xml data file produced by pw.x or cp.x
     CALL read_file_new(needwf)
