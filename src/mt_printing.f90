@@ -1267,6 +1267,8 @@
         CALL print_clock('set_dos_nlm')
       IF (TRIM(formulation) == "inflectionless") &
         CALL print_clock('set_dos_nlm_form2')
+      IF (TRIM(formulation) == "default") &
+        CALL print_clock('set_dos_nlm_form3')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
       CALL print_clock('print_at_rmt')
