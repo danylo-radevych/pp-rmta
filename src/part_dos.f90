@@ -2108,7 +2108,7 @@
                   r(ir, stp(iat)) * r(ir, stp(iat)) * &
                   wr(ir, iorb, ispin, iat) / &
                   (tmp * tmp)
-                WRITE(stdout, '(/8x, "formulation ''inflectionless'' is used")')
+                WRITE(stdout, '(/8x, "formulation ''monotonic'' is used")')
               ELSE
                 CALL errore(routine_name, &
                   "No reliable partial DOS formulation for given MT radius.", 1)
