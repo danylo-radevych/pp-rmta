@@ -1265,7 +1265,7 @@
       CALL print_clock('tetra_delta_weights')
       IF (TRIM(formulation) == "nodeless") &
         CALL print_clock('set_dos_nlm')
-      IF (TRIM(formulation) == "derivative") &
+      IF (TRIM(formulation) == "inflectionless") &
         CALL print_clock('set_dos_nlm_form2')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
@@ -1542,10 +1542,10 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''derivative''")') &
+                  "Try setting formulation = ''default'' or ''inflectionless''")') &
                   TRIM(orb_label(iorb))
               END IF
-              IF (TRIM(formulation) == "derivative" .AND. &
+              IF (TRIM(formulation) == "inflectionless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
                   "Try setting formulation = ''default'' or ''nodeless''")') &
@@ -1555,10 +1555,10 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''derivative''")') &
+                  "Try setting formulation = ''default'' or ''inflectionless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
-              IF (TRIM(formulation) == "derivative" .AND. &
+              IF (TRIM(formulation) == "inflectionless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
                   "Try setting formulation = ''default'' or ''nodeless''")') &
@@ -1734,10 +1734,10 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''derivative''")') &
+                  "Try setting formulation = ''default'' or ''inflectionless''")') &
                   TRIM(orb_label(iorb))
               END IF
-              IF (TRIM(formulation) == "derivative" .AND. &
+              IF (TRIM(formulation) == "inflectionless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
                   "Try setting formulation = ''default'' or ''nodeless''")') &
@@ -1747,10 +1747,10 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''derivative''")') &
+                  "Try setting formulation = ''default'' or ''inflectionless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
-              IF (TRIM(formulation) == "derivative" .AND. &
+              IF (TRIM(formulation) == "inflectionless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
                   "Try setting formulation = ''default'' or ''nodeless''")') &

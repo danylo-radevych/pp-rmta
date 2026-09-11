@@ -389,7 +389,7 @@
           1 : norbs, 1 : nspins, 1 : natoms), &
           mt_degauss, fermi_energy, &
           dos_nlmrf, dos_nlrf, dos_nrf, dos_n)
-      ELSE IF (TRIM(formulation) == "derivative") THEN
+      ELSE IF (TRIM(formulation) == "inflectionless") THEN
         CALL set_dos_nlm_form2(ltetra, mt_nrf, irf_min, irf_max, igp_scale, &
           ist_i, &
           natoms, norbs, nspins, mt_ngauss, mt_rf, &
@@ -1659,10 +1659,10 @@
             IF (TRIM(formulation) == "nodeless" .AND. &
               ABS(ul / ulmax) < eps2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''derivative''")') &
+                & "Try setting formulation = ''default'' or ''inflectionless''")') &
                 iorb - 1
             END IF
-            IF (TRIM(formulation) == "derivative" .AND. &
+            IF (TRIM(formulation) == "inflectionless" .AND. &
               ABS(duldrmulor / duldrmulormax) < eps2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
@@ -1696,10 +1696,10 @@
             IF (TRIM(formulation) == "nodeless" .AND. &
               ABS(ul1 / ul1max) < eps2) THEN
               WRITE(stdout, '(/5x, "WARNING: u_", I0, " is very small. ", &
-                & "Try setting formulation = ''default'' or ''derivative''")') &
+                & "Try setting formulation = ''default'' or ''inflectionless''")') &
                 iorb
             END IF
-            IF (TRIM(formulation) == "derivative" .AND. &
+            IF (TRIM(formulation) == "inflectionless" .AND. &
               ABS(dul1drmul1or / dul1drmul1ormax) < eps2) THEN
               WRITE(stdout, &
                 '(/5x, "WARNING: [du / dr - u / r]_", I0, " is very small. ", &
