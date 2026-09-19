@@ -2733,7 +2733,8 @@
       USE mp_images, ONLY: intra_image_comm
       USE mp, ONLY: mp_sum
       USE ktetra, ONLY: ntetra, tetra
-      USE constants, ONLY: eps32
+      USE constants, ONLY: eps6
+      USE const, ONLY: zero, one, two, three, four
       !
       IMPLICIT NONE
       !
@@ -2782,13 +2783,16 @@
       !! energy differences
       REAL(DP) :: C, C1, C2, C3, DC, DC1, DC2, DC3, E
       !! tmp, aux
+      REAL(DP) :: etol
+      !! energy tolerance for degeneracies
       !
       E = ef
+      etol = eps6
       !
       routine_name = "tetra_delta_weights"
       CALL start_clock(routine_name)
       !
-      rfac = 1._dp / ntetra
+      rfac = one / ntetra
       !
       ! check if tetrahedrons were initialized
       IF (ntetra == 0) &
@@ -2803,7 +2807,7 @@
         ENDIF
         !
         DO ibnd = 1, nbnd
-          wdk(ibnd, ik) = 0._dp
+          wdk(ibnd, ik) = zero
         ENDDO ! ibnd
         !
       ENDDO ! ik
@@ -2819,7 +2823,7 @@
       !
       !$OMP PARALLEL DEFAULT(NONE) &
       !$OMP & SHARED(nspin_lsda, is, nks, s_tetra, l_tetra, nbnd, et, tetra, &
-      !$OMP &   wdk, E, rfac) &
+      !$OMP &   wdk, E, rfac, etol) &
       !$OMP & PRIVATE(ns, nk, nt, ibnd, i, etetra, itetra, e1, e2, e3, e4, &
       !$OMP &   kp1, kp2, kp3, kp4, &
       !$OMP &   e21, e31, e41, e32, e42, e43, &
@@ -2862,6 +2866,13 @@
             e3 = etetra(3)
             e4 = etetra(4)
             !
+            ! lift degeneracies before forming the differences, so
+            ! every e_ij stays consistent with the shifted e1 - e4
+            !
+            IF (e2 - e1 < etol) e2 = e1 + etol
+            IF (e3 - e2 < etol) e3 = e2 + etol
+            IF (e4 - e3 < etol) e4 = e3 + etol
+            !
             ! energy differences
             !
             e21 = e2 - e1
@@ -2887,175 +2898,79 @@
             !
             ! calculate weights wg
             !
-            ! IF (e1 > E .OR. E >= e4) THEN
-            !   !
-            !   ! redundancy
-            !   !
-            !   wdk(ibnd, kp1) = 0._dp
-            !   wdk(ibnd, kp2) = 0._dp
-            !   wdk(ibnd, kp3) = 0._dp
-            !   wdk(ibnd, kp4) = 0._dp
-            !   !
-            ! ELSE
             IF (e1 <= E .AND. E < e2) THEN
               !
-              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) + rfac * (E - e1)**2 / &
-              !   (e21 * e31 * e41) * &
-              !   (-(E - e1) * (1._dp / e21 + 1._dp / e31 + 1._dp / e41) + &
-              !   3._dp)
-              ! !
-              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) + rfac * (E - e1)**3 / &
-              !   (e21 * e31 * e41) / &
-              !   e21
-              ! !
-              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) + rfac * (E - e1)**3 / &
-              !   (e21 * e31 * e41) / &
-              !   e31
-              ! !
-              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (E - e1)**3 / &
-              !   (e21 * e31 * e41) / &
-              !   e41
-              !
-              C=rfac / 4.* (E-e1)**3/(e2-e1)/(e3-e1)/(e4-e1)
-              DC=rfac / 4.* 3*(E-e1)**2/(e2-e1)/(e3-e1)/(e4-e1)
+              C = rfac / four * (E - e1) * (E - e1) * (E - e1) &
+                / e21 / e31 / e41
+              DC = rfac / four * three * (E - e1) * (E - e1) / e21 / &
+                e31 / e41
               wdk(ibnd, kp1) = wdk(ibnd, kp1) + &
-                DC*(4-(E-e1)*(1/(e2-e1)+1/(e3-e1)+1/(e4-e1))) &
-                -C*(1/(e2-e1)+1/(e3-e1)+1/(e4-e1))
+                DC * (four - (E - e1) * (one / e21 + &
+                one / e31 + one / e41)) &
+                -C * (one / e21 + one / e31 + one / e41)
               !
               wdk(ibnd, kp2) = wdk(ibnd, kp2) + &
-                DC*(E-e1)/(e2-e1)+C/(e2-e1)
+                DC * (E - e1) / e21 + C / e21
               !
               wdk(ibnd, kp3) = wdk(ibnd, kp3) + &
-                DC*(E-e1)/(e3-e1)+C/(e3-e1)
+                DC * (E - e1) / e31 + C / e31
               !
               wdk(ibnd, kp4) = wdk(ibnd, kp4) + &
-                DC*(E-e1)/(e4-e1)+C/(e4-e1)
+                DC * (E - e1) / e41 + C / e41
               !
             ELSEIF (e2 <= E .AND. E < e3) THEN
               !
-              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) + rfac * &
-              !   (E**3 * e1**2 - 2._dp * E**3 * e1 * e3 - &
-              !   2._dp * E**3 * e1 * e4 + 2._dp * e2 * E**3 * e1 + &
-              !   E**3 * e3**2 + E**3 * e3 * e4 - e2 * E**3 * e3 + &
-              !   E**3 * e4**2 - e2 * E**3 * e4 - 3._dp * e2 * E**2 * e1**2 + &
-              !   6._dp * E**2 * e1 * e3 * e4 - 3._dp * E**2 * e3**2 * e4 - &
-              !   3._dp * E**2 * e3 * e4**2 + 3._dp * e2 * E**2 * e3 * e4 - &
-              !   3._dp * E * e1**2 * e3 * e4 + 3._dp * e2 * E * e1**2 * e3 + &
-              !   3._dp * e2 * E * e1**2 * e4 - &
-              !   6._dp * e2 * E * e1 * e3 * e4 + &
-              !   3._dp * E* e3**2 * e4**2 + e1**2 * e3**2 * e4 - &
-              !   e2 * e1**2 * e3**2 + e1**2 * e3 * e4**2 - &
-              !   e2 * e1**2 * e3 * e4 - e2 * e1**2 * e4**2 - &
-              !   2._dp * e1 * e3**2 * e4**2 + 2._dp * e2 * e1 * e3**2 * e4 + &
-              !   2._dp * e2 * e1 * e3 * e4**2 - e2 * e3**2 * e4**2) / &
-              !   (e31 * e32 * e41 * e42) / (e31 * e41)
-              ! !
-              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) + rfac * &
-              !   (E**3 * e2**2 - 2._dp * E**3 * e2 * e3 - &
-              !   2._dp * E**3 * e2 * e4 + 2._dp * e1 * E**3 * e2 + &
-              !   E**3 * e3**2 + E**3 * e3 * e4 - e1 * E**3 * e3 + &
-              !   E**3 * e4**2 - e1 * E**3 * e4 - 3._dp * e1 * E**2 * e2**2 + &
-              !   6._dp * E**2 * e2 * e3 * e4 - 3._dp * E**2 * e3**2 * e4 - &
-              !   3._dp * E**2 * e3 * e4**2 + 3._dp * e1 * E**2 * e3 * e4 - &
-              !   3._dp * E * e2**2 * e3 * e4 + 3._dp * e1 * E * e2**2 * e3 + &
-              !   3._dp * e1 * E * e2**2 * e4 - &
-              !   6._dp * e1 * E * e2 * e3 * e4 + &
-              !   3._dp * E * e3**2 * e4**2 + e2**2 * e3**2 * e4 - &
-              !   e1 * e2**2 * e3**2 + e2**2 * e3 * e4**2 - &
-              !   e1 * e2**2 * e3 * e4 - e1 * e2**2 * e4**2 - &
-              !   2._dp * e2 * e3**2 * e4**2 + 2._dp * e1 * e2 * e3**2 * e4 + &
-              !   2._dp * e1 * e2 * e3 * e4**2 - e1 * e3**2 * e4**2) / &
-              !   (e31 * e32 * e41 * e42) / (e32 * e42)
-              ! !
-              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) - rfac * &
-              !   (E**3 * e1**2 + E**3 * e1 * e2 - 2._dp * E**3 * e1 * e3 - &
-              !   e4 * E**3 * e1 + E**3 * e2**2 - 2._dp * E**3 * e2 * e3 - &
-              !   e4 * E**3 * e2 + E**3 * e3**2 + 2._dp * e4 * E**3 * e3 - &
-              !   3._dp * E**2 * e1**2 * e2 - 3._dp * E**2 * e1 * e2**2 + &
-              !   6._dp * E**2 * e1 * e2 * e3 + 3._dp * e4 * E**2 * e1 * e2 - &
-              !   3._dp * e4 * E**2 * e3**2 + 3._dp * E * e1**2 * e2**2 - &
-              !   3._dp * E * e1 * e2 * e3**2 - &
-              !   6._dp * e4 * E * e1 * e2 * e3 + &
-              !   3._dp * e4 * E * e1 * e3**2 + 3._dp * e4 * E * e2 * e3**2 - &
-              !   2._dp * e1**2 * e2**2 * e3 - e4 * e1**2 * e2**2 + &
-              !   e1**2 * e2 * e3**2 + 2._dp * e4 * e1**2 * e2 * e3 - &
-              !   e4 * e1**2 * e3**2 + e1 * e2**2 * e3**2 + &
-              !   2._dp * e4 * e1 * e2**2 * e3 - e4 * e1 * e2 * e3**2 - &
-              !   e4 * e2**2 * e3**2) / &
-              !   (e31 * e32 * e41 * e42) / (e31 * e32)
-              ! !
-              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) - rfac * &
-              !   (E**3 * e1**2 + E**3 * e1 * e2 - 2._dp * E**3 * e1 * e4 - &
-              !   e3 * E**3 * e1 + E**3 * e2**2 - 2._dp * E**3 * e2 * e4 - &
-              !   e3 * E**3 * e2 + E**3 * e4**2 + 2._dp * e3 * E**3 * e4 - &
-              !   3._dp * E**2 * e1**2 * e2 - 3._dp * E**2 * e1 * e2**2 + &
-              !   6._dp * E**2 * e1 * e2 * e4 + 3._dp * e3 * E**2 * e1 * e2 - &
-              !   3._dp * e3 * E**2 * e4**2 + 3._dp * E * e1**2 * e2**2 - &
-              !   3._dp * E * e1 * e2 * e4**2 - &
-              !   6._dp * e3 * E * e1 * e2 * e4 + &
-              !   3._dp * e3 * E * e1 * e4**2 + 3._dp * e3 * E * e2 * e4**2 - &
-              !   2._dp * e1**2 * e2**2 * e4 - e3 * e1**2 * e2**2 + &
-              !   e1**2 * e2 * e4**2 + 2._dp * e3 * e1**2 * e2 * e4 - &
-              !   e3 * e1**2 * e4**2 + e1 * e2**2 * e4**2 + &
-              !   2._dp * e3 * e1 * e2**2 * e4 - e3 * e1 * e2 * e4**2 - &
-              !   e3 * e2**2 * e4**2) / &
-              !   (e31 * e32 * e41 * e42) / (e41 * e42)
-              !
-              C1=rfac / 4.* (E-e1)**2/(e4-e1)/(e3-e1)
-              DC1=rfac / 4. * 2*(E-e1)/(e4-e1)/(e3-e1)
-              C2=rfac / 4. * (E-e1)*(E-e2)*(e3-E)/(e4-e1)/(e3-e2)/(e3-e1)
-              DC2=rfac / 4. * ((E-e2)*(e3-E)+(E-e1)*(e3-E)-(E-e1)*(E-e2)) &
-                 /(e4-e1)/(e3-e2)/(e3-e1)
-              C3=rfac / 4. * (E-e2)**2*(e4-E)/(e4-e2)/(e3-e2)/(e4-e1)
-              DC3=rfac / 4. * (2*(E-e2)*(e4-E)-(E-e2)**2) &
-              /(e4-e2)/(e3-e2)/(e4-e1)
+              C1 = rfac / four * (E - e1) * (E - e1) / e41 / e31
+              DC1 = rfac / four * two * (E - e1) / e41 / e31
+              C2 = rfac / four * (E - e1) * (E - e2) * (e3 - E) / &
+                e41 / e32 / e31
+              DC2 = rfac / four * ((E - e2) * (e3 - E) + &
+                (E - e1) * (e3 - E) - (E - e1) * (E - e2)) / &
+                e41 / e32 / e31
+              C3 = rfac / four * (E - e2) * (E - e2) * (e4 - E) / &
+                e42 / e32 / e41
+              DC3 = rfac / four * (two * (E - e2) * (e4 - E) - &
+                (E - e2) * (E - e2)) / &
+                e42 / e32 / e41
               !
               wdk(ibnd, kp1) = wdk(ibnd, kp1) + &
-                DC1+(DC1+DC2)*(e3-E)/(e3-e1)+(DC1+DC2+DC3)*(e4-E)/(e4-e1) &
-                -(C1+C2)/(e3-e1)-(C1+C2+C3)/(e4-e1)
+                DC1 + (DC1 + DC2) * (e3 - E) / e31 + &
+                (DC1 + DC2 + DC3) * (e4 - E) / e41 - &
+                (C1 + C2) / e31 - (C1 + C2 + C3) / e41
               !
               wdk(ibnd, kp2) = wdk(ibnd, kp2) + &
-                DC1+DC2+DC3+(DC2+DC3)*(e3-E)/(e3-e2)+DC3*(e4-E)/(e4-e2) &
-                       -(C2+C3)/(e3-e2)-C3/(e4-e2)
+                DC1 + DC2 + DC3 + (DC2 + DC3) * (e3 - E) / e32 + &
+                DC3 * (e4 - E) / e42 - &
+                (C2 + C3) / e32 - C3 / e42
               !
               wdk(ibnd, kp3) = wdk(ibnd, kp3) + &
-                (DC1+DC2)*(E-e1)/(e3-e1)+(DC2+DC3)*(E-e2)/(e3-e2) &
-                +(C1+C2)/(e3-e1)+(C2+C3)/(e3-e2)
+                (DC1 + DC2) * (E - e1) / e31 + (DC2 + DC3) * (E - e2) / e32 + &
+                (C1 + C2) / e31 + (C2 + C3) / e32
               !
               wdk(ibnd, kp4) = wdk(ibnd, kp4) + &
-                (DC1+DC2+DC3)*(E-e1)/(e4-e1)+DC3*(E-e2)/(e4-e2) &
-                +(C1+C2+C3)/(e4-e1)+C3/(e4-e2)
+                (DC1 + DC2 + DC3) * (E - e1) / e41 + DC3 * (E - e2) / e42 + &
+                (C1 + C2 + C3) / e41 + C3 / e42
               !
             ELSEIF (e3 <= E .AND. E < e4) THEN
               !
-              ! wdk(ibnd, kp1) = wdk(ibnd, kp1) - rfac * (E - e4)**3 / &
-              !   (e41 * e42 * e43) / e41
-              ! !
-              ! wdk(ibnd, kp2) = wdk(ibnd, kp2) - rfac * (E - e4)**3 / &
-              !   (e41 * e42 * e43) / e42
-              ! !
-              ! wdk(ibnd, kp3) = wdk(ibnd, kp3) - rfac * (E - e4)**3 / &
-              !   (e41 * e42 * e43) / e43
-              ! !
-              ! wdk(ibnd, kp4) = wdk(ibnd, kp4) + rfac * (E - e4)**2 / &
-              !   (e41 * e42 * e43) * &
-              !   ((E - e4) * (1._dp / e41 + 1._dp / e42 + 1._dp / e43) + 3._dp)
+              C = rfac / four * (e4 - E) * (e4 - E) * (e4 - E) / &
+                e41 / e42 / e43
+              DC = rfac / four * (-three) * (e4 - E) * (e4 - E) / &
+                e41 / e42 / e43
               !
-              C = rfac / 4. * (e4-E)**3 / (e4-e1) / (e4-e2) / (e4-e3)
-              DC = rfac / 4. * -3*(e4-E)**2 / (e4-e1) / (e4-e2) / (e4-e3)
+              wdk(ibnd, kp1) = wdk(ibnd, kp1) - &
+                DC * (e4 - E) / e41 + C / e41
               !
-              wdk(ibnd, kp1) = wdk(ibnd, kp1) &
-                -DC*(e4-E)/(e4-e1)+C/(e4-e1)
+              wdk(ibnd, kp2) = wdk(ibnd, kp2) - &
+                DC * (e4 - E) / e42 + C / e42
               !
-              wdk(ibnd, kp2) = wdk(ibnd, kp2) &
-                -DC*(e4-E)/(e4-e2)+C/(e4-e2)
+              wdk(ibnd, kp3) = wdk(ibnd, kp3) - &
+                DC * (e4 - E) / e43 + C / e43
               !
-              wdk(ibnd, kp3) = wdk(ibnd, kp3) &
-                -DC*(e4-E)/(e4-e3)+C/(e4-e3)
-              !
-              wdk(ibnd, kp4) = wdk(ibnd, kp4) &
-                -DC*(4-(e4-E)*(1/(e4-e1)+1/(e4-e2)+1/(e4-e3))) &
-                -C*(1/(e4-e1)+1/(e4-e2)+1/(e4-e3))
+              wdk(ibnd, kp4) = wdk(ibnd, kp4) - &
+                DC * (four - &
+                (e4 - E) * (one / e41 + one / e42 + one / e43)) - &
+                C * (one / e41 + one / e42 + one / e43)
               !
             ENDIF
             !
@@ -3077,7 +2992,7 @@
       !
       ! add correct spin normalization (2 for LDA, 1 for all other cases)
       IF (nspin == 1) THEN
-        wdk(1 : nbnd, 1 : nks) = wdk(1 : nbnd, 1 : nks) * 2._dp
+        wdk(1 : nbnd, 1 : nks) = wdk(1 : nbnd, 1 : nks) * two
       END IF
       !
       CALL stop_clock(routine_name)
