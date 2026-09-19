@@ -1544,26 +1544,26 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''monotonic''")') &
+                  & "Try setting formulation = ''default'' or ''monotonic''")') &
                   TRIM(orb_label(iorb))
               END IF
               IF (TRIM(formulation) == "monotonic" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''nodeless''")') &
+                  & "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''monotonic''")') &
+                  & "Try setting formulation = ''default'' or ''monotonic''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               IF (TRIM(formulation) == "monotonic" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''nodeless''")') &
+                  & "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !
@@ -1736,26 +1736,26 @@
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''monotonic''")') &
+                  & "Try setting formulation = ''default'' or ''monotonic''")') &
                   TRIM(orb_label(iorb))
               END IF
               IF (TRIM(formulation) == "monotonic" .AND. &
                 (nl > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''nodeless''")') &
+                  & "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb))
               END IF
               !
               IF (TRIM(formulation) == "nodeless" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''monotonic''")') &
+                  & "Try setting formulation = ''default'' or ''monotonic''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               IF (TRIM(formulation) == "monotonic" .AND. &
                 (nl1 > ntot * natoms)) THEN
                 WRITE(stdout, '(/5x, "WARNING: n_", A, " > N. ", &
-                  "Try setting formulation = ''default'' or ''nodeless''")') &
+                  & "Try setting formulation = ''default'' or ''nodeless''")') &
                   TRIM(orb_label(iorb + 1))
               END IF
               !
