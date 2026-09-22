@@ -1250,7 +1250,6 @@
     !! Prints RMTA clocks.
     !!
       USE io_global, ONLY: stdout
-      USE mt_var, ONLY: formulation
       !
       IMPLICIT NONE
       !
@@ -1263,12 +1262,7 @@
       CALL print_clock('set_log_ders')
       CALL print_clock('set_pet_mll1')
       CALL print_clock('tetra_delta_weights')
-      IF (TRIM(formulation) == "nodeless") &
-        CALL print_clock('set_dos_nlm')
-      IF (TRIM(formulation) == "monotonic") &
-        CALL print_clock('set_dos_nlm_form2')
-      IF (TRIM(formulation) == "default") &
-        CALL print_clock('set_dos_nlm_form3')
+      CALL print_clock('set_dos_nlm')
       CALL print_clock('set_dos_n')
       CALL print_clock('set_eta')
       CALL print_clock('print_at_rmt')

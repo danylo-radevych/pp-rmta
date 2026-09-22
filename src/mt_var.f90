@@ -83,7 +83,7 @@
     !! Name of the code
     CHARACTER(LEN=12), SAVE :: rmta_routine = 'rmta'
     !! Name of the code (short)
-    CHARACTER(LEN=12) :: formulation
+    CHARACTER(LEN=256) :: formulation
     !! methodology used
     CHARACTER(len = 256) :: atomic_type
     !! TODO: obsolete

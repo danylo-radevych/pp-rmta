@@ -33,10 +33,11 @@
     !
     IMPLICIT NONE
     !
-    PUBLIC :: gauss_points, ylm4, set_dos_n, get_sum_wk, get_sum_wdk, &
+    PUBLIC :: gauss_points, ylm4, set_dos_n, set_dos_nlm, &
+      get_sum_wk, get_sum_wdk, &
       tetra_delta_weights
     !
-    PRIVATE :: grule
+    PRIVATE :: grule, symmetrize_tetra_delta_weights
     !
   !
   CONTAINS
@@ -49,7 +50,7 @@
     !! Generates Gaussian points (unit vectors corrsponding to specific
     !! angles phi and theta) to integrate spherical harmonics
     !! up to lmax exactly (!).
-    !! <lm|l'm'> for l, l' <= lmax, number of points = (2*lmax+1)*(lmax+1))
+    !! <lm|l'm'> for l, l' <= lmax, number of points = (2*lmax+1)*(lmax+1)
     !!
     !---------------------------------------------------------------------------
     !
@@ -544,1116 +545,8 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm(ltetra, nr, imin, imax, igp_lmax, &
-      stp, nat, norb, &
-      nspin, ngauss, r, &
-      tau_cart, dloglde, degauss, efermi, &
-      dos_nlmr, dos_nlr, dos_nr, dos_n)
-    !---------------------------------------------------------------------------
-    !!
-    !! Computes partial densities n at Fermi level for each atom i,
-    !! spin s, and angular L = l, m on a range of r-indices [nmin, nmax]
-    !!
-    !---------------------------------------------------------------------------
-    !
-    !  D. Radevych
-    !
-      USE io_global, ONLY: stdout
-      USE constants, ONLY: tpi, eps32, eps6, eps4
-      USE cell_base, ONLY: tpiba, omega
-      USE parameters, ONLY: npk
-      USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
-      USE wvfct, ONLY: npwx, et, nbnd
-      USE io_files, ONLY: restart_dir
-      USE pw_restart_new, ONLY: read_collected_wfc
-      USE gvect, ONLY: g ! mill, gl, ngl
-      USE lsda_mod, ONLY: isk
-      USE const, ONLY: zero, one, two, czero
-      !
-      IMPLICIT NONE
-      !
-      EXTERNAL :: errore, start_clock, stop_clock, cryst_to_cart
-      REAL(DP), EXTERNAL :: w0gauss
-      ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
-      !
-      LOGICAL, INTENT(in) :: ltetra
-      !! if true, use tetrahedron method
-      INTEGER, INTENT(in) :: nr
-      !! number of points on radial grid
-      INTEGER, INTENT(in) :: imin
-      !! min index of the radial point for partial DOS
-      !! partial DOS for ir < nmin will be left zero
-      INTEGER, INTENT(in) :: imax
-      !! max index of the radial point for partial DOS
-      !! partial DOS for ir > nmax will be left zero
-      INTEGER, INTENT(in) :: igp_lmax
-      !! lmax used in gp integration
-      INTEGER, INTENT(in) :: stp(:)
-      !! array converting atom indices into symmetry type indices, stp(atom)
-      INTEGER, INTENT(in) :: nat
-      !! number of atoms
-      INTEGER, INTENT(in) :: norb
-      !! number of orbitals
-      INTEGER, INTENT(in) :: nspin
-      !! number of spins
-      INTEGER, INTENT(in) :: ngauss
-      !! type of delta-function
-      REAL(DP), INTENT(in) :: r(:, :)
-      !! radial grid for each symmetry type, r(sym_type)
-      REAL(DP), INTENT(in) :: tau_cart(:, :)
-      !! atomic Cartesian coordinates
-      REAL(DP), INTENT(in) :: dloglde(:, :, :, :)
-      !! d L_l(r, e) / d e
-      REAL(DP), INTENT(in) :: degauss
-      !! smearing value
-      REAL(DP), INTENT(in) :: efermi(:)
-      !! Fermi energy
-      !
-      REAL(DP), INTENT(inout) :: dos_nlmr(:, :, :, :)
-      !! partial densities n**i_{lm}(r, E_F)
-      !! dos_nlmr(nr, (lmax + 1)**2, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_nlr(:, :, :, :)
-      !! partial densities n**i_{l}(r, E_F)
-      !! dos_nlr(nr, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_nr(:, :, :)
-      !! partial densities n**i(r, E_F), per atom, per spin
-      !! dos_nr(nr, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_n(:)
-      !! total DOS at the Fermi level n(E_F), per atom per spin
-      !! dos_n(nspin)
-      !
-      ! local variables
-      !
-      CHARACTER(len=256) :: routine_name
-      !! name of this subroutine
-      LOGICAL :: lspeedup = .TRUE.
-      !! if true, ignore bands far on the tails of the delta-function
-      !! (should be done)
-      LOGICAL :: lselect
-      !! auxiliary flag to include specific bands in integration
-      INTEGER :: ierr
-      !! error code
-      INTEGER :: iat, iorb, im, ir, ispin, igp, ik, ig, ibnd
-      !! iterators
-      INTEGER :: lmax
-      !! max angular momentum
-      INTEGER :: gp_ntheta
-      !! number of Gauss points for theta
-      INTEGER :: gp_nphi
-      !! number of Gauss points for phi
-      INTEGER :: ngp
-      !! number of all Gauss points
-      INTEGER :: npw
-      !! number of plane-waves
-      INTEGER :: l
-      !! current ang momentum number
-      INTEGER :: l0
-      !! l0
-      INTEGER :: m
-      !! current m quantum number
-      REAL(DP) :: deltaf
-      !! current value of Dirac-delta function
-      REAL(DP) :: prefactor_part_dos
-      !! constant prefactor for partial DOS
-      REAL(DP) :: prefactor
-      !! common prefactor for given rmt, atom, and l
-      REAL(DP) :: rvec_cart(3)
-      !! temporary MT-sphere vector for Gauss integration
-      !! in Cartesian coordinates
-      REAL(DP) :: kvec_cart(3)
-      !! temporary k-point vector
-      !! in Cartesian coordinates
-      REAL(DP) :: gvec_cart(3)
-      !! temporary G-vector
-      !! in Cartesian coordinates
-      REAL(DP) :: arg
-      !! temporary argument of the exponent
-      REAL(DP) :: sum_wk
-      !! sum of all k-point weights
-      REAL(DP) :: sum_wdk
-      !! sum of all k-point and band weights (ltetra = .true.)
-      REAL(DP) :: psi_kg_norm
-      !! norm of psi(k + G) coefficients
-      REAL(DP), ALLOCATABLE :: gp_vec(:, :)
-      !! unit vectors for Gauss integration
-      REAL(DP), ALLOCATABLE :: gp_wt(:)
-      !! weights for Gauss integration
-      REAL(DP), ALLOCATABLE :: wdk(:, :)
-      !! tetrahedron weights for integration with the delta-function
-      COMPLEX(DP) :: cnr_aux
-      !! complex version of partial DOS on r grid
-      COMPLEX(DP), ALLOCATABLE :: psi_kg(:, :, :)
-      !! FT coefficients of SCF wavefunctions for all bands and kpoints
-      !! psi_kg(npwx, nbnd, nks)
-      COMPLEX(DP), ALLOCATABLE :: psi_krtau_aux(:, :, :)
-      !! temporary value of
-      !! \delta(\varepsilon_{\bm{k}, i} - E_F)
-      !! \sum_{\bm{G}} e**{i (\bm{k} + \bm{G}) \cdot (\bm{r} + \bm{tau})}
-      !! psi_i(\bm{k} + \bm{G}) =
-      !! \delta(\varepsilon_{\bm{k}, i} - E_F)
-      !! psi_{\bm{k}, i}(\bm{r} + \bm{\tau})
-      !! on the given MT sphere
-      COMPLEX(DP), ALLOCATABLE :: ylm(:, :)
-      !! temporary array containing spherical harmonics
-      !! for specific unit vector and l
-      !
-      !
-      !
-      !
-      routine_name = "set_dos_nlm"
-      CALL start_clock(routine_name)
-      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
-      !
-      IF (imax > nr) &
-        CALL errore(routine_name, "imax > nr", 1)
-      !
-      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
-      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
-      IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
-        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
-      END IF
-      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
-      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
-      !
-      IF (ltetra) THEN
-        !
-        ALLOCATE(wdk(nbnd, nkstot), STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating wdk', 1)
-        wdk(:, :) = zero
-        !
-        DO ispin = 1, nspin
-          !
-          CALL tetra_delta_weights(nkstot, nspin, ispin, isk, nbnd, &
-            efermi(ispin), et, wdk)
-          !
-        END DO ! ispin
-        !
-      END IF
-      !
-      DO ik = 1, nkstot, nkstot - 1
-        WRITE(stdout, '(7x, "isk(", I6, ") = ", I1)') ik, isk(ik)
-      END DO
-      !
-      sum_wk = get_sum_wk()
-      WRITE(stdout, '(7x, "sum_wk = ", F10.4, /7x)') sum_wk
-      !
-      IF (ltetra) THEN
-        sum_wdk = get_sum_wdk(wdk)
-        WRITE(stdout, '(7x, "sum_wdk = ", F10.4, /7x)') sum_wdk
-      END IF
-      !
-      lmax = MAX(norb - 1, igp_lmax)
-      !
-      !
-      ! generate Gauss-integration points for integration with
-      ! spherical harmonics
-      !
-      gp_ntheta = (lmax + 1)
-      gp_nphi = (2 * lmax + 1)
-      ngp = gp_ntheta * gp_nphi
-      !
-      ALLOCATE(gp_vec(3, ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_vec', 1)
-      !
-      ALLOCATE(gp_wt(ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
-      !
-      CALL gauss_points(gp_vec, gp_wt, lmax)
-      !
-      !
-      ! prepare corresponding spherical harmonics for
-      ! Gauss-point integration
-      !
-      ALLOCATE(ylm((lmax + 1) * (lmax + 1), ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ylm', 1)
-      !
-      ylm(:, :) = czero
-      !
-      DO igp = 1, ngp
-        CALL ylm4(gp_vec(:, igp), ylm(:, igp), lmax)
-      END DO
-      !
-      !
-      !
-      ! read and store all psi_kg (evc) coefficients of the wavefunctions
-      !
-      WRITE(stdout, &
-        '(/6x, "Reading all stored psi_kg ", &
-        & "coefficients of the wavefunctions...")')
-      !
-      ALLOCATE(psi_kg(npwx, nbnd, nkstot), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating psi_kg', 1)
-      !
-      !
-      DO ik = 1, nkstot
-        !
-        ! WRITE(stdout, '(/5x, "k-point #", I)') ik
-        !
-        ! npw = ngk(ik)
-        ! CALL read_collected_wfc(restart_dir(), ik, evc)
-        CALL read_collected_wfc(restart_dir(), ik, psi_kg(:, :, ik))
-      END DO ! ik
-      !
-      WRITE(stdout, '(6x, "Done reading all stored psi_kg ", &
-        & "coefficients of the wavefunctions.", /6x, /6x)')
-      !
-      psi_kg_norm = zero
-      DO ik = 1, nkstot
-        DO ibnd = 1, nbnd
-          npw = ngk(ik)
-          DO ig = 1, npw
-            psi_kg_norm = psi_kg_norm + &
-              REAL(psi_kg(ig, ibnd, ik) * CONJG(psi_kg(ig, ibnd, ik)), KIND=DP)
-          END DO ! ig
-        END DO ! ibnd
-      END DO ! ik
-      psi_kg_norm = psi_kg_norm / nkstot / nbnd
-      WRITE(stdout, '(7x, "psi_kg_norm = ", F10.4, /7x)') psi_kg_norm
-      !
-      !
-      !
-      ! partial DOS = f(r, E_F) integration
-      !
-      WRITE(stdout, &
-        '(/6x, "Computing partial DOS per atom per spin = f(r, E_F)...")')
-      !
-      dos_nlmr(:, :, :, :) = zero
-      dos_nlr(:, :, :, :) = zero
-      dos_nr(:, :, :) = zero
-      !
-      !
-      ! spin!
-      IF (ltetra) THEN
-        prefactor_part_dos = one / omega
-        !
-        If (nspin == 1) THEN
-          prefactor_part_dos = prefactor_part_dos / two
-        END IF
-        !
-      ELSE
-        ! times nspin to compensate sum_wk = 2
-        prefactor_part_dos = one / omega / sum_wk * nspin
-      END IF
-      !
-      !
-      ! prefactor0 = one
-      ! prefactor0 = one / omega / (tpi * tpi * tpi)
-      ! prefactor0 = prefactor0 * prefactor0 * prefactor0
-      !
-      !
-      ALLOCATE(psi_krtau_aux(ngp, nbnd, nkstot), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error allocating psi_krtau_aux', 1)
-      !
-      DO iat = 1, nat
-        !
-        WRITE(stdout, '(/6x, "atom #", I0, " out of ", I0)') iat, nat
-        !
-        DO ispin = 1, nspin
-          !
-          WRITE(stdout, '(/7x, "spin #", I0, " out of ", I0)') ispin, nspin
-          !
-          DO ir = imin, imax
-            !
-            WRITE(stdout, '(8x, "ir #", I0, " on [", I0, ", ", I0, "]")') &
-             ir, imin, imax
-            !
-            ! precompute psi_krtau with delta function for all bands
-            !
-            psi_krtau_aux(:, :, :) = czero
-            !
-            WRITE(stdout, &
-              '(/9x, "Precomputing ", &
-              & "psi_krtau_aux...")')
-            !
-            DO ik = 1, nkstot
-              !
-              ! only k-points of the corresponding spin
-              !
-              IF (isk(ik) == ispin) THEN
-                !
-                npw = ngk(ik)
-                !
-                kvec_cart(:) = tpiba * xk(:, ik)
-                ! WRITE(*, *) "xk(:, ik)", xk(:, ik)
-                !
-                ! loop over KS-states
-                !
-                DO ibnd = 1, nbnd
-                  !
-                  IF (ltetra) THEN
-                    lselect = ABS(wdk(ibnd, ik)) > eps32
-                    ! lselect = .true.
-                  ELSE
-                    deltaf = &
-                      w0gauss((et(ibnd, ik) - efermi(ispin)) / &
-                      degauss, ngauss) / degauss
-                      ! w0gauss((et(ibnd, ik) - efermi) / degauss, ngauss)
-                    lselect = ABS(deltaf) > eps32 .OR. (.NOT. lspeedup)
-                  END IF
-                  !
-                  IF (lselect) THEN
-                    !
-                    DO igp = 1, ngp
-                      !
-                      rvec_cart(:) = r(ir, stp(iat)) * gp_vec(:, igp)
-                      !
-                      ! sum over G-vectors
-                      !
-                      DO ig = 1, npw
-                        !
-                        gvec_cart(:) = tpiba * g(:, igk_k(ig, ik))
-                        !
-                        ! WRITE(*, *) "g(:, igk_k(ig, ik))", g(:, igk_k(ig, ik))
-                        !
-                        arg = DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
-                          rvec_cart(:) + tau_cart(:, iat))
-                        !
-                        ! TEST (naive, against all equations)
-                        ! arg = DOT_PRODUCT(kvec_cart(:) - gvec_cart(:), &
-                        !   rvec_cart(:) + tau_cart(:, iat))
-                        !
-                        psi_krtau_aux(igp, ibnd, ik) = &
-                          psi_krtau_aux(igp, ibnd, ik) + &
-                          CMPLX(COS(arg), SIN(arg), KIND=DP) * &
-                          psi_kg(ig, ibnd, ik)
-                        !
-                      END DO ! ig
-                      !
-                    END DO ! igp
-                    !
-                  END IF ! lselect
-                  !
-                END DO ! ibnd
-                !
-              END IF ! isk
-              !
-            END DO ! ik
-            !
-            !
-            WRITE(stdout, '(9x, "Done precomputing ", &
-              & "psi_krtau_aux.", /6x)')
-            !
-            DO iorb = 1, norb
-              !
-              l = iorb - 1
-              l0 = l * (l + 1) + 1
-              !
-              ! WRITE(stdout, '(/8x, "orbit #", I0, " out of ", I0)') l, norb - 1
-              !
-              prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
-                ABS(dloglde(ir, iorb, ispin, iat))
-              !
-              DO im = 1, 2 * l + 1
-                !
-                m = im - l - 1
-                !
-                ! WRITE(stdout, '(/9x, "m #", I)') m
-                !
-                ! integral over k-points
-                !
-                DO ik = 1, nkstot
-                  !
-                  IF (isk(ik) == ispin) THEN
-                  !
-                  npw = ngk(ik)
-                  !
-                  !
-                  ! loop over KS-states
-                  !
-                  DO ibnd = 1, nbnd
-                    !
-                    deltaf = zero
-                    !
-                    IF (ltetra) THEN
-                      lselect = (ABS(wdk(ibnd, ik)) > eps32)
-                      ! lselect = .true.
-                    ELSE
-                      deltaf = &
-                        w0gauss((et(ibnd, ik) - efermi(ispin)) / &
-                        degauss, ngauss) / degauss
-                        ! w0gauss((et(ibnd, ik) - efermi) / degauss, ngauss)
-                      lselect = (ABS(deltaf) > eps32) .OR. (.NOT. lspeedup)
-                    END IF
-                    !
-                    IF (lselect) THEN
-                      !
-                      cnr_aux = czero
-                      !
-                      ! integral over r angle (Gauss points)
-                      !
-                      DO igp = 1, ngp
-                        !
-                        cnr_aux = cnr_aux + &
-                          psi_krtau_aux(igp, ibnd, ik) * &
-                          CONJG(ylm(l * (l + 1) + 1 + m, igp)) * &
-                          gp_wt(igp)
-                        !
-                      END DO ! igp
-                      !
-                      IF (ltetra) THEN
-                        dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
-                          dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
-                          prefactor * &
-                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
-                          wdk(ibnd, ik)
-                      ELSE
-                        dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
-                          dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
-                          prefactor * &
-                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
-                          wk(ik) * deltaf
-                      END IF
-                      !
-                    END IF ! lselect
-                    !
-                  END DO ! ibnd
-                  !
-                  END IF ! isk
-                  !
-                END DO ! ik
-                !
-                dos_nlr(ir - imin + 1, iorb, ispin, iat) = &
-                  dos_nlr(ir - imin + 1, iorb, ispin, iat) + &
-                  dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
-                !
-                dos_nr(ir - imin + 1, ispin, iat) = &
-                  dos_nr(ir - imin + 1, ispin, iat) + &
-                  dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
-                !
-              END DO ! im
-              !
-            END DO ! iorb
-            !
-          END DO ! ir
-        END DO ! ispin
-      END DO ! iat
-      !
-      !
-      CALL symmetrize_dos_nlm(imin, imax, nat, norb, nspin, &
-        dos_nlmr, dos_nlr, dos_nr)
-      !
-      !
-      WRITE(stdout, '(6x, "Done computing partial DOS per atom per spin", &
-        & " = f(r, E_F).", /6x, /6x)')
-      !
-      !
-      ! clean-up
-      !
-      DEALLOCATE(psi_krtau_aux, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating psi_krtau_aux', 1)
-      !
-      DEALLOCATE(ylm, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating ylm', 1)
-      !
-      DEALLOCATE(psi_kg, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating psi_kg', 1)
-      !
-      DEALLOCATE(gp_vec, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_vec', 1)
-      !
-      DEALLOCATE(gp_wt, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_wt', 1)
-      !
-      !
-      ! total DOS
-      CALL set_dos_n(ltetra, nat, nspin, ngauss, degauss, &
-        sum_wk, efermi, wdk, dos_n)
-      !
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>    PARTIAL DOS END    <<<<<<<<<", &
-        & /5x, /5x, /5x)')
-      !
-      IF (ltetra) THEN
-        !
-        DEALLOCATE(wdk, STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
-        !
-      END IF
-      !
-      CALL stop_clock(routine_name)
-      !
-      !
-    !---------------------------------------------------------------------------
-    END SUBROUTINE set_dos_nlm
-    !---------------------------------------------------------------------------
-    !
-    !
-    !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm_form2(ltetra, nr, imin, imax, igp_lmax, &
-      stp, nat, norb, &
-      nspin, ngauss, r, &
-      tau_cart, wr, dudrmuorr, degauss, efermi, &
-      dos_nlmr, dos_nlr, dos_nr, dos_n)
-    !---------------------------------------------------------------------------
-    !!
-    !! Computes partial densities n at Fermi level for each atom i,
-    !! spin s, and angular L = l, m on a range of r-indices [nmin, nmax]
-    !! (formulation 2)
-    !!
-    !---------------------------------------------------------------------------
-    !
-    !  D. Radevych
-    !
-      USE io_global, ONLY: stdout
-      USE constants, ONLY: tpi, eps6, eps4, eps12, eps32
-      USE cell_base, ONLY: tpiba, omega
-      USE parameters, ONLY: npk
-      USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
-      USE wvfct, ONLY: npwx, et, nbnd
-      USE io_files, ONLY: restart_dir
-      USE pw_restart_new, ONLY: read_collected_wfc
-      USE gvect, ONLY: g ! mill, gl, ngl
-      USE lsda_mod, ONLY: isk
-      USE const, ONLY: zero, one, two, czero, ci
-      !
-      IMPLICIT NONE
-      !
-      EXTERNAL :: errore, start_clock, stop_clock, cryst_to_cart
-      REAL(DP), EXTERNAL :: w0gauss
-      ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
-      !
-      LOGICAL, INTENT(in) :: ltetra
-      !! if true, use tetrahedron method
-      INTEGER, INTENT(in) :: nr
-      !! number of points on radial grid
-      INTEGER, INTENT(in) :: imin
-      !! min index of the radial point for partial DOS
-      !! partial DOS for ir < nmin will be left zero
-      INTEGER, INTENT(in) :: imax
-      !! max index of the radial point for partial DOS
-      !! partial DOS for ir > nmax will be left zero
-      INTEGER, INTENT(in) :: igp_lmax
-      !! lmax for gp integration
-      INTEGER, INTENT(in) :: stp(:)
-      !! array converting atom indices into symmetry type indices, stp(atom)
-      INTEGER, INTENT(in) :: nat
-      !! number of atoms
-      INTEGER, INTENT(in) :: norb
-      !! number of orbitals
-      INTEGER, INTENT(in) :: nspin
-      !! number of spins
-      INTEGER, INTENT(in) :: ngauss
-      !! type of delta-function
-      REAL(DP), INTENT(in) :: r(:, :)
-      !! radial grid for each symmetry type, r(sym_type)
-      REAL(DP), INTENT(in) :: tau_cart(:, :)
-      !! atomic Cartesian coordinates
-      ! REAL(DP), INTENT(in) :: ur(:, :, :, :)
-      ! !! u_l(r, e)
-      ! REAL(DP), INTENT(in) :: dudrr(:, :, :, :)
-      ! !! d u_l(r, e) / d r
-      REAL(DP), INTENT(in) :: wr(:, :, :, :)
-      !! \int d r u^2_l(r, e)
-      REAL(DP), INTENT(in) :: dudrmuorr(:, :, :, :)
-      !! d u(r, e) / dr - u(r, e) / r
-      REAL(DP), INTENT(in) :: degauss
-      !! smearing value
-      REAL(DP), INTENT(in) :: efermi(:)
-      !! Fermi energy
-      !
-      REAL(DP), INTENT(inout) :: dos_nlmr(:, :, :, :)
-      !! partial densities n**i_{lm}(r, E_F)
-      !! dos_nlmr(nr, (lmax + 1)**2, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_nlr(:, :, :, :)
-      !! partial densities n**i_{l}(r, E_F)
-      !! dos_nlr(nr, norb, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_nr(:, :, :)
-      !! partial densities n**i(r, E_F), per atom, per spin
-      !! dos_nr(nr, nspin, nat)
-      !! lmax = norb - 1
-      REAL(DP), INTENT(inout) :: dos_n(:)
-      !! total DOS at the Fermi level n(E_F), per atom per spin
-      !! dos_n(nspin)
-      !
-      ! local variables
-      !
-      CHARACTER(len=256) :: routine_name
-      !! name of this subroutine
-      LOGICAL :: lspeedup = .TRUE.
-      !! if true, ignore bands far on the tails of the delta-function
-      !! (should be done)
-      LOGICAL :: lselect
-      !! auxiliary flag to include specific bands in integration
-      INTEGER :: ierr
-      !! error code
-      INTEGER :: iat, iorb, im, ir, ispin, igp, ik, ig, ibnd
-      !! iterators
-      INTEGER :: lmax
-      !! max angular momentum
-      INTEGER :: gp_ntheta
-      !! number of Gauss points for theta
-      INTEGER :: gp_nphi
-      !! number of Gauss points for phi
-      INTEGER :: ngp
-      !! number of all Gauss points
-      INTEGER :: npw
-      !! number of plane-waves
-      INTEGER :: l
-      !! current ang momentum number
-      INTEGER :: l0
-      !! l0
-      INTEGER :: m
-      !! current m quantum number
-      REAL(DP) :: tmp
-      !! temporary variable
-      REAL(DP) :: deltaf
-      !! current value of Dirac-delta function
-      REAL(DP) :: prefactor_part_dos
-      !! constant prefactor for partial DOS
-      REAL(DP) :: prefactor
-      !! common prefactor for given rmt, atom, and l
-      REAL(DP) :: rvec_cart(3)
-      !! temporary MT-sphere vector for Gauss integration
-      !! in Cartesian coordinates
-      REAL(DP) :: kvec_cart(3)
-      !! temporary k-point vector
-      !! in Cartesian coordinates
-      REAL(DP) :: gvec_cart(3)
-      !! temporary G-vector
-      !! in Cartesian coordinates
-      REAL(DP) :: arg
-      !! temporary argument of the exponent
-      REAL(DP) :: sum_wk
-      !! sum of all k-point weights
-      REAL(DP) :: sum_wdk
-      !! sum of all k-point and band weights (ltetra = .true.)
-      REAL(DP) :: psi_kg_norm
-      !! norm of psi(k + G) coefficients
-      REAL(DP), ALLOCATABLE :: gp_vec(:, :)
-      !! unit vectors for Gauss integration
-      REAL(DP), ALLOCATABLE :: gp_wt(:)
-      !! weights for Gauss integration
-      REAL(DP), ALLOCATABLE :: wdk(:, :)
-      !! tetrahedron weights for integration with the delta-function
-      COMPLEX(DP) :: cnr_aux
-      !! complex version of partial DOS on r grid
-      COMPLEX(DP), ALLOCATABLE :: psi_kg(:, :, :)
-      !! FT coefficients of SCF wavefunctions for all bands and kpoints
-      !! psi_kg(npwx, nbnd, nks)
-      COMPLEX(DP), ALLOCATABLE :: psi_krtau_aux(:, :, :)
-      !! temporary value of
-      !! \delta(\varepsilon_{\bm{k}, i} - E_F)
-      !! \sum_{\bm{G}}
-      !! i (\bm{k} + \bm{G}) \cdot \hat{\bm{r}}
-      !! e**{i (\bm{k} + \bm{G}) \cdot (\bm{r} + \bm{tau})}
-      !! psi_i(\bm{k} + \bm{G})
-      !! on the given MT sphere
-      COMPLEX(DP), ALLOCATABLE :: ylm(:, :)
-      !! temporary array containing spherical harmonics
-      !! for specific unit vector and l
-      !
-      !
-      !
-      !
-      routine_name = "set_dos_nlm_form2"
-      CALL start_clock(routine_name)
-      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
-      !
-      !
-      IF (imax > nr) &
-        CALL errore(routine_name, "imax > nr", 1)
-      !
-      !
-      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
-      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
-      IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
-        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
-      END IF
-      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
-      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
-      !
-      IF (ltetra) THEN
-        !
-        ALLOCATE(wdk(nbnd, nkstot), STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating wdk', 1)
-        wdk(:, :) = zero
-        !
-        DO ispin = 1, nspin
-          !
-          CALL tetra_delta_weights(nkstot, nspin, ispin, isk, nbnd, &
-            efermi(ispin), et, wdk)
-          !
-        END DO ! ispin
-        !
-      END IF
-      !
-      DO ik = 1, nkstot, nkstot - 1
-        WRITE(stdout, '(7x, "isk(", I6, ") = ", I1)') ik, isk(ik)
-      END DO
-      !
-      sum_wk = get_sum_wk()
-      WRITE(stdout, '(7x, "sum_wk = ", F10.4, /7x)') sum_wk
-      !
-      IF (ltetra) THEN
-        sum_wdk = get_sum_wdk(wdk)
-        WRITE(stdout, '(7x, "sum_wdk = ", F10.4, /7x)') sum_wdk
-      END IF
-      !
-      lmax = MAX(norb - 1, igp_lmax)
-      !
-      !
-      ! generate Gauss-integration points for integration with
-      ! spherical harmonics
-      !
-      gp_ntheta = (lmax + 1)
-      gp_nphi = (2 * lmax + 1)
-      ngp = gp_ntheta * gp_nphi
-      !
-      ALLOCATE(gp_vec(3, ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_vec', 1)
-      !
-      ALLOCATE(gp_wt(ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gp_wt', 1)
-      !
-      CALL gauss_points(gp_vec, gp_wt, lmax)
-      !
-      !
-      ! prepare corresponding spherical harmonics for
-      ! Gauss-point integration
-      !
-      ALLOCATE(ylm((lmax + 1) * (lmax + 1), ngp), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ylm', 1)
-      !
-      ylm(:, :) = czero
-      !
-      DO igp = 1, ngp
-        CALL ylm4(gp_vec(:, igp), ylm(:, igp), lmax)
-      END DO
-      !
-      !
-      !
-      ! read and store all psi_kg (evc) coefficients of the wavefunctions
-      !
-      WRITE(stdout, &
-        '(/6x, "Reading all stored psi_kg ", &
-        & "coefficients of the wavefunctions...")')
-      !
-      ALLOCATE(psi_kg(npwx, nbnd, nkstot), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating psi_kg', 1)
-      !
-      !
-      DO ik = 1, nkstot
-        !
-        CALL read_collected_wfc(restart_dir(), ik, psi_kg(:, :, ik))
-        !
-      END DO ! ik
-      !
-      WRITE(stdout, '(6x, "Done reading all stored psi_kg ", &
-        & "coefficients of the wavefunctions.", /6x, /6x)')
-      !
-      psi_kg_norm = zero
-      DO ik = 1, nkstot
-        DO ibnd = 1, nbnd
-          npw = ngk(ik)
-          DO ig = 1, npw
-            psi_kg_norm = psi_kg_norm + &
-              REAL(psi_kg(ig, ibnd, ik) * CONJG(psi_kg(ig, ibnd, ik)), KIND=DP)
-          END DO ! ig
-        END DO ! ibnd
-      END DO ! ik
-      psi_kg_norm = psi_kg_norm / nkstot / nbnd
-      WRITE(stdout, '(7x, "psi_kg_norm = ", F10.4, /7x)') psi_kg_norm
-      !
-      !
-      !
-      ! partial DOS = f(r, E_F) integration
-      !
-      WRITE(stdout, &
-        '(/6x, "Computing partial DOS per atom per spin = f(r, E_F)...")')
-      !
-      dos_nlmr(:, :, :, :) = zero
-      dos_nlr(:, :, :, :) = zero
-      dos_nr(:, :, :) = zero
-      !
-      !
-      ! spin!
-      IF (ltetra) THEN
-        prefactor_part_dos = one / omega
-        !
-        If (nspin == 1) THEN
-          prefactor_part_dos = prefactor_part_dos / two
-        END IF
-        !
-      ELSE
-        ! times nspin to compensate sum_wk = 2
-        prefactor_part_dos = one / omega / sum_wk * nspin
-      END IF
-      !
-      !
-      ! prefactor0 = one
-      ! prefactor0 = one / omega / (tpi * tpi * tpi)
-      ! prefactor0 = prefactor0 * prefactor0 * prefactor0
-      !
-      !
-      ALLOCATE(psi_krtau_aux(ngp, nbnd, nkstot), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error allocating psi_krtau_aux', 1)
-      psi_krtau_aux(:, :, :) = czero
-      !
-      DO iat = 1, nat
-        !
-        WRITE(stdout, '(/6x, "atom #", I0, " out of ", I0)') iat, nat
-        !
-        DO ispin = 1, nspin
-          !
-          WRITE(stdout, '(/7x, "spin #", I0, " out of ", I0)') ispin, nspin
-          !
-          DO ir = imin, imax
-            !
-            WRITE(stdout, '(8x, "ir #", I0, " on [", I0, ", ", I0, "]")') &
-             ir, imin, imax
-            !
-            ! precompute psi_krtau with delta function for all bands
-            !
-            psi_krtau_aux(:, :, :) = czero
-            !
-            WRITE(stdout, &
-              '(/9x, "Precomputing ", &
-              & "psi_krtau_aux...")')
-            !
-            DO ik = 1, nkstot
-              !
-              ! only k-points of the corresponding spin
-              !
-              IF (isk(ik) == ispin) THEN
-                !
-                npw = ngk(ik)
-                !
-                kvec_cart(:) = tpiba * xk(:, ik)
-                ! WRITE(*, *) "xk(:, ik)", xk(:, ik)
-                !
-                ! loop over KS-states
-                !
-                DO ibnd = 1, nbnd
-                  !
-                  IF (ltetra) THEN
-                    lselect = ABS(wdk(ibnd, ik)) > eps32
-                    ! lselect = .true.
-                  ELSE
-                    deltaf = &
-                      w0gauss((et(ibnd, ik) - efermi(ispin)) / &
-                      degauss, ngauss) / degauss
-                      ! w0gauss((et(ibnd, ik) - efermi) / degauss, ngauss)
-                    lselect = ABS(deltaf) > eps32 .OR. (.NOT. lspeedup)
-                  END IF
-                  !
-                  IF (lselect) THEN
-                    !
-                    DO igp = 1, ngp
-                      !
-                      rvec_cart(:) = r(ir, stp(iat)) * gp_vec(:, igp)
-                      !
-                      ! sum over G-vectors
-                      !
-                      DO ig = 1, npw
-                        !
-                        gvec_cart(:) = tpiba * g(:, igk_k(ig, ik))
-                        !
-                        ! WRITE(*, *) "g(:, igk_k(ig, ik))", g(:, igk_k(ig, ik))
-                        !
-                        arg = DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
-                          rvec_cart(:) + tau_cart(:, iat))
-                        !
-                        ! reformulated
-                        !
-                        psi_krtau_aux(igp, ibnd, ik) = &
-                          psi_krtau_aux(igp, ibnd, ik) + &
-                          ci * &
-                          DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
-                          gp_vec(:, igp)) * &
-                          CMPLX(COS(arg), SIN(arg), KIND=DP) * &
-                          psi_kg(ig, ibnd, ik)
-                        !
-                      END DO ! ig
-                      !
-                    END DO ! igp
-                    !
-                  END IF ! lselect
-                  !
-                END DO ! ibnd
-                !
-              END IF ! isk
-              !
-            END DO ! ik
-            !
-            !
-            WRITE(stdout, '(9x, "Done precomputing ", &
-              & "psi_krtau_aux.", /6x)')
-            !
-            DO iorb = 1, norb
-              !
-              l = iorb - 1
-              l0 = l * (l + 1) + 1
-              !
-              ! WRITE(stdout, '(/8x, "orbit #", I0, " out of ", I0)') l, norb - 1
-              !
-              ! reformulated
-              prefactor = zero
-              !
-              tmp = dudrmuorr(ir, iorb, ispin, iat)
-              !
-              IF (ABS(tmp) > eps12) THEN
-                prefactor = prefactor_part_dos * &
-                  r(ir, stp(iat)) * r(ir, stp(iat)) * &
-                  wr(ir, iorb, ispin, iat) / &
-                  (tmp * tmp)
-              END IF
-              !
-              !
-              DO im = 1, 2 * l + 1
-                !
-                m = im - l - 1
-                !
-                !
-                ! integral over k-points
-                !
-                DO ik = 1, nkstot
-                  !
-                  IF (isk(ik) == ispin) THEN
-                  !
-                  npw = ngk(ik)
-                  !
-                  !
-                  ! loop over KS-states
-                  !
-                  DO ibnd = 1, nbnd
-                    !
-                    deltaf = zero
-                    !
-                    IF (ltetra) THEN
-                      lselect = (ABS(wdk(ibnd, ik)) > eps32)
-                      ! lselect = .true.
-                    ELSE
-                      deltaf = &
-                        w0gauss((et(ibnd, ik) - efermi(ispin)) / &
-                        degauss, ngauss) / degauss
-                        ! w0gauss((et(ibnd, ik) - efermi) / degauss, ngauss)
-                      lselect = (ABS(deltaf) > eps32) .OR. (.NOT. lspeedup)
-                    END IF
-                    !
-                    IF (lselect) THEN
-                      !
-                      cnr_aux = czero
-                      !
-                      ! integral over r angle (Gauss points)
-                      !
-                      DO igp = 1, ngp
-                        !
-                        cnr_aux = cnr_aux + &
-                          psi_krtau_aux(igp, ibnd, ik) * &
-                          CONJG(ylm(l * (l + 1) + 1 + m, igp)) * &
-                          gp_wt(igp)
-                        !
-                      END DO ! igp
-                      !
-                      IF (ltetra) THEN
-                        !
-                        dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
-                          dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
-                          prefactor * &
-                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
-                          wdk(ibnd, ik)
-                        !
-                      ELSE
-                        !
-                        dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) = &
-                          dos_nlmr(ir - imin + 1, l0 + m, ispin, iat) + &
-                          prefactor * &
-                          REAL(cnr_aux * CONJG(cnr_aux), KIND=DP) * &
-                          wk(ik) * deltaf
-                        !
-                      END IF
-                      !
-                    END IF ! lselect
-                    !
-                  END DO ! ibnd
-                  !
-                  END IF ! isk
-                  !
-                END DO ! ik
-                !
-                dos_nlr(ir - imin + 1, iorb, ispin, iat) = &
-                  dos_nlr(ir - imin + 1, iorb, ispin, iat) + &
-                  dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
-                !
-                dos_nr(ir - imin + 1, ispin, iat) = &
-                  dos_nr(ir - imin + 1, ispin, iat) + &
-                  dos_nlmr(ir - imin + 1, l0 + m, ispin, iat)
-                !
-              END DO ! im
-              !
-            END DO ! iorb
-            !
-          END DO ! ir
-        END DO ! ispin
-      END DO ! iat
-      !
-      !
-      CALL symmetrize_dos_nlm(imin, imax, nat, norb, nspin, &
-        dos_nlmr, dos_nlr, dos_nr)
-      !
-      !
-      WRITE(stdout, '(6x, "Done computing partial DOS per atom per spin", &
-        & " = f(r, E_F).", /6x, /6x)')
-      !
-      !
-      ! clean-up
-      !
-      DEALLOCATE(psi_krtau_aux, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, &
-        'Error deallocating psi_krtau_aux', 1)
-      !
-      DEALLOCATE(ylm, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating ylm', 1)
-      !
-      DEALLOCATE(psi_kg, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating psi_kg', 1)
-      !
-      DEALLOCATE(gp_vec, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_vec', 1)
-      !
-      DEALLOCATE(gp_wt, STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gp_wt', 1)
-      !
-      !
-      ! total DOS
-      CALL set_dos_n(ltetra, nat, nspin, ngauss, degauss, &
-        sum_wk, efermi, wdk, dos_n)
-      !
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>    PARTIAL DOS END    <<<<<<<<<", &
-        & /5x, /5x, /5x)')
-      !
-      IF (ltetra) THEN
-        !
-        DEALLOCATE(wdk, STAT = ierr)
-        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating wdk', 1)
-        !
-      END IF
-      !
-      CALL stop_clock(routine_name)
-      !
-      !
-    !---------------------------------------------------------------------------
-    END SUBROUTINE set_dos_nlm_form2
-    !---------------------------------------------------------------------------
-    !
-    !
-    !---------------------------------------------------------------------------
-    SUBROUTINE set_dos_nlm_form3(ltetra, nr, imin, imax, igp_lmax, stp, &
+    SUBROUTINE set_dos_nlm(formulation, &
+      ltetra, nr, imin, imax, igp_lmax, stp, &
       nat, norb, nspin, ngauss, r, &
       tau_cart, dloglde, &
       urmax, dudrmuorrmax, &
@@ -1663,7 +556,6 @@
     !!
     !! Computes partial densities n at Fermi level for each atom i,
     !! spin s, and angular L = l, m on a range of r-indices [nmin, nmax]
-    !! (formulation 3)
     !!
     !---------------------------------------------------------------------------
     !
@@ -1687,6 +579,8 @@
       REAL(DP), EXTERNAL :: w0gauss
       ! EXTERNAL :: ylmr2 ! no good: produces REAL spherical harmonics
       !
+      CHARACTER(len=256), INTENT(in) :: formulation
+      !! formulation used
       LOGICAL, INTENT(in) :: ltetra
       !! if true, use tetrahedron method
       INTEGER, INTENT(in) :: nr
@@ -1750,8 +644,13 @@
       !
       CHARACTER(len=256) :: routine_name
       !! name of this subroutine
+      LOGICAL :: l_prep_form1
+      !! if .true., prepare original--nodeless--formulation from the paper
+      !! (form 1)
+      LOGICAL :: l_prep_form2
+      !! if .true., prepare second--monotinic--formulation (form 2)
       LOGICAL :: lorigform
-      !! if .true., use original formulation from the paper
+      !! if .true., use original formulation from the paper (form 1)
       LOGICAL :: lspeedup = .TRUE.
       !! if true, ignore bands far on the tails of the delta-function
       !! (should be done)
@@ -1836,10 +735,12 @@
       !
       !
       !
-      routine_name = "set_dos_nlm_form3"
+      routine_name = "set_dos_nlm"
       CALL start_clock(routine_name)
       WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
       !
+      l_prep_form1 = .FALSE.
+      l_prep_form2 = .FALSE.
       !
       IF (imax > nr) &
         CALL errore(routine_name, "imax > nr", 1)
@@ -1977,15 +878,34 @@
       ! prefactor0 = one / omega / (tpi * tpi * tpi)
       ! prefactor0 = prefactor0 * prefactor0 * prefactor0
       !
+      IF (TRIM(formulation) /= "default" .AND. &
+        TRIM(formulation) /= "nodeless" .AND. &
+        TRIM(formulation) /= "monotonic") THEN
+        CALL errore(routine_name, "Formulation " // TRIM(formulation) // &
+          & "is not known", 1)
+      END IF ! formulation
+      !
+      IF (TRIM(formulation) == "default" .OR. &
+        TRIM(formulation) == "nodeless") THEN
+        l_prep_form1 = .TRUE.
+      END IF ! formulation
+      !
+      IF (TRIM(formulation) == "default" .OR. &
+        TRIM(formulation) == "monotonic") THEN
+        l_prep_form2 = .TRUE.
+      END IF ! formulation
       !
       ALLOCATE(psi_krtau_aux(ngp, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating psi_krtau_aux', 1)
       psi_krtau_aux(:, :, :) = czero
+      !
       ALLOCATE(psi_krtau_form2_aux(ngp, nbnd, nkstot), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, &
         'Error allocating psi_krtau_form2_aux', 1)
       psi_krtau_form2_aux(:, :, :) = czero
+      !
+
       !
       DO iat = 1, nat
         !
@@ -2002,12 +922,17 @@
             !
             ! precompute psi_krtau with delta function for all bands
             !
-            psi_krtau_aux(:, :, :) = czero
-            psi_krtau_form2_aux(:, :, :) = czero
-            !
             WRITE(stdout, &
               '(/9x, "Precomputing ", &
               & "psi_krtau_aux...")')
+            !
+            IF (l_prep_form1) THEN
+              psi_krtau_aux(:, :, :) = czero
+            END IF
+            IF (l_prep_form2) THEN
+              psi_krtau_form2_aux(:, :, :) = czero
+            END IF
+            !
             !
             DO ik = 1, nkstot
               !
@@ -2054,18 +979,22 @@
                         !
                         ! reformulated
                         !
-                        psi_krtau_aux(igp, ibnd, ik) = &
-                          psi_krtau_aux(igp, ibnd, ik) + &
-                          CMPLX(COS(arg), SIN(arg), KIND=DP) * &
-                          psi_kg(ig, ibnd, ik)
+                        IF (l_prep_form1) THEN
+                          psi_krtau_aux(igp, ibnd, ik) = &
+                            psi_krtau_aux(igp, ibnd, ik) + &
+                            CMPLX(COS(arg), SIN(arg), KIND=DP) * &
+                            psi_kg(ig, ibnd, ik)
+                        END IF
                         !
-                        psi_krtau_form2_aux(igp, ibnd, ik) = &
-                          psi_krtau_form2_aux(igp, ibnd, ik) + &
-                          ci * &
-                          DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
-                          gp_vec(:, igp)) * &
-                          CMPLX(COS(arg), SIN(arg), KIND=DP) * &
-                          psi_kg(ig, ibnd, ik)
+                        IF (l_prep_form2) THEN
+                          psi_krtau_form2_aux(igp, ibnd, ik) = &
+                            psi_krtau_form2_aux(igp, ibnd, ik) + &
+                            ci * &
+                            DOT_PRODUCT(kvec_cart(:) + gvec_cart(:), &
+                            gp_vec(:, igp)) * &
+                            CMPLX(COS(arg), SIN(arg), KIND=DP) * &
+                            psi_kg(ig, ibnd, ik)
+                        END IF
                         !
                       END DO ! ig
                       !
@@ -2080,6 +1009,9 @@
             END DO ! ik
             !
             !
+
+            !
+            !
             WRITE(stdout, '(9x, "Done precomputing ", &
               & "psi_krtau_aux.", /6x)')
             !
@@ -2092,24 +1024,44 @@
               !
               prefactor = zero
               lorigform = .TRUE.
-              tmp = dudrmuorr(ir, iorb, ispin, iat)
+              tmp = czero
               !
-              IF (ABS(ur(ir, iorb, ispin, iat) / &
-                urmax(iorb, ispin, iat)) > eps2) THEN
+              IF (l_prep_form1 .AND. .NOT. l_prep_form2) THEN
                 lorigform = .TRUE.
-                prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
-                  ABS(dloglde(ir, iorb, ispin, iat))
-                WRITE(stdout, '(/8x, "formulation ''nodeless'' is used")')
-              ELSE IF (ABS(tmp / dudrmuorrmax(iorb, ispin, iat)) > eps2) THEN
+                  prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
+                    ABS(dloglde(ir, iorb, ispin, iat))
+                  WRITE(stdout, '(/8x, "formulation ''nodeless'' is used")')
+              ELSE IF (l_prep_form2 .AND. .NOT. l_prep_form1) THEN
                 lorigform = .FALSE.
                 prefactor = prefactor_part_dos * &
                   r(ir, stp(iat)) * r(ir, stp(iat)) * &
                   wr(ir, iorb, ispin, iat) / &
                   (tmp * tmp)
                 WRITE(stdout, '(/8x, "formulation ''monotonic'' is used")')
+              ELSE IF (l_prep_form1 .AND. l_prep_form2) THEN
+                tmp = dudrmuorr(ir, iorb, ispin, iat)
+                !
+                IF (ABS(ur(ir, iorb, ispin, iat) / &
+                  urmax(iorb, ispin, iat)) > eps2) THEN
+                  lorigform = .TRUE.
+                  prefactor = prefactor_part_dos * r(ir, stp(iat)) * &
+                    ABS(dloglde(ir, iorb, ispin, iat))
+                  WRITE(stdout, '(/8x, "formulation ''nodeless'' is used")')
+                ELSE IF (ABS(tmp / dudrmuorrmax(iorb, ispin, iat)) > eps2) THEN
+                  lorigform = .FALSE.
+                  prefactor = prefactor_part_dos * &
+                    r(ir, stp(iat)) * r(ir, stp(iat)) * &
+                    wr(ir, iorb, ispin, iat) / &
+                    (tmp * tmp)
+                  WRITE(stdout, '(/8x, "formulation ''monotonic'' is used")')
+                ELSE
+                  CALL errore(routine_name, &
+                    "No reliable partial DOS " // &
+                    & "formulation for given MT radius.", 1)
+                END IF
               ELSE
                 CALL errore(routine_name, &
-                  "No reliable partial DOS formulation for given MT radius.", 1)
+                  "Bug indicating flag conflicts.", 1)
               END IF
               !
               !
@@ -2259,7 +1211,7 @@
       !
       !
     !---------------------------------------------------------------------------
-    END SUBROUTINE set_dos_nlm_form3
+    END SUBROUTINE set_dos_nlm
     !---------------------------------------------------------------------------
     !
     !
