@@ -9,13 +9,13 @@
      Please cite:
      D. Radevych, T. Shishidou, M. Weinert, 
      E. R. Margine, A. N. Kolmogorov, I. I. Mazin, 
-     Rigid muffin-tin approximation in plane wave 
+     Rigid muffin-tin approximation in plane-wave 
      codes for fast modeling of phonon-mediated 
      superconductors, npj Comput Mater (2026) 
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on  9Sep2026 at 11:23:30 
+     Program RMTA v.7.5 starts on 22Sep2026 at 17: 7:21 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     1062 MiB available memory on the printing compute node when the environment starts
+     3033 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -201,9 +201,11 @@
 
        u_0(r_mt) =      -1.14326553
        R_0(r_mt) =      -0.42322802
+       [du / dr - u / r]_0(r_mt) =       0.23549966
 
        u_1(r_mt) =      -1.31285711
        R_1(r_mt) =      -0.48600950
+       [du / dr - u / r]_1(r_mt) =      -0.44703944
 
                M_sp   (      2.70129925):     -0.87361925 (Ry / bohr)
              M^2_sp   (      2.70129925):      0.76321060 (Ry / bohr)^2
@@ -213,9 +215,11 @@
 
        u_1(r_mt) =      -1.31285711
        R_1(r_mt) =      -0.48600950
+       [du / dr - u / r]_1(r_mt) =      -0.44703944
 
        u_2(r_mt) =       0.65493695
        R_2(r_mt) =       0.24245257
+       [du / dr - u / r]_2(r_mt) =      -0.35957073
 
                M_pd   (      2.70129925):      0.67757785 (Ry / bohr)
              M^2_pd   (      2.70129925):      0.45911174 (Ry / bohr)^2
@@ -225,9 +229,11 @@
 
        u_2(r_mt) =       0.65493695
        R_2(r_mt) =       0.24245257
+       [du / dr - u / r]_2(r_mt) =      -0.35957073
 
        u_3(r_mt) =       1.56574796
        R_3(r_mt) =       0.57962773
+       [du / dr - u / r]_3(r_mt) =       1.13186944
 
                M_df   (      2.70129925):      2.08857225 (Ry / bohr)
              M^2_df   (      2.70129925):      4.36213403 (Ry / bohr)^2
@@ -240,7 +246,7 @@
 
 
 
-     >>>>>>>>>>   PartDOS BEGIN   <<<<<<<<<<<
+     >>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<
 
        ltetra =  T
        two_fermi_energies =  F
@@ -248,6 +254,12 @@
        nkstot = 413
        nbnd = 11
        omega =   121.3909
+
+     symmetrize_tetra_delta_weights:
+      averaged blocks = 62
+      sum_wdk_before = 2.04302740+01
+      sum_wdk_after  = 2.04302740+01
+
        isk(     1) = 1
        isk(   413) = 1
        sum_wk =     2.0000
@@ -267,10 +279,50 @@
       atom #1 out of 1
 
        spin #1 out of 1
-        ir #401 on [401, 401]
+
+        ir #400 on [400, 401]
 
          Precomputing psi_krtau_aux...
          Done precomputing psi_krtau_aux.
+
+
+        orbit #0 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #1 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #2 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #3 out of 3
+
+        formulation 'nodeless' is used
+
+        ir #401 on [400, 401]
+
+         Precomputing psi_krtau_aux...
+         Done precomputing psi_krtau_aux.
+
+
+        orbit #0 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #1 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #2 out of 3
+
+        formulation 'nodeless' is used
+
+        orbit #3 out of 3
+
+        formulation 'nodeless' is used
 
        Symmetrizing partial DOS = f(r, E_F)...
        Done symmetrizing partial DOS = f(r, E_F).
@@ -284,12 +336,12 @@
 
       spin #1 out of 1
 
-       n(E_F, 1) =   1.02151295E+01
+       n(E_F, 1) =   1.02151370E+01
       Done computing total DOS per atom per spin = f(spin, E_F).
 
 
 
-     >>>>>>>>>>    PartDOS END    <<<<<<<<<<<
+     >>>>>>>>    PARTIAL DOS END    <<<<<<<<<
 
 
 
@@ -323,13 +375,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_s(   2.70130) (1 / Ry):    1.5947E-01
-                n_p(   2.70130) (1 / Ry):    1.1188E+00
-                n_s / n :     1.5611E-02
-                n_p / n :     1.0952E-01
-                n_s:    1.5947E-01
+                n_s(   2.70130) (1 / Ry):    2.0015E-01
+                n_p(   2.70130) (1 / Ry):    1.0975E+00
+                n_s / n :     1.9594E-02
+                n_p / n :     1.0744E-01
+                n_s:    2.0015E-01
 
-           eta_sp(   2.70130):    8.8866E-03 (Ry / bohr^2) =    4.3177E-01 (eV / A^2)
+           eta_sp(   2.70130):    1.0941E-02 (Ry / bohr^2) =    5.3161E-01 (eV / A^2)
 
 
 
@@ -342,13 +394,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_p(   2.70130) (1 / Ry):    1.1188E+00
-                n_d(   2.70130) (1 / Ry):    6.8531E+00
-                n_p / n :     1.0952E-01
-                n_d / n :     6.7088E-01
-                n_p:    1.1188E+00
+                n_p(   2.70130) (1 / Ry):    1.0975E+00
+                n_d(   2.70130) (1 / Ry):    6.6288E+00
+                n_p / n :     1.0744E-01
+                n_d / n :     6.4892E-01
+                n_p:    1.0975E+00
 
-           eta_pd(   2.70130):    9.1893E-02 (Ry / bohr^2) =    4.4648E+00 (eV / A^2)
+           eta_pd(   2.70130):    8.7193E-02 (Ry / bohr^2) =    4.2364E+00 (eV / A^2)
 
 
 
@@ -361,25 +413,25 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_d(   2.70130) (1 / Ry):    6.8531E+00
-                n_f(   2.70130) (1 / Ry):    1.7493E-01
-                n_d / n :     6.7088E-01
-                n_f / n :     1.7125E-02
-                n_d:    6.8531E+00
-                n_f:    1.7493E-01
+                n_d(   2.70130) (1 / Ry):    6.6288E+00
+                n_f(   2.70130) (1 / Ry):    1.7495E-01
+                n_d / n :     6.4892E-01
+                n_f / n :     1.7126E-02
+                n_d:    6.6288E+00
+                n_f:    1.7495E-01
 
-           eta_df(   2.70130):    8.7761E-02 (Ry / bohr^2) =    4.2640E+00 (eV / A^2)
+           eta_df(   2.70130):    8.4895E-02 (Ry / bohr^2) =    4.1248E+00 (eV / A^2)
 
 
         sum_l: total ...............................................................
 
-        eta_tot(   2.70130):    1.8854E-01 (Ry / bohr^2) =    9.1606E+00 (eV / A^2)
-          ? eta_tot:    9.1606E+00
+        eta_tot(   2.70130):    1.8303E-01 (Ry / bohr^2) =    8.8928E+00 (eV / A^2)
+          ? eta_tot:    8.8928E+00
 
 
 
 
-      sum_n_dos:   2.04302590E+01 (1 / Ry)
+      sum_n_dos:   2.04302740E+01 (1 / Ry)
 
 
 
@@ -400,13 +452,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_s(   2.70130) (1 / Ry):    1.5947E-01
-                n_p(   2.70130) (1 / Ry):    1.1188E+00
-                n_s / n :     1.5611E-02
-                n_p / n :     1.0952E-01
+                n_s(   2.70130) (1 / Ry):    2.0015E-01
+                n_p(   2.70130) (1 / Ry):    1.0975E+00
+                n_s / n :     1.9594E-02
+                n_p / n :     1.0744E-01
 
-           eta_sp(   2.70130):    8.8866E-03 (Ry / bohr^2) =    4.3177E-01 (eV / A^2)
-           eta_sp:    4.3177E-01
+           eta_sp(   2.70130):    1.0941E-02 (Ry / bohr^2) =    5.3161E-01 (eV / A^2)
+           eta_sp:    5.3161E-01
 
 
         l:  p ......................................................................
@@ -419,13 +471,13 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_p(   2.70130) (1 / Ry):    1.1188E+00
-                n_d(   2.70130) (1 / Ry):    6.8531E+00
-                n_p / n :     1.0952E-01
-                n_d / n :     6.7088E-01
+                n_p(   2.70130) (1 / Ry):    1.0975E+00
+                n_d(   2.70130) (1 / Ry):    6.6288E+00
+                n_p / n :     1.0744E-01
+                n_d / n :     6.4892E-01
 
-           eta_pd(   2.70130):    9.1893E-02 (Ry / bohr^2) =    4.4648E+00 (eV / A^2)
-           eta_pd:    4.4648E+00
+           eta_pd(   2.70130):    8.7193E-02 (Ry / bohr^2) =    4.2364E+00 (eV / A^2)
+           eta_pd:    4.2364E+00
 
 
         l:  d ......................................................................
@@ -438,17 +490,17 @@
 
                   N(   2.70130) (1 / Ry):    1.0215E+01
                   n(   2.70130) (1 / Ry):    1.0215E+01
-                n_d(   2.70130) (1 / Ry):    6.8531E+00
-                n_f(   2.70130) (1 / Ry):    1.7493E-01
-                n_d / n :     6.7088E-01
-                n_f / n :     1.7125E-02
+                n_d(   2.70130) (1 / Ry):    6.6288E+00
+                n_f(   2.70130) (1 / Ry):    1.7495E-01
+                n_d / n :     6.4892E-01
+                n_f / n :     1.7126E-02
 
-           eta_df(   2.70130):    8.7761E-02 (Ry / bohr^2) =    4.2640E+00 (eV / A^2)
-           eta_df:    4.2640E+00
+           eta_df(   2.70130):    8.4895E-02 (Ry / bohr^2) =    4.1248E+00 (eV / A^2)
+           eta_df:    4.1248E+00
 
         sum_l: total ...............................................................
-        eta_tot(   2.70130):    1.8854E-01 (Ry / bohr^2) =    9.1606E+00 (eV / A^2)
-          ! eta_tot:    9.1606E+00
+        eta_tot(   2.70130):    1.8303E-01 (Ry / bohr^2) =    8.8928E+00 (eV / A^2)
+          ! eta_tot:    8.8928E+00
 
 
 
@@ -469,6 +521,7 @@
      writing duderf
      writing dudrrf
      writing d2udrderf
+     writing dudrmuorrf
      writing mll1rf
      writing vfullrf
      writing rvfullrf
@@ -486,17 +539,17 @@
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
      tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_nlm_ :      1.11s CPU      1.20s WALL (       1 calls)
+     set_dos_nlm  :      6.66s CPU      7.11s WALL (       1 calls)
      set_dos_n    :      0.00s CPU      0.00s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.01s CPU      0.02s WALL (       1 calls)
+     rmta_write   :      0.02s CPU      0.04s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      3.94s CPU      4.06s WALL
+     RMTA         :      9.51s CPU     10.01s WALL
 
  
-   This run was terminated on:  11:23:34   9Sep2026            
+   This run was terminated on:  17: 7:31  22Sep2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
