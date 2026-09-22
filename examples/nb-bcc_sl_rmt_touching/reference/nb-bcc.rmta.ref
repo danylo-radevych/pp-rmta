@@ -15,7 +15,7 @@
      DOI: https://doi.org/10.1038/s41524-026-02141-7
 
 
-     Program RMTA v.7.5 starts on 22Sep2026 at 17: 7:21 
+     Program RMTA v.7.5 starts on 22Sep2026 at 17:16:43 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -29,7 +29,7 @@
      Parallel version (MPI), running on     1 processors
 
      MPI processes distributed on     1 nodes
-     3033 MiB available memory on the printing compute node when the environment starts
+     1750 MiB available memory on the printing compute node when the environment starts
  
 
      Check input:
@@ -280,29 +280,7 @@
 
        spin #1 out of 1
 
-        ir #400 on [400, 401]
-
-         Precomputing psi_krtau_aux...
-         Done precomputing psi_krtau_aux.
-
-
-        orbit #0 out of 3
-
-        formulation 'nodeless' is used
-
-        orbit #1 out of 3
-
-        formulation 'nodeless' is used
-
-        orbit #2 out of 3
-
-        formulation 'nodeless' is used
-
-        orbit #3 out of 3
-
-        formulation 'nodeless' is used
-
-        ir #401 on [400, 401]
+        ir #401 on [401, 401]
 
          Precomputing psi_krtau_aux...
          Done precomputing psi_krtau_aux.
@@ -539,17 +517,17 @@
      set_log_ders :      0.00s CPU      0.00s WALL (       1 calls)
      set_pet_mll1 :      0.00s CPU      0.00s WALL (       1 calls)
      tetra_delta_ :      0.03s CPU      0.03s WALL (       1 calls)
-     set_dos_nlm  :      6.66s CPU      7.11s WALL (       1 calls)
+     set_dos_nlm  :      3.31s CPU      3.39s WALL (       1 calls)
      set_dos_n    :      0.00s CPU      0.00s WALL (       1 calls)
      set_eta      :      0.00s CPU      0.00s WALL (       1 calls)
      print_at_rmt :      0.00s CPU      0.00s WALL (       1 calls)
-     rmta_write   :      0.02s CPU      0.04s WALL (       1 calls)
+     rmta_write   :      0.02s CPU      0.03s WALL (       1 calls)
      rmta_quit    :      0.00s CPU      0.00s WALL (       1 calls)
  
-     RMTA         :      9.51s CPU     10.01s WALL
+     RMTA         :      6.14s CPU      6.25s WALL
 
  
-   This run was terminated on:  17: 7:31  22Sep2026            
+   This run was terminated on:  17:16:49  22Sep2026            
 
 =------------------------------------------------------------------------------=
    JOB DONE.
