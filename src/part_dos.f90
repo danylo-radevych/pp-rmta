@@ -3024,20 +3024,6 @@
     !! Symmetrizes band weights so that all bands within a numerically
     !! degenerate energy group receive the same, averaged weight.
     !!
-    !! Degenerate groups are identified, for each k-point, using
-    !! single-linkage clustering on the gaps between consecutive
-    !! (sorted) band energies, so the grouping obtained does not depend
-    !! on which band happens to be examined first.
-    !!
-    !! This is independent of, and complementary to, the degeneracy
-    !! handling performed inside tetra_delta_weights: there, energies
-    !! are lifted along k (same band, different tetrahedron vertices) to
-    !! regularize the Bloechl formulas; here, weights are averaged along
-    !! the band index (different bands, same k-point), which the
-    !! tetrahedron method has no means to enforce by itself. This
-    !! routine should be called after tetra_delta_weights, once wdk has
-    !! already been reduced across images with mp_sum.
-    !!
     !---------------------------------------------------------------------------
     !
       USE io_global,       ONLY : stdout, ionode
@@ -3082,7 +3068,7 @@
       !! total weight, summed over all bands and k-points, before symmetrization
       REAL(DP) :: sum_wdk_after
       !! total weight, summed over all bands and k-points, after symmetrization
-      REAL(DP) :: wgroup
+      REAL(DP) :: sum_wdk_group
       !! sum of weights within the degenerate group currently being averaged
       !
       !
@@ -3113,8 +3099,8 @@
           high = low
           !
           ! extend the group while the gap between consecutive bands
-          ! stays within tolerance (single-linkage clustering); since
-          ! the energies are sorted, this is equivalent to comparing
+          ! stays within tolerance;
+          ! since the energies are sorted, this is equivalent to comparing
           ! every pair of bands in the group with one another, so the
           ! grouping does not depend on the starting band
           !
@@ -3125,8 +3111,8 @@
           !
           IF (high > low) THEN
             !
-            wgroup = SUM(wdk(low : high, ik))
-            wdk(low:high, ik) = wgroup / REAL(high - low + 1, DP)
+            sum_wdk_group = SUM(wdk(low : high, ik))
+            wdk(low:high, ik) = sum_wdk_group / REAL(high - low + 1, DP)
             nblocks = nblocks + 1
             !
           ENDIF
