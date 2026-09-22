@@ -91,8 +91,8 @@
     !! system integer iostat
     INTEGER :: nks_aux
     !! auxiliary number of k-points needed for tetra_init
-    INTEGER :: dnr
-    !! number of points below the MT-radius to print out
+    INTEGER :: nrmt
+    !! number of radial-grid points equal to or below the MT radius to print out
     ! REAL(DP) :: rmt(natmax)
     ! !! muffin-tin radius
     !
@@ -101,7 +101,7 @@
     !
     NAMELIST / rmta / outdir, prefix, &
       rmt, lwrite_dat, ngauss, degauss, &
-      dnr, lrmt, rmt, ltetra, lhybrid, rmt_method, &
+      nrmt, lrmt, rmt, ltetra, lhybrid, rmt_method, &
       ldebug, igp_lmax, formulation
     !
     ! defaults
@@ -117,7 +117,7 @@
     rmt(:) = -1.0_dp
     ngauss = -99
     degauss = 0.001_dp
-    dnr = 0
+    nrmt = 1
     !
     ! initialize parallelization levels
     !
@@ -181,7 +181,12 @@
       ENDIF
       !
       ! variables from input
-      irf_delta = dnr
+      !
+      IF (nrmt < 1) THEN
+        CALL errore(rmta_routine, "nrmt < 1 is invalid.", 1)
+      END IF
+      !
+      irf_delta = nrmt - 1 ! number of MT radii excluding the MT radius itself
       mt_ngauss = ngauss
       mt_degauss = degauss
       !

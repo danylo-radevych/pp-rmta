@@ -917,7 +917,7 @@
           !
           DO ir = imin, imax
             !
-            WRITE(stdout, '(8x, "ir #", I0, " on [", I0, ", ", I0, "]")') &
+            WRITE(stdout, '(/8x, "ir #", I0, " on [", I0, ", ", I0, "]")') &
              ir, imin, imax
             !
             ! precompute psi_krtau with delta function for all bands
