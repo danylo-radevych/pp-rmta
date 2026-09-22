@@ -705,6 +705,21 @@
       !
       routine_name = "set_dos_nlm"
       CALL start_clock(routine_name)
+      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
+      !
+      IF (imax > nr) &
+        CALL errore(routine_name, "imax > nr", 1)
+      !
+      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
+      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
+      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
+      IF (.NOT. ltetra) THEN
+        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
+        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
+      END IF
+      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
+      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
+      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       IF (ltetra) THEN
         !
@@ -720,22 +735,6 @@
         END DO ! ispin
         !
       END IF
-      !
-      IF (imax > nr) &
-        CALL errore(routine_name, "imax > nr", 1)
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
-      !
-      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
-      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
-      IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
-        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
-      END IF
-      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
-      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       DO ik = 1, nkstot, nkstot - 1
         WRITE(stdout, '(7x, "isk(", I6, ") = ", I1)') ik, isk(ik)
@@ -1258,6 +1257,23 @@
       !
       routine_name = "set_dos_nlm_form2"
       CALL start_clock(routine_name)
+      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
+      !
+      !
+      IF (imax > nr) &
+        CALL errore(routine_name, "imax > nr", 1)
+      !
+      !
+      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
+      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
+      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
+      IF (.NOT. ltetra) THEN
+        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
+        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
+      END IF
+      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
+      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
+      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       IF (ltetra) THEN
         !
@@ -1273,22 +1289,6 @@
         END DO ! ispin
         !
       END IF
-      !
-      IF (imax > nr) &
-        CALL errore(routine_name, "imax > nr", 1)
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
-      !
-      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
-      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
-      IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
-        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
-      END IF
-      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
-      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       DO ik = 1, nkstot, nkstot - 1
         WRITE(stdout, '(7x, "isk(", I6, ") = ", I1)') ik, isk(ik)
@@ -1838,6 +1838,22 @@
       !
       routine_name = "set_dos_nlm_form3"
       CALL start_clock(routine_name)
+      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
+      !
+      !
+      IF (imax > nr) &
+        CALL errore(routine_name, "imax > nr", 1)
+      !
+      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
+      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
+      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
+      IF (.NOT. ltetra) THEN
+        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
+        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
+      END IF
+      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
+      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
+      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       IF (ltetra) THEN
         !
@@ -1853,22 +1869,6 @@
         END DO ! ispin
         !
       END IF
-      !
-      IF (imax > nr) &
-        CALL errore(routine_name, "imax > nr", 1)
-      !
-      WRITE(stdout, '(/5x, ">>>>>>>>   PARTIAL DOS BEGIN   <<<<<<<<<")')
-      !
-      WRITE(stdout, '(/7x, "ltetra = ", L2)') ltetra
-      WRITE(stdout, '(7x, "two_fermi_energies = ", L2)') two_fermi_energies
-      WRITE(stdout, '(7x, "nspin = ", I0)') nspin
-      IF (.NOT. ltetra) THEN
-        WRITE(stdout, '(7x, "ngauss = ", I0)') ngauss
-        WRITE(stdout, '(7x, "degauss = ", F10.4)') degauss
-      END IF
-      WRITE(stdout, '(7x, "nkstot = ", I0)') nkstot
-      WRITE(stdout, '(7x, "nbnd = ", I0)') nbnd
-      WRITE(stdout, '(7x, "omega = ", F10.4)') omega
       !
       DO ik = 1, nkstot, nkstot - 1
         WRITE(stdout, '(7x, "isk(", I6, ") = ", I1)') ik, isk(ik)
@@ -2714,7 +2714,8 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE tetra_delta_weights(nks, nspin, is, isk, nbnd, ef, et, wdk)
+    SUBROUTINE tetra_delta_weights(nks, nspin, is, isk, nbnd, ef, et, wdk, &
+      lsymmetrize)
     !---------------------------------------------------------------------------
     !!
     !! Tetrahedron weights for integration with the delta-function,
@@ -2759,10 +2760,16 @@
       ! wg must be (inout) and not (out) because if is /= 0 only terms for
       ! spin = is are initialized; the remaining terms should be kept, not lost
       !
+      LOGICAL, INTENT(IN), OPTIONAL :: lsymmetrize
+      !! whether to symmetrize weights over degenerate bands before
+      !! returning (default: .TRUE.)
+      !
       ! local variables
       !
-      CHARACTER(len = 200) :: routine_name
+      CHARACTER(len = 256) :: routine_name
       !! name of this subroutine
+      LOGICAL :: lsym
+      !! if .true., symmetrize the delta weights
       INTEGER :: ik, ibnd, nt, nk, ns, i
       !! iterators
       INTEGER :: kp1, kp2, kp3, kp4
@@ -2788,6 +2795,8 @@
       !
       E = ef
       etol = eps6
+      lsym = .TRUE.
+      IF (PRESENT(lsymmetrize)) lsym = lsymmetrize
       !
       routine_name = "tetra_delta_weights"
       CALL start_clock(routine_name)
@@ -2995,10 +3004,166 @@
         wdk(1 : nbnd, 1 : nks) = wdk(1 : nbnd, 1 : nks) * two
       END IF
       !
+      ! optional symmetrization based on band degeneracies
+      !
+      IF (lsym) THEN
+        CALL symmetrize_tetra_delta_weights(nks, nbnd, is, isk, et, etol, wdk)
+      END IF
+      !
       CALL stop_clock(routine_name)
       !
     !---------------------------------------------------------------------------
     END SUBROUTINE tetra_delta_weights
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE symmetrize_tetra_delta_weights(nks, nbnd, is, isk, et, etol, wdk)
+    !---------------------------------------------------------------------------
+    !!
+    !! Symmetrizes band weights so that all bands within a numerically
+    !! degenerate energy group receive the same, averaged weight.
+    !!
+    !! Degenerate groups are identified, for each k-point, using
+    !! single-linkage clustering on the gaps between consecutive
+    !! (sorted) band energies, so the grouping obtained does not depend
+    !! on which band happens to be examined first.
+    !!
+    !! This is independent of, and complementary to, the degeneracy
+    !! handling performed inside tetra_delta_weights: there, energies
+    !! are lifted along k (same band, different tetrahedron vertices) to
+    !! regularize the Bloechl formulas; here, weights are averaged along
+    !! the band index (different bands, same k-point), which the
+    !! tetrahedron method has no means to enforce by itself. This
+    !! routine should be called after tetra_delta_weights, once wdk has
+    !! already been reduced across images with mp_sum.
+    !!
+    !---------------------------------------------------------------------------
+    !
+      USE io_global,       ONLY : stdout, ionode
+      USE constants,       ONLY : eps6, eps12
+      USE const,           ONLY : one
+      USE ieee_arithmetic, ONLY : IEEE_IS_FINITE
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore, start_clock, stop_clock
+      !
+      INTEGER, INTENT(IN) :: nks
+      !! number of k in irreducible BZ
+      INTEGER, INTENT(IN) :: nbnd
+      !! number of bands
+      INTEGER, INTENT(IN) :: is
+      !! spin label
+      INTEGER, INTENT(IN) :: isk(nks)
+      !! for each k-point: 1 = spin up, 2 = spin down
+      REAL(DP), INTENT(IN) :: et(nbnd, nks)
+      !! eigenvalues of the Hamiltonian, sorted in ascending order for
+      !! each k-point
+      REAL(DP), INTENT(in) :: etol
+      !! energy tolerance for degeneracies
+      REAL(DP), INTENT(INOUT) :: wdk(nbnd, nks)
+      !! the weight of each k point and band, symmetrized in
+      !! place over degenerate bands
+      !
+      ! local variables
+      !
+      CHARACTER(len = 256) :: routine_name
+      !! name of this subroutine
+      INTEGER :: ik
+      !! k-point iterator
+      INTEGER :: low
+      !! lower band index of the degenerate group currently being examined
+      INTEGER :: high
+      !! upper band index of the degenerate group currently being examined
+      INTEGER :: nblocks
+      !! number of nontrivial degenerate groups (size greater than one) found
+      REAL(DP) :: sum_wdk_before
+      !! total weight, summed over all bands and k-points, before symmetrization
+      REAL(DP) :: sum_wdk_after
+      !! total weight, summed over all bands and k-points, after symmetrization
+      REAL(DP) :: wgroup
+      !! sum of weights within the degenerate group currently being averaged
+      !
+      !
+      routine_name = "symmetrize_tetra_delta_weights"
+      CALL start_clock(routine_name)
+      !
+      ! reject nonfinite input right away, since it would otherwise
+      ! silently propagate through the averaging performed below
+      !
+      IF (ANY(.NOT. IEEE_IS_FINITE(et)) .OR. ANY(.NOT. IEEE_IS_FINITE(wdk))) &
+        CALL errore(routine_name, 'nonfinite energies or weights', 1)
+      !
+      sum_wdk_before = SUM(wdk)
+      nblocks = 0
+      !
+      DO ik = 1, nks
+        !
+        IF (is /= 0) THEN
+          IF (isk(ik) /= is) CYCLE
+        ENDIF
+        !
+        IF (ANY(et(2 : nbnd, ik) < et(1 : nbnd - 1, ik))) &
+          CALL errore(routine_name, 'bands are not sorted', 1)
+        !
+        low = 1
+        DO WHILE (low <= nbnd)
+          !
+          high = low
+          !
+          ! extend the group while the gap between consecutive bands
+          ! stays within tolerance (single-linkage clustering); since
+          ! the energies are sorted, this is equivalent to comparing
+          ! every pair of bands in the group with one another, so the
+          ! grouping does not depend on the starting band
+          !
+          DO WHILE (high < nbnd)
+            IF (et(high + 1, ik) - et(high, ik) > etol) EXIT
+            high = high + 1
+          ENDDO
+          !
+          IF (high > low) THEN
+            !
+            wgroup = SUM(wdk(low : high, ik))
+            wdk(low:high, ik) = wgroup / REAL(high - low + 1, DP)
+            nblocks = nblocks + 1
+            !
+          ENDIF
+          !
+          low = high + 1
+          !
+        ENDDO ! low
+        !
+      ENDDO ! ik
+      !
+      sum_wdk_after = SUM(wdk)
+      !
+      ! the symmetrization above only redistributes weight within each
+      ! group, so the total must be conserved up to round-off
+      !
+      IF (ABS(sum_wdk_after - sum_wdk_before) > &
+        eps12 * MAX(one, SUM(ABS(wdk)))) &
+        CALL errore(routine_name, 'weight sum changed', 1)
+      !
+      IF (ionode) THEN
+        !
+        WRITE(stdout, '(/5x, A)') &
+        TRIM(routine_name) // ":"
+        WRITE(stdout, '(6x, A, I0)') &
+          "averaged blocks = ", nblocks
+        WRITE(stdout, '(6x, A, ES0.8)') &
+          "sum_wdk_before = ", sum_wdk_before
+        WRITE(stdout, '(6x, A, ES0.8)') &
+          "sum_wdk_after  = ", sum_wdk_after
+        WRITE(stdout, '()')
+        !
+      END IF ! ionode
+      !
+      CALL stop_clock(routine_name)
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE symmetrize_tetra_delta_weights
     !---------------------------------------------------------------------------
     !
     !
