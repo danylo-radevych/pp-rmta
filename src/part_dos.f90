@@ -2042,8 +2042,17 @@
           IF (isk(ik) /= is) CYCLE
         ENDIF
         !
-        IF (ANY(et(2 : nbnd, ik) < et(1 : nbnd - 1, ik))) &
+        ! et_{ibnd+1, ik} can be bigger than et_{ibnd, ik} by 1E-13 ->
+        ! etol here is typically higher than it should be
+        !
+        IF (ANY(et(2 : nbnd, ik) < et(1 : nbnd - 1, ik) - ABS(etol))) &
           CALL errore(routine_name, 'bands are not sorted', 1)
+        !
+        ! DO low = 1, nbnd - 1
+        !   IF (et(low + 1, ik) < et(low, ik)) &
+        !     WRITE(stdout, '("et2 - et1 == ", ES0.16)') &
+        !       et(low + 1, ik) - et(low, ik)
+        ! END DO
         !
         low = 1
         DO WHILE (low <= nbnd)
