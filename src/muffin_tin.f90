@@ -534,7 +534,8 @@
               EXIT loop_ichi2
             END IF
             !
-            IF ((l > lmax) .AND. (l + 1 <= norbs)) lmax = l
+            IF (l > lmax) lmax = l
+            !
           END DO loop_ichi2
           ! WRITE(*, *) "lmax == ", lmax
           !
