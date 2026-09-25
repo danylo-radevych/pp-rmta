@@ -699,7 +699,6 @@
       USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
-      USE const, ONLY: zero, one
       !
       IMPLICIT NONE
       !
