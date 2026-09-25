@@ -226,6 +226,7 @@
       USE kinds, ONLY: DP
       USE splinelib, ONLY: spline, splint
       USE constants, ONLY: eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -297,7 +298,7 @@
       END IF
       !
       !
-      IF (yf /= yf) THEN
+      IF (IEEE_IS_NAN(yf)) THEN
         CALL errore(routine_name, 'yf value is NAN', 1)
       END IF
       !
