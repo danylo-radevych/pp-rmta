@@ -146,7 +146,7 @@
     !! max size in the mt_nr array
     INTEGER, ALLOCATABLE :: natoms_per_chem_type(:)
     !! number of atoms per each chemical type
-    INTEGER, ALLOCATABLE:: mt_nr(:)
+    INTEGER, ALLOCATABLE :: mt_nr(:)
     !! mt_nr(n_chem_types)
     !! number of points on radial mesh for each type
     INTEGER :: rmta_ng
@@ -407,7 +407,7 @@
       !
       IMPLICIT NONE
       !
-      CHARACTER(len=256) :: routine_name
+      CHARACTER(LEN = 128) :: routine_name
       !! name of this subroutine
       LOGICAL, ALLOCATABLE :: lrmt_fixed(:)
       !! if true, mt_rmt(ist) is already constrained 
@@ -415,6 +415,8 @@
       !! error code
       INTEGER :: ist, iat, jat
       !! iterators
+      INTEGER, ALLOCATABLE :: iatmt(:)
+    !! iat indices ordered according to their MT radii in descending order
       REAL(DP) :: rtmp, rtmp2
       !! real temporary vars
       REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
@@ -426,11 +428,18 @@
       !
       ALLOCATE(mt_rmt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
+      mt_rmt(:) = - one
+      !
       ALLOCATE(lrmt_fixed(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating lrmt_fixed', 1)
-      !
-      mt_rmt(:) = - one
       lrmt_fixed(:) = .FALSE.
+      !
+      ALLOCATE(iatmt(natoms), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, 'Error allocating iatmt', 1)
+      iatmt(:) = -1
+      !
+      ! set default rmt and get sorted atomic indices
+      CALL set_init_rmt_and_iatmt(natoms, rmt_method, rmt, iatmt)
       !
       IF (.NOT. lrmt) THEN
         !
@@ -458,6 +467,7 @@
           TRIM(rmt_method) == "pseudotouching") THEN
           !
           ! based on the nearest-neighbor distances
+          ! atomic order does not matter here
           !
           DO iat = 1, natoms
             !
@@ -467,21 +477,14 @@
               rmt_d_iat_nn = zero
               !
               IF (TRIM(rmt_method) == "neighbor" .OR. &
-                TRIM(rmt_method) == "touching") THEN
-                !
-                ! this symmetry type
-                rmt_d_iat = rmt_default(st_name(ist_i(iat)))
-                ! its nearest neighbor symmetry type
-                rmt_d_iat_nn = &
-                  rmt_default(st_name(ist_i(jat)))
-                !
-              ELSE IF (TRIM(rmt_method) == "pseudoneighbor" .OR. &
+                TRIM(rmt_method) == "touching" .OR. &
+                TRIM(rmt_method) == "pseudoneighbor" .OR. &
                 TRIM(rmt_method) == "pseudotouching") THEN
                 !
                 ! this atom
-                rmt_d_iat = MAXVAL(upf(ityp(iat))%rcut(:))
+                rmt_d_iat = rmt(iat)
                 ! another atom
-                rmt_d_iat_nn = MAXVAL(upf(ityp(jat))%rcut(:))
+                rmt_d_iat_nn = rmt(jat)
                 !
               ELSE
                 WRITE(stdout, '(/5x, "rmt_method: ", A)') TRIM(rmt_method)
@@ -568,19 +571,20 @@
             !
             ! if sym types of some atoms are not fixed,
             ! try to increase them
+            ! note: iat atomic order does matter here
             !
             DO iat = 1, natoms
               !
-              IF (.NOT. lrmt_fixed(ist_i(iat))) THEN
+              IF (.NOT. lrmt_fixed(ist_i(iatmt(iat)))) THEN
                 !
                 rtmp = - one
                 !
                 DO jat = 1, natoms
                   !
-                  IF (ist_i(jat) == ist_i(iat)) THEN
-                    rtmp2 = half * nr_dist(jat, iat)
+                  IF (ist_i(jat) == ist_i(iatmt(iat))) THEN
+                    rtmp2 = half * nr_dist(jat, iatmt(iat))
                   ELSE
-                    rtmp2 = nr_dist(jat, iat) - mt_rmt(ist_i(jat))
+                    rtmp2 = nr_dist(jat, iatmt(iat)) - mt_rmt(ist_i(jat))
                   END IF
                   !
                   IF ( (((rtmp > zero) .AND. (rtmp2 < rtmp)) .OR. &
@@ -590,11 +594,11 @@
                   !
                 END DO ! jat
                 !
-                IF ((rtmp > zero) .AND. (rtmp > mt_rmt(ist_i(iat)))) THEN
-                  mt_rmt(ist_i(iat)) = rtmp
+                IF ((rtmp > zero) .AND. (rtmp > mt_rmt(ist_i(iatmt(iat))))) THEN
+                  mt_rmt(ist_i(iatmt(iat))) = rtmp
                 END IF
                 !
-                lrmt_fixed(ist_i(iat)) = .TRUE.
+                lrmt_fixed(ist_i(iatmt(iat))) = .TRUE.
                 !
                 !
               END IF
@@ -646,8 +650,118 @@
       IF (ierr /= 0) &
         CALL errore(routine_name, 'Error deallocating lrmt_fixed', 1)
       !
+      DEALLOCATE(iatmt, STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, 'Error deallocating iatmt', 1)
+      !
     !---------------------------------------------------------------------------
     END SUBROUTINE set_rmt
+    !---------------------------------------------------------------------------
+    !
+    !
+    !---------------------------------------------------------------------------
+    SUBROUTINE set_init_rmt_and_iatmt(natoms, rmt_method, rmt, iatmt)
+    !---------------------------------------------------------------------------
+    !!
+    !! Set atomic indices sorted according to their MT radii, in descending
+    !! order, based on the selected MT method
+    !!
+    !
+    !  D. Radevych
+    !
+      USE io_global, ONLY: stdout
+      USE uspp_param, ONLY: upf
+      USE ions_base, ONLY: ityp
+      !
+      IMPLICIT NONE
+      !
+      EXTERNAL :: errore
+      !
+      ! input
+      INTEGER, INTENT(in) :: natoms
+      !! number of atoms
+      CHARACTER(LEN = 128), INTENT(in) :: rmt_method
+      !! MT method
+      !
+      ! inout
+      REAL(DP), INTENT(inout) :: rmt(natoms)
+      !! initial array of MT radii
+      !
+      ! output
+      INTEGER, INTENT(out) :: iatmt(natoms)
+      !! array of sorted atomic indices
+      !
+      ! local
+      CHARACTER(LEN = 128) :: routine_name
+      !! name of this subroutine
+      INTEGER :: iat, jat
+      !! iterator over atoms
+      INTEGER :: itmp
+      !! temporary integer
+      !
+      routine_name = "set_init_rmt_and_iatmt"
+      !
+      WRITE(stdout, '(/5x, A)') &
+        "Sorting atomic indices according to their default MT radii..."
+      !
+      ! original order
+      !
+      DO iat = 1, natoms
+        iatmt(iat) = iat
+      END DO ! iat
+      !
+      ! MT assignment
+      !
+      IF (.NOT. lrmt) THEN
+        !
+        ! WRITE(stdout, '(5x, "rmt_method = ", A)') TRIM(rmt_method)
+        !
+        IF (TRIM(rmt_method) == "default" .OR. &
+          TRIM(rmt_method) == "touching" .OR. &
+          TRIM(rmt_method) == "neighbor") THEN
+          DO iat = 1, natoms
+            rmt(iat) = rmt_default(upf(ityp(iat))%psd)
+          END DO ! iat
+        ELSE IF (TRIM(rmt_method) == "pseudo" .OR. &
+          TRIM(rmt_method) == "pseudotouching" .OR. &
+          TRIM(rmt_method) == "pseudoneighbor") THEN
+          DO iat = 1, natoms
+            rmt(iat) = MAXVAL(upf(ityp(iat))%rcut(:))
+          END DO ! iat
+        ELSE
+          CALL errore(routine_name, &
+            "Check if rmt_method is spelled correctly.", 1)
+        END IF
+        !
+      END IF ! lrmt
+      !
+      WRITE(stdout, '(5x, A)') "Default MT radii: "
+      WRITE(stdout, '(5x, 10(1x, F0.4))') rmt(:)
+      !
+      ! sorting in the descending order
+      !
+      DO iat = 1, natoms - 1
+        DO jat = 1, natoms - iat
+          !
+          IF (rmt(iatmt(jat)) < rmt(iatmt(jat + 1))) THEN
+            itmp = iatmt(jat)
+            iatmt(jat) = iatmt(jat + 1)
+            iatmt(jat + 1) = itmp
+          END IF
+          !
+        END DO ! jat
+      END DO ! iat
+      !
+      WRITE(stdout, '(5x, A, A)') "Atomic indices sorted according to ", &
+        "their default MT radii,"
+      WRITE(stdout, '(5x, A)') "in the descending order: "
+      WRITE(stdout, '(5x, 10I4)') iatmt(:)
+      WRITE(stdout, '(5x, A)') &
+        "Done sorting atomic indices according to their default MT radii."
+      WRITE(stdout, '()')
+      !
+    !---------------------------------------------------------------------------
+    END SUBROUTINE set_init_rmt_and_iatmt
     !---------------------------------------------------------------------------
     !
     !
@@ -662,7 +776,7 @@
       !
       IMPLICIT NONE
       !
-      CHARACTER(len=256) :: routine_name
+      CHARACTER(LEN = 128) :: routine_name
       !! name of this subroutine
       INTEGER :: ist, iat
       !! iterators
@@ -682,6 +796,12 @@
       DO iat = 1, natoms
         WRITE(stdout, '(6x, "rmt(", I0, ") =  ", F0.16)') &
           iat, mt_rmt(ist_i(iat))
+      END DO ! iat
+      !
+      WRITE(stdout, '(5x, "Percent of the default MT radii:")')
+      DO iat = 1, natoms
+        WRITE(stdout, '(6x, "rmt(", I0, ") / r0 =  ", F0.1, A)') &
+          iat, mt_rmt(ist_i(iat)) / rmt(iat) * 100., "%"
       END DO ! iat
       !WRITE(stdout, '(/5x)')
       !
