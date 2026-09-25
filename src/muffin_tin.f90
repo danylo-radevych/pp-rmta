@@ -726,6 +726,8 @@
       INTEGER, INTENT(in) :: l
       !! angular momentum quantum number
       !
+      CHARACTER(len = 256) :: routine_name
+      !! name of this routine
       INTEGER :: ir
       !! iterator
       REAL(DP) :: al
@@ -742,13 +744,16 @@
       ro = r(1) / SQRT(amesh)
       sn = ro**(2 * l + 3) / (2 * l + 3)
       !
+      routine_name = "rmta_integrate_u2"
       !
-      IF (nr == 1) THEN
+      IF (nr < 1) THEN
+        CALL errore(routine_name, "nr < 0", 1)
+      ELSE IF (nr == 1) THEN
         ! Single-point estimation (asymptotic contribution + first grid point)
         sn = sn + 0.5_DP * al * r(1) * ur(1)**2
       ELSE IF (nr == 2) THEN
-        ! Two-point estimation using trapezoidal integration
-        sn = sn + 0.5_DP * al * (r(1) * ur(1)**2 + r(2) * ur(2)**2)
+        ! Two-point estimation using
+        sn = sn + al * (1.125_DP * r(1) * ur(1)**2 + 0.375_DP * r(2) * ur(2)**2)
       ELSE
         !
         ! Multi-point integration rule (requires nr >= 3)
