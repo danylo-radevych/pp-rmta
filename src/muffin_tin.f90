@@ -711,7 +711,8 @@
     !
     ! D. Radevych
     !
-      USE kinds, ONLY: DP
+      USE kinds, ONLY : DP
+      USE const, ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -747,7 +748,7 @@
       routine_name = "rmta_integrate_u2"
       !
       IF (nr < 1) THEN
-        CALL errore(routine_name, "nr < 0", 1)
+        rmta_integrate_u2 = zero
       ELSE IF (nr == 1) THEN
         ! Single-point estimation (asymptotic contribution + first grid point)
         sn = sn + 0.5_DP * al * r(1) * ur(1)**2
