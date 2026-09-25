@@ -430,7 +430,7 @@
       USE kinds, ONLY: DP
       USE uspp_param, ONLY: upf
       USE ions_base, ONLY: nat, ityp
-      USE mt_var, ONLY: luse_ref_pot, mt_nr, mt_r, nchis, nbetas
+      USE mt_var, ONLY: luse_ref_pot, mt_nr, mt_r, nchis, nbetas, norbs
       USE constants, ONLY: eps12, eps32
       USE const, ONLY: zero
       !
@@ -496,10 +496,17 @@
           ! read semilocal from upf
           !
           lmax = 0
-          DO ichi = 1, nchis(ict)
+          loop_ichi : DO ichi = 1, nchis(ict)
             l = rmta_get_lchi(ichi, ict)
+            !
+            IF (l + 1 > norbs) THEN
+              WRITE(stdout, '(/5x, "WARNING: g orbitals are not supported")')
+              EXIT loop_ichi
+            END IF
+            !
             IF (l > lmax) lmax = l
-          END DO
+            !
+          END DO loop_ichi
           ! WRITE(*, *) "lmax == ", lmax
           !
           DO iorb = 1, lmax + 1
@@ -519,10 +526,16 @@
           ! recover semilocal from non-local
           !
           lmax = 0
-          DO ichi = 1, nchis(ict)
+          loop_ichi2 : DO ichi = 1, nchis(ict)
             l = rmta_get_lchi(ichi, ict)
-            IF (l > lmax) lmax = l
-          END DO
+            !
+            IF (l + 1 > norbs) THEN
+              WRITE(stdout, '(/5x, "WARNING: g orbitals are not supported")')
+              EXIT loop_ichi2
+            END IF
+            !
+            IF ((l > lmax) .AND. (l + 1 <= norbs)) lmax = l
+          END DO loop_ichi2
           ! WRITE(*, *) "lmax == ", lmax
           !
           ! array with flags whether V_SL for particular l is already found
