@@ -67,7 +67,6 @@
     !
     !  D. Radevych
     !
-      USE kinds,             ONLY : DP
       ! USE ions_base,         ONLY : ityp ! tau
       ! USE scf,               ONLY : rho, v_of_0, vltot, vrs, v, kedtau
       ! USE gvect,             ONLY : gl, g ! ngl, mill, ecutrho
@@ -89,7 +88,6 @@
         vlocscrg3d, mt_g, vlocscfg3d, &
         rmta_ng, mt_nrf, mt_rf
       USE mt_printing, ONLY: check_upf
-      USE constants, ONLY: eps12
       !
       IMPLICIT NONE
       !
@@ -744,13 +742,25 @@
       ro = r(1) / SQRT(amesh)
       sn = ro**(2 * l + 3) / (2 * l + 3)
       !
-      DO ir = 1, nr - 3
-        sn = sn + al * r(ir) * ur(ir)**2
-      END DO
       !
-      sn = sn + al * (23.0_dp * r(nr - 2) * ur(nr - 2)**2 + &
-        28.0_dp * r(nr - 1) * ur(nr - 1)**2 + &
-        9.0_dp * r(nr) * ur(nr)**2) / 24.0_dp
+      IF (nr == 1) THEN
+        ! Single-point estimation (asymptotic contribution + first grid point)
+        sn = sn + 0.5_DP * al * r(1) * ur(1)**2
+      ELSE IF (nr == 2) THEN
+        ! Two-point estimation using trapezoidal integration
+        sn = sn + 0.5_DP * al * (r(1) * ur(1)**2 + r(2) * ur(2)**2)
+      ELSE
+        !
+        ! Multi-point integration rule (requires nr >= 3)
+        DO ir = 1, nr - 3
+          sn = sn + al * r(ir) * ur(ir)**2
+        END DO
+        !
+        sn = sn + al * (23.0_DP * r(nr - 2) * ur(nr - 2)**2 + &
+          28.0_DP * r(nr - 1) * ur(nr - 1)**2 + &
+          9.0_DP * r(nr) * ur(nr)**2) / 24.0_DP
+        !
+      END IF
       !
       rmta_integrate_u2 = sn
       !
@@ -785,7 +795,7 @@
       IF (ichi <= nchis(ict)) THEN
         l = upf(ict)%lchi(ichi)
       ELSE
-        l = 3 ! 4F
+        l = MAXVAL(upf(ict)%lchi(:)) + 1
       END IF
       !
       rmta_get_lchi = l
@@ -1371,7 +1381,6 @@
       USE kinds, ONLY: DP
       USE uspp_param, ONLY: upf
       USE io_global, ONLY : stdout
-      USE constants, ONLY : rytoev
       USE const, ONLY : bohr_to_ang
       USE ions_base, ONLY: ityp
       USE mt_var, ONLY: formulation, ldebug, &
@@ -1385,7 +1394,7 @@
         urf, dudrrf, &
         wrf, dudrmuorrf, loglrf
       USE sym_type, ONLY: ist_i
-      USE constants, ONLY: eps6, eps12
+      USE constants, ONLY : rytoev, eps12
       USE const, ONLY: zero, half, eps2
       !
       IMPLICIT NONE
@@ -1758,6 +1767,7 @@
       USE kinds,             ONLY: DP
       USE splinelib,         ONLY: spline, splint
       USE constants, ONLY: eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -1828,14 +1838,14 @@
         ELSE IF (xf(ix) >= xmax) THEN
           yf(ix) = y(xdim)
         ELSE
-          IF (yf(1) /= yf(1)) THEN
+          IF (IEEE_IS_NAN(yf(1))) THEN
             CALL errore(routine_name, 'yf(1) value is NAN', 1)
           END IF
           !
           yf(ix) = y(1)
         END IF
         !
-        IF (yf(ix) /= yf(ix)) THEN
+        IF (IEEE_IS_NAN(yf(ix))) THEN
           CALL errore(routine_name, 'yf value is NAN', 1)
         END IF
         !
@@ -1864,6 +1874,7 @@
       USE kinds, ONLY: DP
       USE splinelib, ONLY: spline, splint
       USE constants, ONLY: eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -1924,17 +1935,6 @@
       ! prepare spline
       CALL spline(x(1 : xdim), y(1 : xdim), startu, startd, d2y)
       !
-      ! IF ((xf <= xmax) .AND. (xf >= xmin)) THEN
-      !   yf = splint(x(1 : xdim), y(1 : xdim), d2y, xf)
-      ! ELSE IF (xf >= xmax) THEN
-      !   yf = y(xdim)
-      ! ELSE
-      !   IF (yf /= yf) THEN
-      !     CALL errore(routine_name, 'yf value is NAN', 1)
-      !   END IF
-      !   !
-      !   yf = y(1)
-      ! END IF
       !
       IF ((xf <= xmax) .AND. (xf >= xmin)) THEN
         yf = splint(x(1 : xdim), y(1 : xdim), d2y, xf)
@@ -1942,7 +1942,7 @@
         CALL errore(routine_name, "interpolation out of bounds", 1)
       END IF
       !
-      IF (yf /= yf) THEN
+      IF (IEEE_IS_NAN(yf)) THEN
         CALL errore(routine_name, 'yf value is NAN', 1)
       END IF
       !
@@ -1969,6 +1969,7 @@
       USE kinds, ONLY: DP
       USE splinelib, ONLY: spline, splint
       USE constants, ONLY: eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -2037,7 +2038,7 @@
         CALL errore(routine_name, "interpolation out of specified bounds", 1)
       END IF
       !
-      IF (yf /= yf) THEN
+      IF (IEEE_IS_NAN(yf)) THEN
         CALL errore(routine_name, 'yf value is NAN', 1)
       END IF
       !
