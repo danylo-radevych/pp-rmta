@@ -113,7 +113,7 @@
     LOGICAL :: luse_ref_pot
     !! use reference (AE) potential instead of PS
     LOGICAL :: lrmt_only
-    !! if true, stop as soon as possible after displaying MT radii
+    !! if true, stop as soon as possible after displaying the MT radii
     INTEGER :: mt_ngauss
     !! type of the delta-function
     INTEGER :: norbs
@@ -416,7 +416,7 @@
       INTEGER :: ist, iat, jat
       !! iterators
       INTEGER, ALLOCATABLE :: iatmt(:)
-    !! iat indices ordered according to their MT radii in descending order
+      !! iat indices ordered according to their MT radii in descending order
       REAL(DP) :: rtmp, rtmp2
       !! real temporary vars
       REAL(DP) :: rmt_d_iat, rmt_d_iat_nn

@@ -904,7 +904,6 @@
         'Error allocating psi_krtau_form2_aux', 1)
       psi_krtau_form2_aux(:, :, :) = czero
       !
-
       !
       DO iat = 1, nat
         !
@@ -1007,8 +1006,6 @@
               !
             END DO ! ik
             !
-            !
-
             !
             !
             WRITE(stdout, '(9x, "Done precomputing ", &
@@ -1715,7 +1712,7 @@
       !
       ! local variables
       !
-      CHARACTER(len = 256) :: routine_name
+      CHARACTER(len = 128) :: routine_name
       !! name of this subroutine
       LOGICAL :: lsym
       !! if .true., symmetrize the delta weights

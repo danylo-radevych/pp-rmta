@@ -183,7 +183,7 @@
       ! variables from input
       !
       IF (nrmt < 1) THEN
-        CALL errore(rmta_routine, "nrmt < 1 is invalid.", 1)
+        CALL errore(rmta_routine, "nrmt < 1 is invalid", 1)
       END IF
       !
       irf_delta = nrmt - 1 ! number of MT radii excluding the MT radius itself
