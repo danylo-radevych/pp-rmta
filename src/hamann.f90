@@ -251,129 +251,152 @@
     !
     !
     !---------------------------------------------------------------------------
-    SUBROUTINE hmn_vkboutwf(ll,nvkb,ep,vkb,evkb,rr,vloc,uu,up,node,mmax,mch)
+    SUBROUTINE hmn_vkboutwf(ll, nvkb, ep, vkb, evkb, rr, vloc, &
+      uu, up, node, mmax, mch)
     !---------------------------------------------------------------------------
     !!
     !! computes Vanderbilt / Kleinman-Bylander outward-integrated wave functions
     !!
-    !ll  angular momentum
-    !nvkb  switch for 1 or 2 projedtors
-    !ep  energy at which wave function is to be calculated
-    !vkb  Vanderbilt-Kleinman-Bylander projectors for this l
-    !evkb  projector coefficients
-    !rr  log radial mesh
-    !vloc  local pseudopotential
-    !uu  wave function
-    !up  1st derivative of uu
-    !node  count of number of nodes from 0 to rr(mch)
-    !mmax  dimension of log mesh
-    !mch  index of radius to which wave function is to be integrated
-
-    IMPLICIT NONE
-    INTEGER, PARAMETER :: dp=kind(1.0d0)
-
-    !Input variables
-    REAL(DP) :: rr(mmax),vloc(mmax),vkb(mmax,nvkb),evkb(nvkb)
-    REAL(DP) :: ep
-    INTEGER nvkb,ll,mmax,mch
-
-    !Output variables
-    REAL(DP) :: uu(mmax),up(mmax)
-    INTEGER node
-
-    !Local variables
-    REAL(DP), allocatable ::  phi(:,:), phip(:,:)
-    REAL(DP), allocatable ::  gg0(:), gg(:,:)
-    INTEGER, allocatable :: ipiv(:)
-
-    REAL(DP) :: rcut
-    INTEGER ii,jj,krc,ierr,info
-
-    EXTERNAL :: dgesv
-
-    uu(:)=0.0d0
-    up(:)=0.0d0
-
-    ! homogeneous solution
-    CALL hmn_lschps(ll,ierr,ep,rr,vloc,uu,up,mmax,mch)
-
-    ! default lower bound for node counting when nvkb==0
-    rcut=0.1d0
-
-    IF(nvkb/=0) THEN
-
-    ALLOCATE(phi(mmax,nvkb),phip(mmax,nvkb))
-    ALLOCATE(gg(nvkb,nvkb),gg0(nvkb))
-    ALLOCATE(ipiv(nvkb))
-
-    phi(:,:)=0.0d0
-    phip(:,:)=0.0d0
-    gg(:,:)=0.0d0
-    gg0(:)=0.0d0
-
-    ! inhomogeneous solutions
-    DO ii=1,nvkb
-    CALL hmn_lschkb(ll,ierr,ep,vkb(1,ii),rr,vloc,phi(1,ii),phip(1,ii),mmax,mch)
-    END DO
-
-
-    ! projector matrix elements and coefficient matrix
-    DO jj=1,nvkb
-    CALL hmn_vpinteg(uu,vkb(1,jj),mch,2*ll+2,gg0(jj),rr)
-    gg0(jj)=evkb(jj)*gg0(jj)
-    !    gg0(jj)=evkb(jj)*gg0(jj) / 2.0_dp ! DR
-    DO ii=1,nvkb
-    CALL hmn_vpinteg(phi(1,ii),vkb(1,jj),mch,2*ll+2,gg(jj,ii),rr)
-    gg(jj,ii)=-evkb(jj)*gg(jj,ii)
-    !     gg(jj,ii)=-evkb(jj)*gg(jj,ii) / 2.0_dp ! DR
-    END DO
-    gg(jj,jj)=1.0d0+gg(jj,jj)
-    END DO
-
-    ! solve linear equations for coefficients
-
-    !    SUBROUTINE DGESV( N, NRHS, A, LDA, IPIV, B, LDB, INFO )
-
-    CALL dgesv(nvkb, 1, gg, nvkb, ipiv, gg0, nvkb, info)
-    IF(info/=0) THEN
-    write(6,'(/a,i4)') 'vkboutwf: dgesv ERROR, stopping info =',info
-    STOP
-    END IF
-
-    ! output wave functions
-    DO jj=1,nvkb
-    uu(:)=uu(:)+gg0(jj)*phi(:,jj)
-    up(:)=up(:)+gg0(jj)*phip(:,jj)
-    END DO
-
-    DEALLOCATE(phi,phip)
-    DEALLOCATE(gg,gg0)
-    DEALLOCATE(ipiv)
-
-
-    ! rcut is lower cutoff for node counting to avoid small-r noise
-    ! this method of "finding" rc is cumbersome but it avoids a lot of re-coding
-    ! to simply pass rc or irc along.
-    krc = 0
-    DO ii=mch,1,-1
-    IF(dabs(vkb(ii,1))>0.0d0) THEN
-    krc=ii+1
-    exit
-    END IF
-    END DO
-    ! the constants below might need future adjustment
-    rcut=dmin1(0.5d0, 0.25d0*rr(krc))
-
-    END IF !nvkb>0
-
-    node=0
-    DO ii=6,mch
-    IF(rr(ii)>rcut .and. uu(ii-1)*uu(ii)<0.0d0) THEN
-    node=node+1
-    END IF
-    END DO
-
-    RETURN
+    ! ll  angular momentum
+    ! nvkb  switch for 1 or 2 projedtors
+    ! ep  energy at which wave function is to be calculated
+    ! vkb  Vanderbilt-Kleinman-Bylander projectors for this l
+    ! evkb  projector coefficients
+    ! rr  log radial mesh
+    ! vloc  local pseudopotential
+    ! uu  wave function
+    ! up  1st derivative of uu
+    ! node  count of number of nodes from 0 to rr(mch)
+    ! mmax  dimension of log mesh
+    ! mch  index of radius to which wave function is to be integrated
+      !
+      USE kinds, ONLY: DP
+      USE const, ONLY: zero, one
+      !
+      IMPLICIT NONE
+      !
+      ! Input variables
+      INTEGER, INTENT(in) :: nvkb, ll, mmax, mch
+      REAL(DP), INTENT(in) :: rr(mmax), vloc(mmax), vkb(mmax, nvkb), evkb(nvkb)
+      REAL(DP), INTENT(in) :: ep
+      !
+      ! Output variables
+      INTEGER, INTENT(out) :: node
+      REAL(DP), INTENT(out) :: uu(mmax), up(mmax)
+      !
+      ! Local variables
+      CHARACTER(len = 256) :: routine_name
+      !! name of this subroutine
+      INTEGER, allocatable :: ipiv(:)
+      INTEGER :: ii, jj, krc, info
+      INTEGER :: ierr
+      !! error code
+      REAL(DP) :: rcut
+      REAL(DP), allocatable ::  phi(:,:), phip(:,:)
+      REAL(DP), allocatable ::  gg0(:), gg(:,:)
+      !
+      EXTERNAL :: dgesv, errore
+      !
+      uu(:) = zero
+      up(:) = zero
+      !
+      ! homogeneous solution
+      CALL hmn_lschps(ll,ierr,ep,rr,vloc,uu,up,mmax,mch)
+      !
+      ! default lower bound for node counting when nvkb==0
+      rcut = 0.1_DP
+      !
+      IF(nvkb /= 0) THEN
+        !
+        ALLOCATE(phi(mmax,nvkb), STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating phi', 1)
+        phi(:, :) = zero
+        !
+        ALLOCATE(phip(mmax, nvkb), STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating phip', 1)
+        phip(:, :)= zero
+        !
+        ALLOCATE(gg(nvkb, nvkb), STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gg', 1)
+        gg(:, :) = zero
+        !
+        ALLOCATE(gg0(nvkb), STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating gg0', 1)
+        gg0(:) = zero
+        !
+        ALLOCATE(ipiv(nvkb), STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error allocating ipiv', 1)
+        !
+        ! inhomogeneous solutions
+        DO ii = 1, nvkb
+          CALL hmn_lschkb(ll, ierr, ep, vkb(1, ii), rr, vloc, phi(1, ii), &
+            phip(1, ii), mmax, mch)
+        END DO
+        !
+        ! projector matrix elements and coefficient matrix
+        DO jj = 1, nvkb
+          CALL hmn_vpinteg(uu, vkb(1, jj), mch, 2 * ll + 2, gg0(jj), rr)
+          gg0(jj) = evkb(jj) * gg0(jj)
+          ! gg0(jj) = evkb(jj) * gg0(jj) / 2.0_dp ! DR
+          DO ii = 1, nvkb
+            CALL hmn_vpinteg(phi(1, ii), vkb(1, jj), mch, 2 * ll + 2, gg(jj, ii), rr)
+            gg(jj,ii) =- evkb(jj) * gg(jj, ii)
+            ! gg(jj,ii) =- evkb(jj) * gg(jj,ii) / 2.0_dp ! DR
+          END DO
+          gg(jj, jj) = one + gg(jj, jj)
+        END DO
+        !
+        ! solve linear equations for coefficients
+        !
+        ! SUBROUTINE DGESV( N, NRHS, A, LDA, IPIV, B, LDB, INFO )
+        !
+        CALL dgesv(nvkb, 1, gg, nvkb, ipiv, gg0, nvkb, info)
+        IF(info /= 0) THEN
+          WRITE(6,'(/a,i4)') 'vkboutwf: dgesv ERROR, stopping info =',info
+          STOP
+        END IF
+        !
+        ! output wave functions
+        DO jj = 1, nvkb
+          uu(:) = uu(:) + gg0(jj) * phi(:, jj)
+          up(:) = up(:) + gg0(jj) * phip(:,jj)
+        END DO
+        !
+        DEALLOCATE(phi, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating phi', 1)
+        DEALLOCATE(phip, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating phip', 1)
+        DEALLOCATE(gg, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gg', 1)
+        DEALLOCATE(gg0, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating gg0', 1)
+        DEALLOCATE(ipiv, STAT = ierr)
+        IF (ierr /= 0) CALL errore(routine_name, 'Error deallocating ipiv', 1)
+        !
+        ! rcut is lower cutoff for node counting to avoid small-r noise
+        ! this method of "finding" rc is cumbersome but it avoids a lot of re-coding
+        ! to simply pass rc or irc along.
+        krc = 0
+        DO ii = mch, 1, -1
+          IF(dabs(vkb(ii, 1)) > zero) THEN
+            krc = ii + 1
+            EXIT
+          END IF
+        END DO
+        ! the constants below might need future adjustment
+        rcut = dmin1(0.5_DP, 0.25_DP * rr(krc))
+        !
+      END IF ! nvkb > 0
+      !
+      node = 0
+      DO ii = 6, mch
+        IF(rr(ii) > rcut .AND. uu(ii - 1) * uu(ii) < zero) THEN
+          node = node + 1
+        END IF
+      END DO
+      !
+      RETURN
+      !
     !---------------------------------------------------------------------------
     END SUBROUTINE hmn_vkboutwf
     !---------------------------------------------------------------------------
@@ -617,6 +640,7 @@
     !!
     !! integrals that go into construction of Vanderbilt separable pseudopotential
     !!
+      USE kinds, ONLY: DP
       !
       IMPLICIT NONE
       !
@@ -624,17 +648,17 @@
       ! integral on usual log mesh from 1 to nn
       !
       !Input variables
-      REAL(DP) :: gg(nn), hh(nn), rr(nn)
-      INTEGER :: nn, mm
+      INTEGER, INTENT(in) :: nn, mm
+      REAL(DP), INTENT(in) :: gg(nn), hh(nn), rr(nn)
       !
       !Output variable
-      REAL(DP) :: ss
+      REAL(DP), INTENT(out) :: ss
       !
       !Local variables
       REAL(DP) :: r0, amesh, al
       INTEGER :: ii
       !
-      al = 0.01d0 * LOG(rr(101) / rr(1))
+      al = 0.01_DP * LOG(rr(101) / rr(1))
       amesh = EXP(al)
       !
       r0 = rr(1) / SQRT(amesh)
@@ -644,9 +668,9 @@
       ss =  ss + al * gg(ii) * hh(ii) * rr(ii)
       END DO
       !
-      ss=ss + al * (23.d0 * rr(nn - 2) * gg(nn - 2) * hh(nn - 2) + &
-        28.d0 * rr(nn-1) * gg(nn - 1) * hh(nn - 1) + &
-        9.d0 * rr(nn) * gg(nn) * hh(nn)) / 24.d0
+      ss=ss + al * (23._DP * rr(nn - 2) * gg(nn - 2) * hh(nn - 2) + &
+        28._DP * rr(nn - 1) * gg(nn - 1) * hh(nn - 1) + &
+        9._DP * rr(nn) * gg(nn) * hh(nn)) / 24._DP
       !
       RETURN
       !
