@@ -562,9 +562,8 @@
     !  D. Radevych
     !
       USE io_global, ONLY: stdout
-      USE constants, ONLY: tpi, eps4, eps6, eps12, eps32
+      USE constants, ONLY: eps32
       USE cell_base, ONLY: tpiba, omega
-      USE parameters, ONLY: npk
       USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
       USE wvfct, ONLY: npwx, et, nbnd
       USE io_files, ONLY: restart_dir
@@ -1229,12 +1228,11 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY: stdout
-      USE constants, ONLY: tpi, eps32, eps6, eps4
-      USE symm_base, ONLY: nrot, irt, nosym
-      USE ions_base, ONLY: ityp
-      USE uspp_param, ONLY: upf
-      USE const, ONLY: zero, one, two
+      USE io_global,  ONLY : stdout
+      USE symm_base,  ONLY : nrot, irt, nosym
+      USE ions_base,  ONLY : ityp
+      USE uspp_param, ONLY : upf
+      USE const,      ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -1450,9 +1448,8 @@
     !  D. Radevych
     !
       USE io_global, ONLY: stdout
-      USE constants, ONLY: tpi, eps32, eps6, eps4
+      USE constants, ONLY: eps32
       USE const, ONLY: zero
-      USE parameters, ONLY: npk
       USE klist, ONLY: nkstot, wk
       USE wvfct, ONLY: et, nbnd
       USE io_files, ONLY: restart_dir
@@ -1979,7 +1976,7 @@
     !---------------------------------------------------------------------------
     !
       USE io_global,       ONLY : stdout, ionode
-      USE constants,       ONLY : eps6, eps12
+      USE constants,       ONLY : eps12
       USE const,           ONLY : one
       USE ieee_arithmetic, ONLY : IEEE_IS_FINITE
       !
