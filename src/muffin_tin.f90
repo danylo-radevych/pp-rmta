@@ -83,7 +83,7 @@
         rmta_set_vars, &
         natoms, nspins, &
         tau_cart, &
-        luse_ref_pot, &
+        luse_ref_pot, lrmt_only, &
         vlocscr00rf, vlocscf00rf, &
         vlocscrg3d, mt_g, vlocscfg3d, &
         rmta_ng, mt_nrf, mt_rf
@@ -112,6 +112,8 @@
       !
       ! RMTA vars
       CALL rmta_set_vars()
+      !
+      IF (lrmt_only) RETURN
       !
       ! check upf data
       CALL check_upf()
@@ -1076,42 +1078,42 @@
       !
       ! allocate u(r, e) and its derivatives
       !
-      ALLOCATE(urf(mt_nrf, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) CALL errore(routine_name, "Error allocating urf", 1)
-      urf(:, :, :, :) = zero
+      ! ALLOCATE(urf(mt_nrf, norbs, &
+      !   nspins, natoms), STAT = ierr)
+      ! IF (ierr /= 0) CALL errore(routine_name, "Error allocating urf", 1)
+      ! urf(:, :, :, :) = zero
       !
-      ALLOCATE(duderf(mt_nrf, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating duderf", 1)
-      duderf(:, :, :, :) = zero
+      ! ALLOCATE(duderf(mt_nrf, norbs, &
+      !   nspins, natoms), STAT = ierr)
+      ! IF (ierr /= 0) &
+      !   CALL errore(routine_name, "Error allocating duderf", 1)
+      ! duderf(:, :, :, :) = zero
       !
-      ALLOCATE(dudrrf(mt_nrf, norbs, &
-          nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating dudrrf", 1)
-      dudrrf(:, :, :, :) = zero
+      ! ALLOCATE(dudrrf(mt_nrf, norbs, &
+      !     nspins, natoms), STAT = ierr)
+      ! IF (ierr /= 0) &
+      !   CALL errore(routine_name, "Error allocating dudrrf", 1)
+      ! dudrrf(:, :, :, :) = zero
       !
-      ALLOCATE(d2udrderf(mt_nrf, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating d2udrderf", 1)
-      d2udrderf(:, :, :, :) = zero
+      ! ALLOCATE(d2udrderf(mt_nrf, norbs, &
+      !   nspins, natoms), STAT = ierr)
+      ! IF (ierr /= 0) &
+      !   CALL errore(routine_name, "Error allocating d2udrderf", 1)
+      ! d2udrderf(:, :, :, :) = zero
       !
-      ALLOCATE(vfullrf(mt_nrf, norbs, &
-        nspins, natoms), STAT = ierr)
-      IF (ierr /= 0) &
-        CALL errore(routine_name, "Error allocating vfullrf", 1)
-      vfullrf(:, :, :, :) = zero
+      ! ALLOCATE(vfullrf(mt_nrf, norbs, &
+      !   nspins, natoms), STAT = ierr)
+      ! IF (ierr /= 0) &
+      !   CALL errore(routine_name, "Error allocating vfullrf", 1)
+      ! vfullrf(:, :, :, :) = zero
       !
-      IF (lwrite_dat) THEN
-        ALLOCATE(rvfullrf(mt_nrf, norbs, &
-          nspins, natoms), STAT = ierr)
-        IF (ierr /= 0) &
-          CALL errore(routine_name, "Error allocating rvfullrf", 1)
-        rvfullrf(:, :, :, :) = zero
-      END IF
+      ! IF (lwrite_dat) THEN
+      !   ALLOCATE(rvfullrf(mt_nrf, norbs, &
+      !     nspins, natoms), STAT = ierr)
+      !   IF (ierr /= 0) &
+      !     CALL errore(routine_name, "Error allocating rvfullrf", 1)
+      !   rvfullrf(:, :, :, :) = zero
+      ! END IF
       !
       IF (lint_to_rmt) THEN
         nin = irf_max

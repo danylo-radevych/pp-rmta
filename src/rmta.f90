@@ -62,7 +62,7 @@
       rmta_code, rmta_routine, & ! variables
       atomic_type, lsemiloc, lhybrid, &
       lnonlocal, &
-      lwrite_dat, mt_ngauss, mt_degauss, &
+      lrmt_only, lwrite_dat, mt_ngauss, mt_degauss, &
       irf_delta, lrmt, &
       ltetra, ldense_r_grid, &
       rmt, rmt_method
@@ -99,7 +99,7 @@
     !! error messages
     !
     NAMELIST / rmta / outdir, prefix, &
-      rmt, lwrite_dat, ngauss, degauss, &
+      rmt, lrmt_only, lwrite_dat, ngauss, degauss, &
       nrmt, lrmt, rmt, ltetra, lhybrid, rmt_method, &
       ldebug, igp_lmax, formulation
     !
@@ -109,6 +109,7 @@
     lmpi_single_rank = .TRUE. ! error if multiple ranks
     !
     formulation = "default"
+    lrmt_only = .FALSE.
     lwrite_dat = .FALSE.
     lrmt = .FALSE.
     igp_lmax = 10 ! if 0, use automatic norb - 1
@@ -209,6 +210,7 @@
     CALL mp_bcast(lrmt, ionode_id, intra_image_comm)
     CALL mp_bcast(rmt_method, ionode_id, intra_image_comm)
     CALL mp_bcast(rmt, ionode_id, intra_image_comm)
+    CALL mp_bcast(lrmt_only, ionode_id, intra_image_comm)
     CALL mp_bcast(lwrite_dat, ionode_id, intra_image_comm)
     CALL mp_bcast(mt_ngauss, ionode_id, intra_image_comm)
     CALL mp_bcast(mt_degauss, ionode_id, intra_image_comm)
@@ -235,7 +237,7 @@
     ! are needed in the input of "tetrahedra"
     !
     !
-    IF (ltetra) THEN
+    IF (ltetra .AND. .NOT. lrmt_only) THEN
       !
       IF (nk1 * nk2 * nk3 == 0) THEN
         CALL errore(program_name, &
@@ -262,13 +264,17 @@
     ! init RMTA
     CALL rmta_init()
     !
-    ! compute RMTA
-    CALL rmta_compute()
-    !
-    !
-    IF (ionode .AND. lwrite_dat) THEN
-      ! print RMTA quantities
-      CALL rmta_write()
+    IF (.NOT. lrmt_only) THEN
+      !
+      ! compute RMTA
+      CALL rmta_compute()
+      !
+      !
+      IF (ionode .AND. lwrite_dat) THEN
+        ! print RMTA quantities
+        CALL rmta_write()
+      END IF
+      !
     END IF
     !
     ! deallocate rmta-specific arrays

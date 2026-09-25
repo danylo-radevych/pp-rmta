@@ -62,7 +62,7 @@
       atomic_type, &
       lsemiloc, lsemilocupf, &
       lhybrid, lnonlocal, &
-      lwrite_dat, &
+      lrmt_only, lwrite_dat, &
       mt_ngauss, mt_degauss, &
       mt_rab, &
       nchis, chi_label, &
@@ -79,25 +79,25 @@
     INTEGER, PARAMETER :: natmax = 256
     !! max number of atoms
     !
-    CHARACTER(LEN=12), SAVE :: rmta_code = 'RMTA'
+    CHARACTER(LEN = 12), SAVE :: rmta_code = 'RMTA'
     !! Name of the code
-    CHARACTER(LEN=12), SAVE :: rmta_routine = 'rmta'
+    CHARACTER(LEN = 12), SAVE :: rmta_routine = 'rmta'
     !! Name of the code (short)
-    CHARACTER(LEN=256) :: formulation
+    CHARACTER(LEN = 256) :: formulation
     !! methodology used
     CHARACTER(len = 256) :: atomic_type
     !! TODO: obsolete
-    CHARACTER(LEN=128) :: rmt_method
+    CHARACTER(LEN = 128) :: rmt_method
     !! Method for the selection of MT radii
-    CHARACTER(LEN=1), ALLOCATABLE :: orb_label(:)
+    CHARACTER(LEN = 1), ALLOCATABLE :: orb_label(:)
     !! orbital labels
-    CHARACTER(LEN=5), ALLOCATABLE :: mll1rf_label(:, :, :)
+    CHARACTER(LEN = 5), ALLOCATABLE :: mll1rf_label(:, :, :)
     !! mll1rf_label(norbs, nspins, natoms)
     !! labels for mll1rf
-    CHARACTER(LEN=2), ALLOCATABLE :: beta_label(:, :)
+    CHARACTER(LEN = 2), ALLOCATABLE :: beta_label(:, :)
     !! beta_label(nbetas(n_chem_types), n_chem_types)
     !! label of beta(r) for each atomic wfc and type
-    CHARACTER(LEN=2), ALLOCATABLE :: chi_label(:, :)
+    CHARACTER(LEN = 2), ALLOCATABLE :: chi_label(:, :)
     !! chi_label(nchis(n_chem_types), n_chem_types)
     !! label of chi(r) for each atomic wfc and type
     LOGICAL :: ldebug
@@ -112,6 +112,8 @@
     !! use nonlocal operator V_{NL}(r, r')
     LOGICAL :: luse_ref_pot
     !! use reference (AE) potential instead of PS
+    LOGICAL :: lrmt_only
+    !! if true, stop as soon as possible after displaying MT radii
     INTEGER :: mt_ngauss
     !! type of the delta-function
     INTEGER :: norbs
@@ -1470,6 +1472,45 @@
       !
       !
       ! allocate other arrays
+      !
+      ! allocate u(r, e) and its derivatives
+      !
+      ALLOCATE(urf(mt_nrf, norbs, &
+        nspins, natoms), STAT = ierr)
+      IF (ierr /= 0) CALL errore(routine_name, "Error allocating urf", 1)
+      urf(:, :, :, :) = zero
+      !
+      ALLOCATE(duderf(mt_nrf, norbs, &
+        nspins, natoms), STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, "Error allocating duderf", 1)
+      duderf(:, :, :, :) = zero
+      !
+      ALLOCATE(dudrrf(mt_nrf, norbs, &
+          nspins, natoms), STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, "Error allocating dudrrf", 1)
+      dudrrf(:, :, :, :) = zero
+      !
+      ALLOCATE(d2udrderf(mt_nrf, norbs, &
+        nspins, natoms), STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, "Error allocating d2udrderf", 1)
+      d2udrderf(:, :, :, :) = zero
+      !
+      ALLOCATE(vfullrf(mt_nrf, norbs, &
+        nspins, natoms), STAT = ierr)
+      IF (ierr /= 0) &
+        CALL errore(routine_name, "Error allocating vfullrf", 1)
+      vfullrf(:, :, :, :) = zero
+      !
+      IF (lwrite_dat) THEN
+        ALLOCATE(rvfullrf(mt_nrf, norbs, &
+          nspins, natoms), STAT = ierr)
+        IF (ierr /= 0) &
+          CALL errore(routine_name, "Error allocating rvfullrf", 1)
+        rvfullrf(:, :, :, :) = zero
+      END IF
       !
       ALLOCATE(urmax(norbs, nspins, natoms), &
         STAT = ierr)
