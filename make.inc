@@ -1,7 +1,7 @@
-## gfortran
+# gfortran
 #export QE_ROOT=$(HOME)/install/qef-gnu
-#export OPTFLAGS = -Wall
+#export OPTFLAGS = -Wall # -Wextra -Wpedantic -Wsurprising
 
 # intel
 export QE_ROOT=$(HOME)/install/qef-dr
-export OPTFLAGS = -warn all
+export OPTFLAGS = -warn all # -check all -g -traceback -check bounds -O0
