@@ -1285,7 +1285,7 @@
       USE io_global, ONLY: stdout
       USE ions_base, ONLY: ityp
       USE uspp_param, ONLY: upf
-      USE constants, ONLY: rytoev, eps6, eps12
+      USE constants, ONLY: rytoev
       USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
       USE mt_var, ONLY: formulation, natoms, norbs, orb_label, &
         nspins, fermi_energy, &
@@ -1900,15 +1900,15 @@
         WRITE(stdout, '(7x, "type: ", A)') upf(ict)%typ
         WRITE(stdout, '(7x, "functional: ", A)') upf(ict)%dft
         WRITE(stdout, '(7x, "relativistic: ", A)') upf(ict)%rel
-        WRITE(stdout, '(7x, "is_ultrasoft: ", L)') upf(ict)%tvanp
-        WRITE(stdout, '(7x, "is_paw: ", L)') upf(ict)%tpawp
-        WRITE(stdout, '(7x, "is_coulomb: ", L)') upf(ict)%tcoulombp
-        WRITE(stdout, '(7x, "has_so: ", L)') upf(ict)%has_so
-        WRITE(stdout, '(7x, "has_wfc: ", L)') upf(ict)%has_wfc
-        WRITE(stdout, '(7x, "has_gipaw: ", L)') upf(ict)%has_gipaw
-        WRITE(stdout, '(7x, "paw_as_gipaw: ", L)') upf(ict)%paw_as_gipaw
-        WRITE(stdout, '(7x, "core_correction: ", L)') upf(ict)%nlcc
-        WRITE(stdout, '(7x, "with_metagga_info: ", L)') &
+        WRITE(stdout, '(7x, "is_ultrasoft: ", L1)') upf(ict)%tvanp
+        WRITE(stdout, '(7x, "is_paw: ", L1)') upf(ict)%tpawp
+        WRITE(stdout, '(7x, "is_coulomb: ", L1)') upf(ict)%tcoulombp
+        WRITE(stdout, '(7x, "has_so: ", L1)') upf(ict)%has_so
+        WRITE(stdout, '(7x, "has_wfc: ", L1)') upf(ict)%has_wfc
+        WRITE(stdout, '(7x, "has_gipaw: ", L1)') upf(ict)%has_gipaw
+        WRITE(stdout, '(7x, "paw_as_gipaw: ", L1)') upf(ict)%paw_as_gipaw
+        WRITE(stdout, '(7x, "core_correction: ", L1)') upf(ict)%nlcc
+        WRITE(stdout, '(7x, "with_metagga_info: ", L1)') &
           upf(ict)%with_metagga_info
         WRITE(stdout, '(7x, "total_psenergy: ", F0.16)') upf(ict)%etotps
         WRITE(stdout, '(7x, "wfc_cutoff: ", F10.6)') upf(ict)%ecutwfc
