@@ -255,7 +255,6 @@ cat > ${NAME}.in << EOF
 /
 EOF
 $EXEC -n 1 $PPRMTA_ROOT/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
-# $EXEC -n 1 ~/install/rmta-qe/bin/rmta.x < $NAME.in > $OUT_DIR/$NAME.out
 
 $ECHO "$SUFFIX is done"
 
