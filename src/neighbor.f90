@@ -63,7 +63,7 @@
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, alat ! bg, omega
       USE const, ONLY: bohr_to_ang, one, zero
-      USE constants, ONLY: eps6, eps12
+      USE constants, ONLY: eps6
       !
       IMPLICIT NONE
       !
@@ -137,7 +137,7 @@
                 tmp_dist = SQRT(tmp_dist)
                 !
                 IF (((jat_dist < zero) .OR. &
-                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps12)) THEN
+                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps6)) THEN
                   jat_dist = tmp_dist
                 END IF
                 !
@@ -198,7 +198,7 @@
                 tmp_dist = SQRT(tmp_dist)
                 !
                 IF (((jat_dist < 0._dp) .OR. &
-                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps12)) THEN
+                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps6)) THEN
                   jat_dist = tmp_dist
                 END IF
                 !
