@@ -62,7 +62,7 @@
       USE ions_base, ONLY: nat, tau, ityp
       USE uspp_param, ONLY: upf
       USE cell_base, ONLY: at, alat ! bg, omega
-      USE const, ONLY: bohr_to_ang, one, zero
+      USE const, ONLY: bohr_to_ang, zero, one
       USE constants, ONLY: eps6
       !
       IMPLICIT NONE
@@ -200,7 +200,7 @@
                 !
                 tmp_dist = SQRT(tmp_dist)
                 !
-                IF (((jat_dist < 0._dp) .OR. &
+                IF (((jat_dist < zero) .OR. &
                   (tmp_dist < jat_dist)) .AND. (tmp_dist > dtol)) THEN
                   jat_dist = tmp_dist
                 END IF

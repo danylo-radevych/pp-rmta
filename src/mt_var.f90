@@ -413,10 +413,14 @@
       !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
       !! error code
-      INTEGER :: ist, iat, jat
+      INTEGER :: ist, iat, jat, kat
       !! iterators
       INTEGER, ALLOCATABLE :: iatmt(:)
       !! iat indices ordered according to their MT radii in descending order
+      REAL(DP) :: dtol
+      !! tolerance for the distance
+      REAL(DP) :: dist_diff
+      !! distance difference
       REAL(DP) :: rtmp, rtmp2
       !! real temporary vars
       REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
@@ -425,6 +429,8 @@
       EXTERNAL :: errore
       !
       routine_name = "set_rmt"
+      !
+      dtol = eps6
       !
       ALLOCATE(mt_rmt(nst), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating mt_rmt', 1)
@@ -548,6 +554,10 @@
               WRITE(stdout, '(/5x, "Current MT radii before touching is ", &
                 & "enforced:")')
               CALL print_rmt()
+              WRITE(stdout, &
+                '(/5x, "Performing safety checks for the MT radii...")')
+              CALL check_rmt()
+              WRITE(stdout, '(5x, "Done safety checks for the MT radii.")')
             END IF
             !
             ! check if some spheres touch already
@@ -557,8 +567,10 @@
               !
               DO jat = 1, natoms
                 !
-                IF (ABS(mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
-                  nr_dist(jat, iat)) < eps6) THEN
+                dist_diff = mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+                  nr_dist(jat, iat)
+                !
+                IF (- dtol < dist_diff .AND. dist_diff < zero) THEN
                   !
                   lrmt_fixed(ist_i(iat)) = .TRUE.
                   lrmt_fixed(ist_i(jat)) = .TRUE.
@@ -579,22 +591,30 @@
                 !
                 rtmp = - one
                 !
-                DO jat = 1, natoms
+                DO kat = 1, natoms
                   !
-                  IF (ist_i(jat) == ist_i(iatmt(iat))) THEN
-                    rtmp2 = half * nr_dist(jat, iatmt(iat))
-                  ELSE
-                    rtmp2 = nr_dist(jat, iatmt(iat)) - mt_rmt(ist_i(jat))
-                  END IF
+                  ! all members of this symmetry type
+                  IF (ist_i(kat) /= ist_i(iatmt(iat))) CYCLE
                   !
-                  IF ( (((rtmp > zero) .AND. (rtmp2 < rtmp)) .OR. &
-                    (rtmp < zero)) .AND. (rtmp2 > zero) ) THEN
-                    rtmp = rtmp2
-                  END IF
+                  DO jat = 1, natoms
+                    !
+                    IF (ist_i(jat) == ist_i(kat)) THEN
+                      rtmp2 = half * nr_dist(jat, kat)
+                    ELSE
+                      rtmp2 = nr_dist(jat, kat) &
+                        - mt_rmt(ist_i(jat))
+                    END IF
+                    !
+                    IF ( ( ((rtmp > zero) .AND. (rtmp2 < rtmp)) .OR. &
+                      (rtmp <= zero) ) .AND. (rtmp2 > dtol) ) THEN
+                      rtmp = rtmp2
+                    END IF
+                    !
+                  END DO ! jat
                   !
-                END DO ! jat
+                END DO ! kat
                 !
-                IF ((rtmp > zero) .AND. (rtmp > mt_rmt(ist_i(iatmt(iat))))) THEN
+                IF ((rtmp > dtol) .AND. (rtmp > mt_rmt(ist_i(iatmt(iat))))) THEN
                   mt_rmt(ist_i(iatmt(iat))) = rtmp
                 END IF
                 !
@@ -821,21 +841,28 @@
       USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
       USE constants, ONLY: eps6
       USE uspp_param, ONLY: upf
+      USE const, ONLY: zero, four
       !
       IMPLICIT NONE
       !
       EXTERNAL :: errore
       !
-      CHARACTER(len=256) :: routine_name
+      CHARACTER(LEN = 256) :: routine_name
       !! name of this subroutine
       INTEGER :: ist, iat, jat, inn
       !! iterators
+      REAL(DP) :: dtol
+      !! distance tolerance
+      REAL(DP) :: dist_diff
+      !! distance difference
       !
       routine_name = "check_rmt"
       !
+      dtol = eps6
+      !
       DO ist = 1, nst
         !
-        IF (mt_rmt(ist) < 0._dp) THEN
+        IF (mt_rmt(ist) < zero) THEN
           !
           WRITE(stdout, '(6x, "MT radius for the type ", I0, &
             & " is not defined")') ist
@@ -859,15 +886,18 @@
         !
         DO inn = 1, nneighbors(iat)
           !
-          IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
-            nn_dist(iat)) > eps6) THEN
+          dist_diff = mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
+            nn_dist(iat)
+          !
+          IF (dist_diff > four * dtol) THEN
             !
             WRITE(stdout, '(/5x, "Neighboring spheres ", I0, " and ", &
               & I0, " overlap:")') &
               iat, inn_i(inn, iat)
-            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", &
-              & F0.16)') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(inn, iat))), nn_dist(iat)
+            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " - ", &
+              & F0.16, " = ", F0.16)') &
+              mt_rmt(ist_i(iat)), mt_rmt(ist_i(inn_i(inn, iat))), &
+              nn_dist(iat), dist_diff
             CALL errore(routine_name, "Error for overlapping spheres", 1)
             !
           END IF
@@ -882,15 +912,18 @@
         !
         DO jat = 1, natoms
           !
-          IF ((mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
-            nr_dist(jat, iat)) > eps6) THEN
+          dist_diff = mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
+            nr_dist(jat, iat)
+          !
+          IF (dist_diff > four * dtol) THEN
             !
             WRITE(stdout, '(/5x, "Replica spheres ", I0, " and ", &
               & I0, " overlap:")') &
               iat, inn_i(jat, iat)
-            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " > ", &
-              & F0.16)') &
-              mt_rmt(ist_i(iat)), mt_rmt(ist_i(jat)), nr_dist(jat, iat)
+            WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " - ", &
+              & F0.16, " = ", F0.16)') &
+              mt_rmt(ist_i(iat)), mt_rmt(ist_i(jat)), &
+              nr_dist(jat, iat), dist_diff
             CALL errore(routine_name, "Error for overlapping spheres", 1)
             !
           END IF
