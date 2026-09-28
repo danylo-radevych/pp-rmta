@@ -77,6 +77,8 @@
       !! iterators
       INTEGER :: nc_max
       !! maximum index of the supercell
+      REAL(DP) :: dtol
+      !! tolerance for the distance
       REAL(DP) :: jat_dist
       !! current distance to atom jat
       REAL(DP) :: tmp_dist
@@ -91,6 +93,7 @@
       ! checking only translational vectors going to neighboring cells
       !
       nc_max = 3
+      dtol = eps6
       !
       ALLOCATE(nneighbors(nat), STAT = ierr)
       IF (ierr /= 0) CALL errore(routine_name, 'Error allocating nneighbors', 1)
@@ -137,12 +140,12 @@
                 tmp_dist = SQRT(tmp_dist)
                 !
                 IF (((jat_dist < zero) .OR. &
-                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps6)) THEN
+                  (tmp_dist < jat_dist)) .AND. (tmp_dist > dtol)) THEN
                   jat_dist = tmp_dist
                 END IF
                 !
                 IF (((tmp_dist < nr_dist(jat, iat)) .OR. &
-                  (nr_dist(jat, iat) < zero)) .AND. (tmp_dist > eps6)) &
+                  (nr_dist(jat, iat) < zero)) .AND. (tmp_dist > dtol)) &
                   nr_dist(jat, iat) = tmp_dist
                 !
               END DO ! nc1
@@ -198,7 +201,7 @@
                 tmp_dist = SQRT(tmp_dist)
                 !
                 IF (((jat_dist < 0._dp) .OR. &
-                  (tmp_dist < jat_dist)) .AND. (tmp_dist > eps6)) THEN
+                  (tmp_dist < jat_dist)) .AND. (tmp_dist > dtol)) THEN
                   jat_dist = tmp_dist
                 END IF
                 !
@@ -207,7 +210,7 @@
           END DO ! nc3
           !
           IF ((nn_dist(iat) >= zero) .AND. &
-            (ABS(jat_dist - nn_dist(iat)) < eps6)) THEN
+            (ABS(jat_dist - nn_dist(iat)) < dtol)) THEN
             nneighbors(iat) = nneighbors(iat) + 1
             inn_i(nneighbors(iat), iat) = jat
           END IF
