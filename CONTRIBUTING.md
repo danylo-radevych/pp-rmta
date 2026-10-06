@@ -2,7 +2,7 @@ This is a personal educational project aiming at learning physics
 and programming and producing maintainable software that delivers 
 predictable results.
 
-External contributions that are written mostly (95%+) and
+External contributions that are written mostly (90%+) and
 verified completely (100%) by real people and that follow the overall
 style of the package and contain clear declarations, algorithms,
 comments, and good ideas are welcome.
