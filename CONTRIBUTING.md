@@ -1,8 +1,9 @@
 This is a personal educational project aiming at learning physics
-and producing maintainable software delivering predictable results.
+and programming and producing maintainable software that delivers 
+predictable results.
 
 External contributions that are written mostly (95%+) and
-verified completely (100%) by real people; that follow the overall
+verified completely (100%) by real people and that follow the overall
 style of the package and contain clear declarations, algorithms,
 comments, and good ideas are welcome.
 
