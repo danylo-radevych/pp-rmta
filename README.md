@@ -20,7 +20,14 @@ phonon-mediated superconductors*,
 ---
 
 ## Installation
-- Compile [Quantum ESPRESSO (QE)](https://gitlab.com/QEF/q-e.git) in the corresponding `QE_ROOT` folder with:
+
+PP-RMTA links to an existing compiled [Quantum ESPRESSO (QE)](https://gitlab.com/QEF/q-e.git)
+installation (`QE_ROOT`), which can be built with either `make` or CMake.
+Use the PP-RMTA build that matches how QE was built.
+
+### Option 1: QE built with `configure` + `make`
+
+- Compile QE in the `QE_ROOT` folder:
 
 ```
 ./configure [OPTIONS]
@@ -33,6 +40,30 @@ make install
 ```
 make all
 ```
+
+### Option 2: QE built with CMake
+
+- Build and **install** QE (the installed folder, not the build folder, is used):
+
+```
+cd $QE_SRC
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$QE_ROOT [OPTIONS]
+cmake --build build -j
+cmake --install build
+```
+
+- In the `PPRMTA_ROOT` root folder of the present code, 
+run (with the same compilers as for QE):
+
+```
+FC=mpiifx CC=mpiicx cmake -S . -B build -DQE_ROOT=$QE_ROOT
+cmake --build build -j
+```
+
+The QE configuration is read from the installation. 
+For dependencies in non-standard locations, add `-DCMAKE_PREFIX_PATH=<path>`.
+
+In both cases the executable is `$PPRMTA_ROOT/bin/rmta.x`.
 
 ## Workflow
 
