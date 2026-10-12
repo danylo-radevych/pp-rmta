@@ -4,7 +4,8 @@ predictable results.
 
 External contributions that are written mostly (90%+) and
 verified completely (100%) by real people and that follow the overall
-style of the package and contain clear declarations, algorithms,
+style of the package, do not indtroduce new dependencies,
+and contain clear declarations, algorithms,
 comments, and good ideas are welcome.
 
 Any merge requests with significant AI-generated code or those that
