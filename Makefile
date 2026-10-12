@@ -1,7 +1,5 @@
 include make.inc
 
-MAKE = make
-
 .PHONY: all rmta clean
 
 all rmta :

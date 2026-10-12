@@ -60,4 +60,6 @@ clean :
 depend .depend :
 	makedepf90 -free $(RMTASRC) > .depend
 
+rmta.o : rmta.f90 librmta.a
+
 include .depend

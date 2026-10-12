@@ -38,7 +38,7 @@ make install
 - In the `PPRMTA_ROOT` root folder of the present code, edit the `QE_ROOT` in `make.inc` to link the compiled QE installation, along with optional additional compiler flags in `OPTFLAGS`, and run
 
 ```
-make all
+make -j all
 ```
 
 ### Option 2: QE built with CMake
