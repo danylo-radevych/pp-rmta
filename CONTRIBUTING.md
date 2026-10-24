@@ -2,11 +2,10 @@ This is a personal educational project aiming at learning physics
 and programming and producing maintainable software that delivers 
 predictable results.
 
-External contributions that are written mostly (90%+) and
-verified completely (100%) by real people and that follow the overall
-style of the package, do not indtroduce new dependencies,
-and contain clear declarations, algorithms,
-comments, and good ideas are welcome.
+External contributions that are written and verified by real 
+people and that follow the overall style of the package, 
+do not indtroduce new dependencies, and contain clear declarations, 
+algorithms, comments, and good ideas are welcome.
 
 Any merge requests with significant AI-generated code or those that
 do not follow the overall style of the package will be rejected without
