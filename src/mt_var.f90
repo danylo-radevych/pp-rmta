@@ -676,7 +676,8 @@
                       - mt_rmt(ist_i(jat)) < dtol) THEN
                       !
                       lrmt_fixed(ist_i(kat)) = .TRUE.
-                      IF (lrmt_active(ist_i(jat))) lrmt_fixed(ist_i(jat)) = .TRUE.
+                      IF (lrmt_active(ist_i(jat))) &
+                        lrmt_fixed(ist_i(jat)) = .TRUE.
                       !
                     END IF
                     !
