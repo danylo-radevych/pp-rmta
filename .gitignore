@@ -11,3 +11,5 @@
 *.tar.xz
 tempdir*
 *.vesta
+tags
+paths.sh
