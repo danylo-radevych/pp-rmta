@@ -389,7 +389,7 @@
     !!
     !! Sets MT radii for each symmetry type as a minimum of the 
     !! nearest-neighbor distance divided in ratio of internal MT radii 
-    !! defaults, then ensuring that the spheres do touch...
+    !! defaults, then ensuring that the spheres do (almost) touch...
     !! ... more in the code below
     !!
     !---------------------------------------------------------------------------
@@ -409,6 +409,8 @@
       !
       CHARACTER(LEN = 128) :: routine_name
       !! name of this subroutine
+      LOGICAL, ALLOCATABLE :: lrmt_active(:)
+      !! if true, this symmetry types grow in the current step
       LOGICAL, ALLOCATABLE :: lrmt_fixed(:)
       !! if true, mt_rmt(ist) is already constrained 
       INTEGER :: ierr
@@ -419,10 +421,16 @@
       !! iat indices ordered according to their MT radii in descending order
       REAL(DP) :: dtol
       !! tolerance for the distance
+      REAL(DP) :: dgap
+      !! free space between two spheres
+      REAL(DP) :: dgrow
+      !! growth of the two spheres per unit of the relative increase
       REAL(DP) :: dist_diff
       !! distance difference
-      REAL(DP) :: rtmp, rtmp2
-      !! real temporary vars
+      REAL(DP) :: rtmp
+      !! real temporary var
+      REAL(DP) :: scale_tmp
+      !! common relative increase of the growing MT radii
       REAL(DP) :: rmt_d_iat, rmt_d_iat_nn
       !! temprary default MT radii
       !
@@ -497,8 +505,10 @@
                 CALL errore(routine_name, "This rmt_method is not known.", 1)
               END IF
               !
+              ! the distance is shortened by dtol / 2 before it is divided,
+              ! so that the two spheres never touch exactly
               !
-              rtmp = nr_dist(jat, iat) * & ! distance to the neighbor
+              rtmp = (nr_dist(jat, iat) - half * dtol) * & ! neighbor distance
                 rmt_d_iat / & ! this atom
                 (rmt_d_iat + rmt_d_iat_nn) ! this atom and its nearest neighbor
               !
@@ -560,7 +570,7 @@
               WRITE(stdout, '(5x, "Done safety checks for the MT radii.")')
             END IF
             !
-            ! check if some spheres touch already
+            ! check if some spheres (almost) touch already
             ! if they do, fix their sym-type radii
             !
             DO iat = 1, natoms
@@ -582,48 +592,107 @@
             END DO ! iat
             !
             ! if sym types of some atoms are not fixed,
-            ! try to increase them
-            ! note: iat atomic order does matter here
+            ! try to increase them, largest default radius first
+            !
+            ! types with equal default radii grow together, each in
+            ! proportion to its current radius (common relative increase)
+            ! note: iatmt must be sorted by rmt in descending order
+            !
+            ALLOCATE(lrmt_active(nst), STAT = ierr)
+            IF (ierr /= 0) CALL errore(routine_name, &
+              'Error allocating lrmt_active', 1)
             !
             DO iat = 1, natoms
               !
-              IF (.NOT. lrmt_fixed(ist_i(iatmt(iat)))) THEN
+              IF (lrmt_fixed(ist_i(iatmt(iat)))) CYCLE
+              !
+              ! this type and all unfixed types tied with it
+              !
+              lrmt_active(:) = .FALSE.
+              !
+              DO jat = iat, natoms
                 !
-                rtmp = - one
+                IF (lrmt_fixed(ist_i(iatmt(jat)))) CYCLE
+                !
+                IF (ABS(rmt(iatmt(jat)) - rmt(iatmt(iat))) < dtol) &
+                  lrmt_active(ist_i(iatmt(jat))) = .TRUE.
+                !
+              END DO ! jat
+              !
+              DO WHILE (ANY(lrmt_active))
+                !
+                ! find the largest common relative increase scale_tmp, i.e.
+                ! mt_rmt -> mt_rmt * (1 + scale_tmp) for every growing type,
+                ! that leaves a gap of at least dtol / 2 between every pair
+                !
+                ! a dgap between two growing spheres (same type or 
+                ! tied type) is shared in ratio of their current radii
+                !
+                scale_tmp = HUGE(one)
                 !
                 DO kat = 1, natoms
                   !
-                  ! all members of this symmetry type
-                  IF (ist_i(kat) /= ist_i(iatmt(iat))) CYCLE
+                  IF (.NOT. lrmt_active(ist_i(kat))) CYCLE
                   !
                   DO jat = 1, natoms
                     !
-                    IF (ist_i(jat) == ist_i(kat)) THEN
-                      rtmp2 = half * nr_dist(jat, kat)
-                    ELSE
-                      rtmp2 = nr_dist(jat, kat) &
-                        - mt_rmt(ist_i(jat))
-                    END IF
+                    IF (nr_dist(jat, kat) < dtol) CYCLE
                     !
-                    IF ( ( ((rtmp > zero) .AND. (rtmp2 < rtmp)) .OR. &
-                      (rtmp <= zero) ) .AND. (rtmp2 > dtol) ) THEN
-                      rtmp = rtmp2
+                    dgap = nr_dist(jat, kat) - mt_rmt(ist_i(kat)) &
+                      - mt_rmt(ist_i(jat)) - half * dtol
+                    !
+                    dgrow = mt_rmt(ist_i(kat))
+                    !
+                    IF (lrmt_active(ist_i(jat))) &
+                      dgrow = dgrow + mt_rmt(ist_i(jat))
+                    !
+                    scale_tmp = MIN(scale_tmp, dgap / dgrow)
+                    !
+                  END DO ! jat
+                  !
+                END DO ! kat
+                !
+                !
+                IF (scale_tmp > half * HUGE(one)) CALL errore(routine_name, &
+                  "No neighbor limits the MT radius.", 1)
+                scale_tmp = MAX(zero, scale_tmp)
+                !
+                DO ist = 1, nst
+                  IF (lrmt_active(ist)) &
+                    mt_rmt(ist) = mt_rmt(ist) + scale_tmp * mt_rmt(ist)
+                END DO
+                !
+                ! fix the growing types that reached a contact
+                !
+                DO kat = 1, natoms
+                  !
+                  IF (.NOT. lrmt_active(ist_i(kat))) CYCLE
+                  !
+                  DO jat = 1, natoms
+                    !
+                    IF (nr_dist(jat, kat) < dtol) CYCLE
+                    !
+                    IF (nr_dist(jat, kat) - mt_rmt(ist_i(kat)) &
+                      - mt_rmt(ist_i(jat)) < dtol) THEN
+                      !
+                      lrmt_fixed(ist_i(kat)) = .TRUE.
+                      IF (lrmt_active(ist_i(jat))) lrmt_fixed(ist_i(jat)) = .TRUE.
+                      !
                     END IF
                     !
                   END DO ! jat
                   !
                 END DO ! kat
                 !
-                IF ((rtmp > dtol) .AND. (rtmp > mt_rmt(ist_i(iatmt(iat))))) THEN
-                  mt_rmt(ist_i(iatmt(iat))) = rtmp
-                END IF
+                lrmt_active(:) = lrmt_active(:) .AND. .NOT. lrmt_fixed(:)
                 !
-                lrmt_fixed(ist_i(iatmt(iat))) = .TRUE.
-                !
-                !
-              END IF
+              END DO ! while
               !
             END DO ! iat
+            !
+            DEALLOCATE(lrmt_active, STAT = ierr)
+            IF (ierr /= 0) &
+              CALL errore(routine_name, 'Error deallocating lrmt_active', 1)
             !
           END IF ! touching
           !
@@ -841,7 +910,7 @@
       USE neighbor,            ONLY : nneighbors, nn_dist, inn_i, nr_dist
       USE constants,           ONLY : eps6
       USE uspp_param,          ONLY : upf
-      USE const,               ONLY : zero, four
+      USE const,               ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -851,8 +920,6 @@
       !! name of this subroutine
       INTEGER :: ist, iat, jat, inn
       !! iterators
-      REAL(DP) :: dtol
-      !! distance tolerance
       REAL(DP) :: dist_diff
       !! distance difference
       !
@@ -889,7 +956,7 @@
           dist_diff = mt_rmt(ist_i(iat)) + mt_rmt(ist_i(inn_i(inn, iat))) - &
             nn_dist(iat)
           !
-          IF (dist_diff > four * dtol) THEN
+          IF (dist_diff >= zero) THEN
             !
             WRITE(stdout, '(/5x, "Neighboring spheres ", I0, " and ", &
               & I0, " overlap:")') &
@@ -915,11 +982,11 @@
           dist_diff = mt_rmt(ist_i(iat)) + mt_rmt(ist_i(jat)) - &
             nr_dist(jat, iat)
           !
-          IF (dist_diff > four * dtol) THEN
+          IF (dist_diff >= zero) THEN
             !
             WRITE(stdout, '(/5x, "Replica spheres ", I0, " and ", &
               & I0, " overlap:")') &
-              iat, inn_i(jat, iat)
+              iat, jat
             WRITE(stdout, '(/5x, "Check: ", F0.16, " + ", F0.16, " - ", &
               & F0.16, " = ", F0.16)') &
               mt_rmt(ist_i(iat)), mt_rmt(ist_i(jat)), &
@@ -928,7 +995,7 @@
             !
           END IF
           !
-        END DO ! inn
+        END DO ! jat
         !
       END DO ! iat
       !
