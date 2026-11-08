@@ -925,8 +925,6 @@
       !
       routine_name = "check_rmt"
       !
-      dtol = eps6
-      !
       DO ist = 1, nst
         !
         IF (mt_rmt(ist) < zero) THEN
