@@ -27,10 +27,10 @@
   !
   !  Danylo Radevych
   !
-    USE kinds, ONLY: DP
-    USE radial_grids, ONLY: radial_grid_type
-    USE constants, ONLY: bohr_radius_si
-    USE const, ONLY: bohr_to_ang
+    USE kinds,                 ONLY : DP
+    USE radial_grids,          ONLY : radial_grid_type
+    USE constants,             ONLY : bohr_radius_si
+    USE const,                 ONLY : bohr_to_ang
     !
     IMPLICIT NONE
     !
@@ -320,9 +320,9 @@
     !! Sets some RMTA variables.
     !!
     !---------------------------------------------------------------------------
-      USE lsda_mod, ONLY: nspin
-      USE ions_base, ONLY: nat
-      USE gvect, ONLY: ngm
+      USE lsda_mod,            ONLY : nspin
+      USE ions_base,           ONLY : nat
+      USE gvect,               ONLY : ngm
       !
       IMPLICIT NONE
       !
@@ -397,13 +397,13 @@
     !  D. Radevych
     !
       !
-      USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i, st_name, ist_ityp
-      USE neighbor, ONLY: nn_dist, nr_dist
-      USE constants, ONLY: eps6
-      USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: ityp
-      USE const, ONLY: zero, one, half
+      USE io_global,           ONLY : stdout
+      USE sym_type,            ONLY : nst, ist_i, st_name, ist_ityp
+      USE neighbor,            ONLY : nn_dist, nr_dist
+      USE constants,           ONLY : eps6
+      USE uspp_param,          ONLY : upf
+      USE ions_base,           ONLY : ityp
+      USE const,               ONLY : zero, one, half
       !
       IMPLICIT NONE
       !
@@ -689,9 +689,9 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY: stdout
-      USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: ityp
+      USE io_global,           ONLY : stdout
+      USE uspp_param,          ONLY : upf
+      USE ions_base,           ONLY : ityp
       !
       IMPLICIT NONE
       !
@@ -791,8 +791,8 @@
     !!
     !! Print current rmt values
     !!
-      USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i, st_name
+      USE io_global,           ONLY : stdout
+      USE sym_type,            ONLY : nst, ist_i, st_name
       !
       IMPLICIT NONE
       !
@@ -836,12 +836,12 @@
     !!
     !! Safety checks for the MT radii
     !!
-      USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst, ist_i, ist_ityp
-      USE neighbor, ONLY: nneighbors, nn_dist, inn_i, nr_dist
-      USE constants, ONLY: eps6
-      USE uspp_param, ONLY: upf
-      USE const, ONLY: zero, four
+      USE io_global,           ONLY : stdout
+      USE sym_type,            ONLY : nst, ist_i, ist_ityp
+      USE neighbor,            ONLY : nneighbors, nn_dist, inn_i, nr_dist
+      USE constants,           ONLY : eps6
+      USE uspp_param,          ONLY : upf
+      USE const,               ONLY : zero, four
       !
       IMPLICIT NONE
       !
@@ -947,14 +947,14 @@
     !
     ! D. Radevych
     !
-      USE kinds, ONLY: DP
-      USE radial_grids, ONLY: radial_grid_type
-      USE radial_grids, ONLY: do_mesh, check_mesh, deallocate_radial_grid, &
+      USE kinds,               ONLY : DP
+      USE radial_grids,        ONLY : radial_grid_type
+      USE radial_grids,        ONLY : do_mesh, check_mesh, deallocate_radial_grid, &
         nullify_radial_grid
-      USE io_global, ONLY: stdout
-      USE sym_type, ONLY: nst
-      USE uspp_param, ONLY: upf
-      ! USE ions_base, ONLY: ityp
+      USE io_global,           ONLY : stdout
+      USE sym_type,            ONLY : nst
+      USE uspp_param,          ONLY : upf
+      ! USE ions_base,         ONLY : ityp
       !
       IMPLICIT NONE
       !
@@ -1180,8 +1180,8 @@
     !!
     !---------------------------------------------------------------------------
       USE io_global, ONLY : stdout
-      USE ions_base, ONLY: tau
-      USE cell_base, ONLY: alat
+      USE ions_base,           ONLY : tau
+      USE cell_base,           ONLY : alat
       !
       IMPLICIT NONE
       !
@@ -1221,10 +1221,10 @@
     !!
     !---------------------------------------------------------------------------
       ! USE io_global, ONLY : stdout, ionode
-      USE lsda_mod, ONLY: nspin
-      USE ener, ONLY: ef, ef_up, ef_dw
-      USE compare, ONLY: ref_ef
-      USE klist, ONLY: two_fermi_energies
+      USE lsda_mod,            ONLY : nspin
+      USE ener,                ONLY : ef, ef_up, ef_dw
+      USE compare,             ONLY : ref_ef
+      USE klist,               ONLY : two_fermi_energies
       !
       IMPLICIT NONE
       !
@@ -1267,8 +1267,8 @@
     !!
     !---------------------------------------------------------------------------
       USE io_global, ONLY : stdout
-      USE ions_base, ONLY: ityp
-      USE uspp_param, ONLY: upf
+      USE ions_base,           ONLY : ityp
+      USE uspp_param,          ONLY : upf
       !
       IMPLICIT NONE
       !
@@ -1312,9 +1312,9 @@
     !! Sets pseudo vars on corresponding radial grids from upf files
     !!
     !---------------------------------------------------------------------------
-      USE uspp_param, ONLY: upf
-      USE io_global, ONLY: stdout
-      ! USE ions_base, ONLY: ityp
+      USE uspp_param,          ONLY : upf
+      USE io_global,           ONLY : stdout
+      ! USE ions_base,         ONLY : ityp
       !
       IMPLICIT NONE
       !
@@ -1501,15 +1501,15 @@
     !! Sets vars from previous (N)SCF run
     !!
     !---------------------------------------------------------------------------
-      USE io_global, ONLY: stdout
-      USE vlocal, ONLY: vloc
-      USE fft_base, ONLY: dfftp
-      USE scf, ONLY: vltot, vrs, v, kedtau ! v_of_0
-      USE gvecs, ONLY: doublegrid
-      USE gvect, ONLY: ngl, g, ngm ! gl, ecutrho, mill
-      USE fft_rho, ONLY: rho_r2g ! rho_g2r
-      USE cell_base, ONLY: tpiba ! omega, at, bg, alat
-      USE const, ONLY: zero
+      USE io_global,           ONLY : stdout
+      USE vlocal,              ONLY : vloc
+      USE fft_base,            ONLY : dfftp
+      USE scf,                 ONLY : vltot, vrs, v, kedtau ! v_of_0
+      USE gvecs,               ONLY : doublegrid
+      USE gvect,               ONLY : ngl, g, ngm ! gl, ecutrho, mill
+      USE fft_rho,             ONLY : rho_r2g ! rho_g2r
+      USE cell_base,           ONLY : tpiba ! omega, at, bg, alat
+      USE const,               ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -1610,7 +1610,7 @@
     !! Initialize empty arrays.
     !!
     !---------------------------------------------------------------------------
-      USE const, ONLY: zero
+      USE const,               ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -1789,7 +1789,7 @@
     !! Deallocates RMTA variables.
     !!
     !---------------------------------------------------------------------------
-      USE radial_grids, ONLY: deallocate_radial_grid
+      USE radial_grids,        ONLY : deallocate_radial_grid
       !
       IMPLICIT NONE
       !
@@ -2035,7 +2035,7 @@
     !  courtesy of M. Weinert and flair: FLAPW code.
     !  https://sites.uwm.edu/weinert/flair/
     !
-      USE const, ONLY: zero
+      USE const,               ONLY : zero
       !
       !
       IMPLICIT NONE

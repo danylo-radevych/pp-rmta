@@ -32,30 +32,30 @@
   !
     !
     ! USE command_line_options, ONLY : npool_
-    USE io_global, ONLY: stdout, ionode, ionode_id
-    USE io_files, ONLY: prefix, tmp_dir
-    USE kinds, ONLY: DP
-    USE io_global, ONLY: ionode, ionode_id
-    USE environment, ONLY: environment_start, environment_end
+    USE io_global,             ONLY : stdout, ionode, ionode_id
+    USE io_files,              ONLY : prefix, tmp_dir
+    USE kinds,                 ONLY : DP
+    USE io_global,             ONLY : ionode, ionode_id
+    USE environment,           ONLY : environment_start, environment_end
     ! USE mp_world, ONLY : mpime
-    USE mp, ONLY: mp_size, mp_bcast
-    USE mp_global, ONLY: mp_startup
-    USE mp_images, ONLY: intra_image_comm
-    ! USE paw_variables, ONLY: okpaw
-    ! USE noncollin_module, ONLY: noncolin, lforcet
-    ! USE control_flags, ONLY: gamma_only
-    USE klist, ONLY: degauss, ngauss
+    USE mp,                    ONLY : mp_size, mp_bcast
+    USE mp_global,             ONLY : mp_startup
+    USE mp_images,             ONLY : intra_image_comm
+    ! USE paw_variables,       ONLY : okpaw
+    ! USE noncollin_module,    ONLY : noncolin, lforcet
+    ! USE control_flags,       ONLY : gamma_only
+    USE klist,                 ONLY : degauss, ngauss
     ! following modules needed for generation of tetrahedra
-    USE ktetra, ONLY: tetra_init
-    USE symm_base, ONLY: nsym, s, time_reversal, t_rev
-    USE klist, ONLY: nks, xk
-    USE start_k, ONLY: k1, k2, k3, nk1, nk2, nk3
-    USE cell_base, ONLY: at, bg
-    USE lsda_mod, ONLY: lsda
-    USE uspp_param, ONLY: upf
+    USE ktetra,                ONLY : tetra_init
+    USE symm_base,             ONLY : nsym, s, time_reversal, t_rev
+    USE klist,                 ONLY : nks, xk
+    USE start_k,               ONLY : k1, k2, k3, nk1, nk2, nk3
+    USE cell_base,             ONLY : at, bg
+    USE lsda_mod,              ONLY : lsda
+    USE uspp_param,            ONLY : upf
     ! custom module
-    USE muffin_tin, ONLY: rmta_init, rmta_compute, rmta_quit
-    USE mt_var, ONLY: formulation, ldebug, &
+    USE muffin_tin,            ONLY : rmta_init, rmta_compute, rmta_quit
+    USE mt_var,                ONLY : formulation, ldebug, &
       lmpi_single_rank, &
       luse_ref_pot, luse_tot_dos, &
       igp_lmax, &
@@ -66,10 +66,10 @@
       irf_delta, lrmt, &
       ltetra, ldense_r_grid, &
       rmt, rmt_method
-    USE mt_printing, ONLY: &
+    USE mt_printing,           ONLY : &
       print_welcome_message, rmta_write, &
       print_clocks, check_input
-    USE compare, ONLY: set_ref_pot, delete_ref_pot
+    USE compare,               ONLY : set_ref_pot, delete_ref_pot
     !
     IMPLICIT NONE
     !

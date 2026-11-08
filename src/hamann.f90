@@ -270,8 +270,8 @@
     ! mmax  dimension of log mesh
     ! mch  index of radius to which wave function is to be integrated
       !
-      USE kinds, ONLY: DP
-      USE const, ONLY: zero, one
+      USE kinds,               ONLY : DP
+      USE const,               ONLY : zero, one
       !
       IMPLICIT NONE
       !
@@ -640,7 +640,7 @@
     !!
     !! integrals that go into construction of Vanderbilt separable pseudopotential
     !!
-      USE kinds, ONLY: DP
+      USE kinds,               ONLY : DP
       !
       IMPLICIT NONE
       !

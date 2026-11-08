@@ -28,7 +28,7 @@
   !
   !  Danylo Radevych
   !
-    USE kinds, ONLY: DP
+    USE kinds,                 ONLY : DP
     !
     IMPLICIT NONE
     !
@@ -58,12 +58,12 @@
     !! Allocate and set nearest-neighbor variables
     !!
     !---------------------------------------------------------------------------
-      USE io_global, ONLY: stdout
-      USE ions_base, ONLY: nat, tau, ityp
-      USE uspp_param, ONLY: upf
-      USE cell_base, ONLY: at, alat ! bg, omega
-      USE const, ONLY: bohr_to_ang, zero, one
-      USE constants, ONLY: eps6
+      USE io_global,           ONLY : stdout
+      USE ions_base,           ONLY : nat, tau, ityp
+      USE uspp_param,          ONLY : upf
+      USE cell_base,           ONLY : at, alat ! bg, omega
+      USE const,               ONLY : bohr_to_ang, zero, one
+      USE constants,           ONLY : eps6
       !
       IMPLICIT NONE
       !

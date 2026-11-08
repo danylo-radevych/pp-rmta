@@ -24,8 +24,8 @@
   !! RMTA constants
   !!
   !
-    USE kinds, ONLY: DP
-    USE constants, ONLY: bohr_radius_si
+    USE kinds,                 ONLY : DP
+    USE constants,             ONLY : bohr_radius_si
     !
     IMPLICIT NONE
     !

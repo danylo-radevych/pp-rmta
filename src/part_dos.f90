@@ -57,9 +57,9 @@
     ! Courtesy of M. Weinert and flair: FLAPW code.
     ! https://sites.uwm.edu/weinert/flair/
     !
-      USE const, ONLY: zero, one
-      USE io_global, ONLY: stdout
-      USE mt_var, ONLY: ldebug
+      USE const,               ONLY : zero, one
+      USE io_global,           ONLY : stdout
+      USE mt_var,              ONLY : ldebug
       !
       IMPLICIT NONE
       !
@@ -168,8 +168,8 @@
     !!
     !! gauss_points with openmp
     !!
-      USE const, ONLY: zero, one, two
-      USE io_global, ONLY: stdout
+      USE const,               ONLY : zero, one, two
+      USE io_global,           ONLY : stdout
       !
       IMPLICIT NONE
       !
@@ -515,7 +515,7 @@
       !
       !.........................................................................
         !
-        USE constants, ONLY: fpi
+        USE constants,         ONLY : fpi
         !
         IMPLICIT NONE
         !
@@ -561,16 +561,16 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY: stdout
-      USE constants, ONLY: eps32
-      USE cell_base, ONLY: tpiba, omega
-      USE klist, ONLY: xk, nkstot, ngk, wk, igk_k, two_fermi_energies
-      USE wvfct, ONLY: npwx, et, nbnd
-      USE io_files, ONLY: restart_dir
-      USE pw_restart_new, ONLY: read_collected_wfc
-      USE gvect, ONLY: g ! mill, gl, ngl
-      USE lsda_mod, ONLY: isk
-      USE const, ONLY: zero, one, two, czero, ci, eps2
+      USE io_global,           ONLY : stdout
+      USE constants,           ONLY : eps32
+      USE cell_base,           ONLY : tpiba, omega
+      USE klist,               ONLY : xk, nkstot, ngk, wk, igk_k, two_fermi_energies
+      USE wvfct,               ONLY : npwx, et, nbnd
+      USE io_files,            ONLY : restart_dir
+      USE pw_restart_new,      ONLY : read_collected_wfc
+      USE gvect,               ONLY : g ! mill, gl, ngl
+      USE lsda_mod,            ONLY : isk
+      USE const,               ONLY : zero, one, two, czero, ci, eps2
       !
       IMPLICIT NONE
       !
@@ -1444,15 +1444,15 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY: stdout
-      USE constants, ONLY: eps32
-      USE const, ONLY: zero
-      USE klist, ONLY: nkstot, wk
-      USE wvfct, ONLY: et, nbnd
-      USE io_files, ONLY: restart_dir
-      USE pw_restart_new, ONLY: read_collected_wfc
-      USE lsda_mod, ONLY: isk
-      USE const, ONLY: zero, one, two, half
+      USE io_global,           ONLY : stdout
+      USE constants,           ONLY : eps32
+      USE const,               ONLY : zero
+      USE klist,               ONLY : nkstot, wk
+      USE wvfct,               ONLY : et, nbnd
+      USE io_files,            ONLY : restart_dir
+      USE pw_restart_new,      ONLY : read_collected_wfc
+      USE lsda_mod,            ONLY : isk
+      USE const,               ONLY : zero, one, two, half
       !
       IMPLICIT NONE
       !
@@ -1592,7 +1592,7 @@
     !! Checks if weights wk sum up to 1.
     !!
     !---------------------------------------------------------------------------
-      USE klist, ONLY: nkstot, wk
+      USE klist,               ONLY : nkstot, wk
       !
       IMPLICIT NONE
       !
@@ -1625,8 +1625,8 @@
     !! Checks if weights wdk sum up to 1
     !!
     !---------------------------------------------------------------------------
-      USE klist, ONLY: nkstot
-      USE wvfct, ONLY: nbnd
+      USE klist,               ONLY : nkstot
+      USE wvfct,               ONLY : nbnd
       !
       IMPLICIT NONE
       !
@@ -1677,11 +1677,11 @@
     !
     ! D. Radevych
     !
-      USE mp_images, ONLY: intra_image_comm
-      USE mp, ONLY: mp_sum
-      USE ktetra, ONLY: ntetra, tetra
-      USE constants, ONLY: eps6
-      USE const, ONLY: zero, one, two, three, four
+      USE mp_images,           ONLY : intra_image_comm
+      USE mp,                  ONLY : mp_sum
+      USE ktetra,              ONLY : ntetra, tetra
+      USE constants,           ONLY : eps6
+      USE const,               ONLY : zero, one, two, three, four
       !
       IMPLICIT NONE
       !

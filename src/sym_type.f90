@@ -65,11 +65,11 @@
     !! Allocate and set symmetry type variables
     !!
     !---------------------------------------------------------------------------
-      USE io_global, ONLY: stdout
-      USE ions_base, ONLY: nat, ityp
-      USE symm_base, ONLY: nrot, irt
-      USE uspp_param, ONLY: upf
-      USE const, ONLY: zero, one
+      USE io_global,           ONLY : stdout
+      USE ions_base,           ONLY : nat, ityp
+      USE symm_base,           ONLY : nrot, irt
+      USE uspp_param,          ONLY : upf
+      USE const,               ONLY : zero, one
       !
       IMPLICIT NONE
       !

@@ -223,10 +223,10 @@
     !!
     !! Spline interpolation to real scalar.
     !!
-      USE kinds, ONLY: DP
-      USE splinelib, ONLY: spline, splint
-      USE constants, ONLY: eps12
-      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
+      USE kinds,               ONLY : DP
+      USE splinelib,           ONLY : spline, splint
+      USE constants,           ONLY : eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN
       !
       IMPLICIT NONE
       !

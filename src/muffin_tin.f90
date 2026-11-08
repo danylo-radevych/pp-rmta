@@ -75,11 +75,11 @@
       ! USE gvecs,             ONLY : doublegrid
       ! USE fft_rho,           ONLY : rho_g2r, rho_r2g
       ! USE constants,         ONLY : fpi, pi, tpi
-      USE compare, ONLY: ref_pot
-      ! USE symm_base, ONLY: nosym
-      USE sym_type, ONLY: allocate_st, ist_i
-      USE neighbor, ONLY: allocate_nn
-      USE mt_var, ONLY: &
+      USE compare,             ONLY : ref_pot
+      ! USE symm_base,         ONLY : nosym
+      USE sym_type,            ONLY : allocate_st, ist_i
+      USE neighbor,            ONLY : allocate_nn
+      USE mt_var,              ONLY : &
         rmta_set_vars, &
         natoms, nspins, &
         tau_cart, &
@@ -87,7 +87,7 @@
         vlocscr00rf, vlocscf00rf, &
         vlocscrg3d, mt_g, vlocscfg3d, &
         rmta_ng, mt_nrf, mt_rf
-      USE mt_printing, ONLY: check_upf
+      USE mt_printing,         ONLY : check_upf
       !
       IMPLICIT NONE
       !
@@ -181,8 +181,8 @@
     !
     !  Danylo Radevych
     !
-      USE constants, ONLY: eps12
-      USE const, ONLY: zero, one, czero
+      USE constants,           ONLY : eps12
+      USE const,               ONLY : zero, one, czero
       !
       IMPLICIT NONE
       !
@@ -324,10 +324,10 @@
     !
     !  D. Radevych
     !
-      USE mt_var, ONLY: norbs, ltetra
-      USE part_dos, ONLY: set_dos_nlm
-      USE mh_eta, ONLY: set_eta
-      USE mt_var, ONLY: formulation, igp_lmax, &
+      USE mt_var,              ONLY : norbs, ltetra
+      USE part_dos,            ONLY : set_dos_nlm
+      USE mh_eta,              ONLY : set_eta
+      USE mt_var,              ONLY : formulation, igp_lmax, &
         mt_nr, mt_r, vsemilocr, &
         vsemilocrf, &
         irf_min, irf_max, &
@@ -343,8 +343,8 @@
         lsemilocupf, mt_rab, &
         lhybrid, mt_ngauss, mt_degauss, fermi_energy, &
         mt_nrf, mt_rf, mt_dx
-      USE mt_printing, ONLY: print_at_rmt
-      USE sym_type, ONLY: ist_i
+      USE mt_printing,         ONLY : print_at_rmt
+      USE sym_type,            ONLY : ist_i
       !
       IMPLICIT NONE
       !
@@ -429,12 +429,12 @@
     ! D. Radevych
     !
       !
-      USE kinds, ONLY: DP
-      USE uspp_param, ONLY: upf
-      USE ions_base, ONLY: nat, ityp
-      USE mt_var, ONLY: luse_ref_pot, mt_nr, mt_r, nchis, nbetas, norbs
-      USE constants, ONLY: eps12, eps32
-      USE const, ONLY: zero
+      USE kinds,               ONLY : DP
+      USE uspp_param,          ONLY : upf
+      USE ions_base,           ONLY : nat, ityp
+      USE mt_var,              ONLY : luse_ref_pot, mt_nr, mt_r, nchis, nbetas, norbs
+      USE constants,           ONLY : eps12, eps32
+      USE const,               ONLY : zero
       !
       IMPLICIT NONE
       !
@@ -670,7 +670,7 @@
     !
     ! D. Radevych
     !
-      USE kinds, ONLY: DP
+      USE kinds,               ONLY : DP
       !
       IMPLICIT NONE
       !
@@ -801,8 +801,8 @@
     !
     ! D. Radevych
     !
-      USE uspp_param, ONLY: upf
-      USE mt_var, ONLY: nchis
+      USE uspp_param,          ONLY : upf
+      USE mt_var,              ONLY : nchis
       !
       IMPLICIT NONE
       !
@@ -841,9 +841,9 @@
     !
     ! D. Radevych
     !
-       USE kinds, ONLY: DP
-       USE constants, ONLY: eps12
-       USE const, ONLY: zero, one
+       USE kinds,              ONLY : DP
+       USE constants,          ONLY : eps12
+       USE const,              ONLY : zero, one
        !
        IMPLICIT NONE
        !
@@ -976,21 +976,21 @@
     !
     ! D. Radevych
     !
-      USE kinds, ONLY: DP
-      USE uspp_param, ONLY: upf ! see upflib/pseudo_types.f90
-      USE io_global, ONLY: stdout
-      USE hamann, ONLY: hamann_lschps, hamann_lschvkbs
-      USE ions_base, ONLY: ityp
-      USE mt_var, ONLY: lwrite_dat, &
+      USE kinds,               ONLY : DP
+      USE uspp_param,          ONLY : upf ! see upflib/pseudo_types.f90
+      USE io_global,           ONLY : stdout
+      USE hamann,              ONLY : hamann_lschps, hamann_lschvkbs
+      USE ions_base,           ONLY : ityp
+      USE mt_var,              ONLY : lwrite_dat, &
         natoms, orb_label, norbs, nspins, fermi_energy, &
         urf, duderf, dudrrf, d2udrderf, &
         vfullrf, rvfullrf, vlocscr00rf, vsemilocrf, &
         irf_max, &
         lsemiloc, lnonlocal, &
         mt_nrf, mt_rf, mt_dx
-      USE sym_type, ONLY: ist_i
-      USE constants, ONLY: eps12
-      USE const, ONLY: zero, one, two
+      USE sym_type,            ONLY : ist_i
+      USE constants,           ONLY : eps12
+      USE const,               ONLY : zero, one, two
       !
       IMPLICIT NONE
       !
@@ -1361,12 +1361,12 @@
     !
     !  D. Radevych
     !
-      USE kinds, ONLY: DP
-      USE uspp_param, ONLY: upf
+      USE kinds,               ONLY : DP
+      USE uspp_param,          ONLY : upf
       USE io_global, ONLY : stdout
       USE const, ONLY : bohr_to_ang
-      USE ions_base, ONLY: ityp
-      USE mt_var, ONLY: formulation, ldebug, &
+      USE ions_base,           ONLY : ityp
+      USE mt_var,              ONLY : formulation, ldebug, &
         natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         mll1rf_label, mll1rf, &
@@ -1376,9 +1376,9 @@
         urmax, dudrmuorrmax, &
         urf, dudrrf, &
         wrf, dudrmuorrf, loglrf
-      USE sym_type, ONLY: ist_i
-      USE constants, ONLY : rytoev, eps12
-      USE const, ONLY: zero, half, eps2
+      USE sym_type,            ONLY : ist_i
+      USE constants,           ONLY : rytoev, eps12
+      USE const,               ONLY : zero, half, eps2
       !
       IMPLICIT NONE
       !
@@ -1747,10 +1747,10 @@
     !! Spline interpolation to real array.
     !!
     !---------------------------------------------------------------------------
-      USE kinds,             ONLY: DP
-      USE splinelib,         ONLY: spline, splint
-      USE constants, ONLY: eps12
-      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
+      USE kinds,               ONLY : DP
+      USE splinelib,           ONLY : spline, splint
+      USE constants,           ONLY : eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -1854,10 +1854,10 @@
     !! Spline interpolation to real scalar.
     !!
     !---------------------------------------------------------------------------
-      USE kinds, ONLY: DP
-      USE splinelib, ONLY: spline, splint
-      USE constants, ONLY: eps12
-      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
+      USE kinds,               ONLY : DP
+      USE splinelib,           ONLY : spline, splint
+      USE constants,           ONLY : eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -1949,10 +1949,10 @@
     !! Spline interpolation to real scalar.
     !!
     !---------------------------------------------------------------------------
-      USE kinds, ONLY: DP
-      USE splinelib, ONLY: spline, splint
-      USE constants, ONLY: eps12
-      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: IEEE_IS_NAN
+      USE kinds,               ONLY : DP
+      USE splinelib,           ONLY : spline, splint
+      USE constants,           ONLY : eps12
+      USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN
       !
       IMPLICIT NONE
       !
@@ -2096,11 +2096,10 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY : stdout
-      USE sym_type, ONLY: deallocate_st
-      USE neighbor, ONLY: deallocate_nn
-      USE mt_var, ONLY: &
-        rmta_delete_vars, rmta_routine
+      USE io_global,           ONLY : stdout
+      USE sym_type,            ONLY : deallocate_st
+      USE neighbor,            ONLY : deallocate_nn
+      USE mt_var,              ONLY : rmta_delete_vars, rmta_routine
       !
       IMPLICIT NONE
       !

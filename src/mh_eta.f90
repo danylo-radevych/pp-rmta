@@ -48,8 +48,8 @@
     !!
     !! Computes McMillan-Hopfield eta_l
     !!
-      USE constants, ONLY: eps12
-      USE const, ONLY: zero, one, two, three
+      USE constants,           ONLY : eps12
+      USE const,               ONLY : zero, one, two, three
       !
       IMPLICIT NONE
       !

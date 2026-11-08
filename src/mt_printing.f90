@@ -27,7 +27,7 @@
   !
   !  Danylo Radevych
   !
-    USE kinds, ONLY: DP
+    USE kinds,                 ONLY : DP
     !
     IMPLICIT NONE
     !
@@ -88,15 +88,15 @@
     !
     ! TODO move potential init to rmta_init
     !
-      USE fft_base,          ONLY : dfftp
-      USE fft_types,         ONLY : fft_index_to_3d
-      USE fft_rho,           ONLY : rho_g2r, rho_r2g
-      USE gvect,             ONLY : ngl, gl, g, ngm, mill
-      USE uspp_param,        ONLY : upf
-      USE cell_base,         ONLY : at, alat, tpiba, omega
-      USE io_global,         ONLY : stdout
-      USE ions_base,         ONLY : ityp
-      USE mt_var, ONLY: mt_prec, natoms, norbs, orb_label, &
+      USE fft_base,            ONLY : dfftp
+      USE fft_types,           ONLY : fft_index_to_3d
+      USE fft_rho,             ONLY : rho_g2r, rho_r2g
+      USE gvect,               ONLY : ngl, gl, g, ngm, mill
+      USE uspp_param,          ONLY : upf
+      USE cell_base,           ONLY : at, alat, tpiba, omega
+      USE io_global,           ONLY : stdout
+      USE ions_base,           ONLY : ityp
+      USE mt_var,              ONLY : mt_prec, natoms, norbs, orb_label, &
         n_chem_types, &
         nchis, nbetas, nspins, &
         mt_nrf, mt_rf, &
@@ -112,7 +112,7 @@
         irf_min, &
         dos_nlmrf, dos_nlrf, dos_nrf, &
         etall1rf, loglrf, dloglderf, dudrmuorrf
-      USE sym_type, ONLY: ist_i
+      USE sym_type,            ONLY : ist_i
       !
       !
       IMPLICIT NONE
@@ -1249,7 +1249,7 @@
     !!
     !! Prints RMTA clocks.
     !!
-      USE io_global, ONLY: stdout
+      USE io_global,           ONLY : stdout
       !
       IMPLICIT NONE
       !
@@ -1282,12 +1282,12 @@
     !!
     !! Prints RMTA results interpolated exactly at MT-radii
     !!
-      USE io_global, ONLY: stdout
-      USE ions_base, ONLY: ityp
-      USE uspp_param, ONLY: upf
-      USE constants, ONLY: rytoev
-      USE sym_type, ONLY: nst, ist_nat, ist_i, st_name
-      USE mt_var, ONLY: formulation, natoms, norbs, orb_label, &
+      USE io_global,           ONLY : stdout
+      USE ions_base,           ONLY : ityp
+      USE uspp_param,          ONLY : upf
+      USE constants,           ONLY : rytoev
+      USE sym_type,            ONLY : nst, ist_nat, ist_i, st_name
+      USE mt_var,              ONLY : formulation, natoms, norbs, orb_label, &
         nspins, fermi_energy, &
         luse_tot_dos, &
         irf_min, irf_max, &
@@ -1295,7 +1295,7 @@
         vlocscr00rf, &
         mll1rf_label, mll1rf, etall1rf, &
         mt_nrf, mt_rf
-      USE const, ONLY: zero, bohr_to_ang
+      USE const,               ONLY : zero, bohr_to_ang
       !
       IMPLICIT NONE
       !
@@ -1840,9 +1840,9 @@
     !
     !  D. Radevych
     !
-      USE io_global, ONLY: stdout, ionode
-      USE io_files, ONLY: prefix, tmp_dir
-      USE mt_var, ONLY: lnonlocal
+      USE io_global,           ONLY : stdout, ionode
+      USE io_files,            ONLY : prefix, tmp_dir
+      USE mt_var,              ONLY : lnonlocal
       !
       IMPLICIT NONE
       !
@@ -1883,7 +1883,7 @@
     !
       USE uspp_param, ONLY : upf ! see upflib/pseudo_types.f90
       USE io_global, ONLY : stdout
-      USE basis, ONLY: natomwfc
+      USE basis,               ONLY : natomwfc
       USE ions_base, ONLY : nat
       USE ener, ONLY : ef
       !
