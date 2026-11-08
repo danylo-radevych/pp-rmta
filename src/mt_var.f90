@@ -1179,7 +1179,7 @@
     !! Sets tau in Cartisian coordinates (in bohr)
     !!
     !---------------------------------------------------------------------------
-      USE io_global, ONLY : stdout
+      USE io_global,           ONLY : stdout
       USE ions_base,           ONLY : tau
       USE cell_base,           ONLY : alat
       !
@@ -1220,7 +1220,7 @@
     !! Sets the Fermi energy
     !!
     !---------------------------------------------------------------------------
-      ! USE io_global, ONLY : stdout, ionode
+      ! USE io_global,           ONLY : stdout, ionode
       USE lsda_mod,            ONLY : nspin
       USE ener,                ONLY : ef, ef_up, ef_dw
       USE compare,             ONLY : ref_ef
@@ -1266,7 +1266,7 @@
     !! Sets chemical types
     !!
     !---------------------------------------------------------------------------
-      USE io_global, ONLY : stdout
+      USE io_global,           ONLY : stdout
       USE ions_base,           ONLY : ityp
       USE uspp_param,          ONLY : upf
       !
@@ -1314,7 +1314,7 @@
     !---------------------------------------------------------------------------
       USE uspp_param,          ONLY : upf
       USE io_global,           ONLY : stdout
-      ! USE ions_base,         ONLY : ityp
+      ! USE ions_base,           ONLY : ityp
       !
       IMPLICIT NONE
       !
