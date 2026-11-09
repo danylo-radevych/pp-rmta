@@ -1015,8 +1015,9 @@
     !
       USE kinds,               ONLY : DP
       USE radial_grids,        ONLY : radial_grid_type
-      USE radial_grids,        ONLY : do_mesh, check_mesh, deallocate_radial_grid, &
-        nullify_radial_grid
+      USE radial_grids,        ONLY : do_mesh, check_mesh, &
+                                      deallocate_radial_grid, &
+                                      nullify_radial_grid
       USE io_global,           ONLY : stdout
       USE sym_type,            ONLY : nst
       USE uspp_param,          ONLY : upf

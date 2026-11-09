@@ -28,7 +28,7 @@
   !
   !  D. Radevych
   !
-    USE kinds, ONLY : DP
+    USE kinds,                 ONLY : DP
     !
     !
     IMPLICIT NONE

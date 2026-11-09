@@ -29,8 +29,8 @@
   !  updated: 2026/06/06
   !  started: 2024/07/20
   !
-    USE kinds, ONLY : DP
-    USE io_global, ONLY : ionode, ionode_id, stdout
+    USE kinds,                 ONLY : DP
+    USE io_global,             ONLY : ionode, ionode_id, stdout
     !
     IMPLICIT NONE
     !

@@ -26,7 +26,7 @@
   !
   !  D. Radevych
   !
-    USE kinds, ONLY : DP
+    USE kinds,                 ONLY : DP
     !
     !
     IMPLICIT NONE
@@ -50,8 +50,8 @@
     !!
     !! Read reference FLAPW potential from file.
     !!
-      USE io_global, ONLY : stdout
-      USE constants, ONLY : eps12
+      USE io_global,           ONLY : stdout
+      USE constants,           ONLY : eps12
       !
       IMPLICIT NONE
       !
